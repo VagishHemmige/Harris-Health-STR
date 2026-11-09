@@ -3,24 +3,24 @@ title: "Data build (Steps 0-8)"
 format: html
 ---
 
-The do-files that build the person-day data set, in the order `Do Main do file.do` runs them, with Main first. Click a file to open it. Patient-level corrections are removed ([why](stata_overview.qmd#privacy)).
+The do-files that build the person-day data set, in the order `Do Main do file.do` runs them, with Main first. Each file is split into its natural sections. Every section links to the R steps that replace it, and every R step links back here. Long sections are folded. Patient-level corrections are removed ([why](stata_overview.qmd#privacy)).
 
 ```{r}
 #| echo: false
 #| eval: true
 #| output: asis
-# Reads the do-files as text; runs no analysis.
-source("_show_stata.R")
-show_do_file("Do Main do file.do")
-show_do_file("Do Step 0B Current Regimen.do")
-show_do_file("Do Step 1A Pharmacy Part 1.do")
-show_do_file("Do Step 2 CD4.do")
-show_do_file("Do Step 3 VL.do")
-show_do_file("Do Step 4 Demographic.do")
-show_do_file("Do Step 4B Insurance.do")
-show_do_file("Do Step 4C Psych.do")
-show_do_file("Do Step 5 Merge and Expand.do")
-show_do_file("Do Step 6 Tokenize Pharmacy.do")
-show_do_file("Do Step 7 Merge Pharmacy.do")
-show_do_file("Do Step 8 Data Preparation.do")
+# Reads the do-files and quarto/stata_map.csv as text; runs no analysis.
+source("_stata_links.R")
+show_stata_file("Do Main do file.do")
+show_stata_file("Do Step 0B Current Regimen.do")
+show_stata_file("Do Step 1A Pharmacy Part 1.do")
+show_stata_file("Do Step 2 CD4.do")
+show_stata_file("Do Step 3 VL.do")
+show_stata_file("Do Step 4 Demographic.do")
+show_stata_file("Do Step 4B Insurance.do")
+show_stata_file("Do Step 4C Psych.do")
+show_stata_file("Do Step 5 Merge and Expand.do")
+show_stata_file("Do Step 6 Tokenize Pharmacy.do")
+show_stata_file("Do Step 7 Merge Pharmacy.do")
+show_stata_file("Do Step 8 Data Preparation.do")
 ```

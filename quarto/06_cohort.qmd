@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/06_cohort.R")
+source("_stata_links.R")
 ```
 
 ## Start at the first regimen
@@ -34,6 +35,13 @@ Days before the first regimen are dropped. Each patient's initial regimen, and w
 ```{r}
 #| label: start-at-first-regimen
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("start-at-first-regimen")
 ```
 
 ## Exclusions
@@ -49,6 +57,13 @@ One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the var
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("apply-exclusions")
+```
+
 ## Exposure and time
 
 The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen 1. `quarter` is 0 for day 0, then 1 to 4 for days 1-91, 92-182, 183-273 and 274-364, and missing afterwards (Stata: `egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes`). `first_year` marks days 0-364.
@@ -56,6 +71,13 @@ The STR group is patients whose initial regimen is a single tablet; among the th
 ```{r}
 #| label: define-exposure-and-time
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-exposure-and-time")
 ```
 
 ## One row per patient
@@ -67,6 +89,13 @@ Stata kept the daily data and picked out each patient's first day with `if First
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("build-patient-table")
+```
+
 ## Categories for the propensity model
 
 Age, baseline viral load and baseline CD4 are put in the same groups as the Stata `egen cut()` lines. The insurance term in the propensity model, `i3.Insurance`, is an indicator for the third category in alphabetical order, because `encode` numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.
@@ -74,4 +103,11 @@ Age, baseline viral load and baseline CD4 are put in the same groups as the Stat
 ```{r}
 #| label: categorise-baseline-values
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("categorise-baseline-values")
 ```

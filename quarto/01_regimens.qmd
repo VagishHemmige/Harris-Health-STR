@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/01_regimens.R")
+source("_stata_links.R")
 ```
 
 ## Read the fills
@@ -36,6 +37,13 @@ One row per drug dispensed: the patient (`studyid`), the date as text (`medtrans
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-fills")
+```
+
 ## Fix drug names and flag twice-daily products
 
 Some fills were recorded as "Experimental" or "Other" though the product description shows the drug. A join to the lookup table in `setup.R` replaces six Stata `replace` lines. Each fill is also flagged if its product is taken twice a day: for example, darunavir 600 mg is the twice-daily dose, while 800 mg (two 400 mg tablets) is the once-daily dose.
@@ -43,6 +51,13 @@ Some fills were recorded as "Experimental" or "Other" though the product descrip
 ```{r}
 #| label: fix-drug-names
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("fix-drug-names")
 ```
 
 ## Name the regimen on each fill date
@@ -65,6 +80,13 @@ In R it is a grouped summary.
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("name-regimen-per-fill-date")
+```
+
 ## Apply manual corrections
 
 The rule above fails when a patient picks up part of a regimen on its own day: Norvir and Truvada on Monday and Reyataz on Wednesday gives two short-lived "regimens", `Norvir/Truvada` and `Reyataz`, and two spurious switches. The original analyst reviewed the patients whose sequences looked wrong and wrote 576 corrections, one `replace` line each, for the patient and date or date range. They name individual patients and dispensing dates, so they are left out of this repository ([why](stata_overview.qmd#privacy)). The code reads them from a file kept with the data; the synthetic example has three made-up rows.
@@ -76,6 +98,13 @@ Note how much of the Stata code these corrections were. A rule that merges fills
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("apply-manual-corrections")
+```
+
 ## Recode early Complera
 
 When Complera first came onto the formulary, some fills were recorded as Truvada. Once the corrections have set a fill date's regimen to Complera, a Truvada fill that day is recoded.
@@ -83,6 +112,13 @@ When Complera first came onto the formulary, some fills were recorded as Truvada
 ```{r}
 #| label: recode-early-complera
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("recode-early-complera")
 ```
 
 ## Check which drugs appear in each regimen
@@ -94,6 +130,13 @@ Stata ran `bysort CurrentRegimen: tab drugname` and then a series of `tab studyi
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("check-drugs-within-regimens")
+```
+
 ## Number the regimens
 
 A new regimen starts on the first fill date and on any fill date whose regimen name differs from the one before. A regimen is twice daily if any fill within it was a twice-daily product. One row per regimen remains, with its start date; Stata kept the same by `keep if NewRegimen` and reshaped it wide with one column per regimen.
@@ -101,4 +144,11 @@ A new regimen starts on the first fill date and on any fill date whose regimen n
 ```{r}
 #| label: number-regimen-episodes
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("number-regimen-episodes")
 ```

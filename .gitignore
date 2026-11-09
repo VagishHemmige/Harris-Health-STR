@@ -45,7 +45,8 @@
 /tables/
 
 # Approved public files: add narrow exceptions here, never a whole format.
-# !tests/fixtures/synthetic.csv
+# The Stata-to-R section map: code line ranges and chunk labels, no data.
+!/quarto/stata_map.csv
 
 # Synthetic data written by R/synthetic/make_synthetic_data.R (regenerate rather than commit)
 /data-synthetic/

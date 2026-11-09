@@ -22,6 +22,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/tables.R")
+source("_stata_links.R")
 ```
 
 ## Write the tables
@@ -31,4 +32,11 @@ A named list holds every table, and a loop over its names writes each one. `tabl
 ```{r}
 #| label: write-tables
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("write-tables")
 ```

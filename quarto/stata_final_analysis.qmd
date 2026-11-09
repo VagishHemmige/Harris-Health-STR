@@ -3,13 +3,13 @@ title: "Final Analysis"
 format: html
 ---
 
-The do-file behind the published paper. It starts from the "Data Analytic file" made by Step 8. It was run by hand a section at a time, so it has a stop line partway down (now a comment) and creates `VirologicallySuppressed2` twice; read it as a record, not a script that runs straight through. The R translation is in [steps 6 to 9](06_cohort.qmd).
+The do-file behind the published paper, in its natural sections. It starts from the "Data Analytic file" made by Step 8. It was run by hand a section at a time, so it has a stop line partway down (now a comment) and creates `VirologicallySuppressed2` twice; read it as a record, not a script that runs straight through. Every section links to the R steps that replace it, in [steps 6 to 9](06_cohort.qmd), and every R step links back here.
 
 ```{r}
 #| echo: false
 #| eval: true
 #| output: asis
-# Reads the do-files as text; runs no analysis.
-source("_show_stata.R")
-show_do_file("Do Final Analysis.do", open = TRUE)
+# Reads the do-file and quarto/stata_map.csv as text; runs no analysis.
+source("_stata_links.R")
+show_stata_file("Do Final Analysis.do")
 ```

@@ -24,6 +24,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/04_daily_regimen.R")
+source("_stata_links.R")
 ```
 
 ## Keep patients with fills
@@ -35,6 +36,13 @@ Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("keep-patients-with-fills")
+```
+
 ## Carry the regimen forward
 
 Each regimen is placed on the day it started and filled down until the next one starts. `new_regimen` marks the start days. A regimen that started before 1 January 2008 is not on the grid, so those days have no regimen until the next start: exactly what the Stata did, since it only matched start dates that fell inside the window.
@@ -42,6 +50,13 @@ Each regimen is placed on the day it started and filled down until the next one 
 ```{r}
 #| label: carry-regimen-forward
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("carry-regimen-forward")
 ```
 
 ## List the drugs on each day
@@ -53,6 +68,13 @@ Stata used `split CurrentRegimen, parse(/)` to make `CurrentDrug1Name`, `Current
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("list-drugs-per-day")
+```
+
 ## Mark dispense days
 
 A drug in today's regimen that was dispensed today counts as a 30-pill fill. A drug dispensed that is not in the current regimen does not count, which is how the original handled stray fills of old drugs.
@@ -60,4 +82,11 @@ A drug in today's regimen that was dispensed today counts as a 30-pill fill. A d
 ```{r}
 #| label: mark-dispense-days
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("mark-dispense-days")
 ```

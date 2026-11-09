@@ -22,6 +22,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/functions.R")
+source("_stata_links.R")
 ```
 
 ## Reading a source file
@@ -33,6 +34,13 @@ Used by [1](01_regimens.qmd) and [2](02_labs_and_baseline.qmd).
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-source-csv")
+```
+
 ## Reading the manual corrections
 
 Returns an empty table if the file is not there, so the code runs without any corrections. Used by [1. Regimens](01_regimens.qmd).
@@ -42,6 +50,13 @@ Returns an empty table if the file is not there, so the code runs without any co
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-regimen-corrections")
+```
+
 ## Naming a regimen
 
 Stata built the name by reshaping the day's fills wide, sorted by drug name, and gluing `drugname1 + "/" + drugname2 + ...`, then trimming trailing slashes. Sorting and pasting does the same in one line. `locale = "C"` sorts the way Stata does, by character code.
@@ -49,6 +64,13 @@ Stata built the name by reshaping the day's fills wide, sorted by drug name, and
 ```{r}
 #| label: make-regimen-name
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("make-regimen-name")
 ```
 
 ## Applying manual corrections
@@ -64,6 +86,13 @@ Here the corrections are rows of a table with a patient, an optional first and l
 ```{r}
 #| label: apply-regimen-corrections
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("apply-regimen-corrections")
 ```
 
 ## Counting pills on hand
@@ -82,6 +111,13 @@ Stata's `replace` works down the rows in order, so `x[_n-1]` on the right is the
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("count-pills-on-hand")
+```
+
 ## Carrying pills into a new regimen
 
 When a patient switches from, say, `Norvir/Reyataz/Truvada` to `Norvir/Prezista/Truvada`, the Truvada and Norvir they still have count towards the new regimen. Stata did this with a loop over every pair of drug positions; here the leftover pills of matching drugs are passed in.
@@ -89,6 +125,13 @@ When a patient switches from, say, `Norvir/Reyataz/Truvada` to `Norvir/Prezista/
 ```{r}
 #| label: carry-over-pills
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("carry-over-pills")
 ```
 
 ## Viral suppression on a day
@@ -100,6 +143,13 @@ The daily definition used throughout. In Stata, a missing value is larger than a
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("vl-suppressed-on-day")
+```
+
 ## Participant flow
 
 Records how many patients remain after each exclusion in [6. Cohort](06_cohort.qmd).
@@ -107,6 +157,13 @@ Records how many patients remain after each exclusion in [6. Cohort](06_cohort.q
 ```{r}
 #| label: count-patients
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("count-patients")
 ```
 
 ## Baseline comparisons
@@ -118,6 +175,13 @@ The R counterparts of `tab ..., chi2`, `ttest` and `ranksum`, with the options t
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("compare-groups")
+```
+
 ## Odds ratios
 
 The R counterpart of `logistic outcome InitialRegimenSTR` and `logistic outcome InitialRegimenSTR [pw=IPW]`. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; `svyglm()` with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are. Used by [8](08_outcomes.qmd) and [9](09_sensitivity.qmd).
@@ -125,4 +189,11 @@ The R counterpart of `logistic outcome InitialRegimenSTR` and `logistic outcome 
 ```{r}
 #| label: odds-ratio-for-str
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("odds-ratio-for-str")
 ```

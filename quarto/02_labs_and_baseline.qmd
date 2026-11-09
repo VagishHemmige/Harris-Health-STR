@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/02_labs_and_baseline.R")
+source("_stata_links.R")
 ```
 
 ## CD4 counts
@@ -36,11 +37,25 @@ Each Stata lab step read the file, converted the date, then reshaped to one row 
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-cd4")
+```
+
 ## Viral loads
 
 ```{r}
 #| label: read-viral-load
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-viral-load")
 ```
 
 ## Demographics
@@ -52,6 +67,13 @@ Lower-case codes (`f`, `m`, `b`, `h`) are corrected, then indicators are made fo
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-demographics")
+```
+
 ## Insurance and prior care
 
 Added in December 2017, probably for the revision of the paper. The insurance categories are used in the propensity model; `prevcareelsewhere` is used as an exclusion in [6. Cohort](06_cohort.qmd).
@@ -59,6 +81,13 @@ Added in December 2017, probably for the revision of the paper. The insurance ca
 ```{r}
 #| label: read-insurance
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-insurance")
 ```
 
 ## Psychiatry visits
@@ -70,6 +99,13 @@ Also added in December 2017, for a sensitivity analysis. The analysis only asks 
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("read-psych-visits")
+```
+
 ## Combine
 
 Stata's `merge 1:1` keeps patients found in either file and records which in `_merge`; the Step 5 code listed the unmatched patients and then kept them all. `full_join()` does the same. A patient in the lab files but not in the demographics file is kept, with missing demographics.
@@ -77,4 +113,11 @@ Stata's `merge 1:1` keeps patients found in either file and records which in `_m
 ```{r}
 #| label: combine-baseline
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("combine-baseline")
 ```

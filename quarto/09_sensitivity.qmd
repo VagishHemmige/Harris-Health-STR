@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/09_sensitivity.R")
+source("_stata_links.R")
 ```
 
 ## A lower threshold after 2008
@@ -38,11 +39,25 @@ As in the main analysis, suppression is counted in the first year; the saved Sta
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("suppression-threshold-by-year")
+```
+
 ## STR use by start year
 
 ```{r}
 #| label: str-by-start-year
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("str-by-start-year")
 ```
 
 ## Adding psychiatry visits to the propensity model
@@ -56,6 +71,13 @@ First, whether patients with a psychiatry visit were less likely to start the ST
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("add-psych-visits-to-propensity")
+```
+
 ## Possible outside pharmacy
 
 A suppressed viral load measured 90 or more days after the last fill of a drug in the current regimen suggests the patient was getting medication somewhere else. Stata counted days since the last fill with the same running-sum trick used for labs; here the last fill date is filled down and subtracted. A patient is flagged if this happens at any time in follow-up, and the flag is compared between the groups.
@@ -65,6 +87,13 @@ A suppressed viral load measured 90 or more days after the last fill of a drug i
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("flag-possible-outside-pharmacy")
+```
+
 ## Excluding them
 
 The paper reports that repeating the analysis without these patients gave similar results (data not shown). Final Analysis.do flags the patients but does not contain those models; they were run in a separate scratch file that is not part of this repository. Here the main models are refitted on the published cohort without the flagged patients, unweighted and with the original weights.
@@ -72,4 +101,11 @@ The paper reports that repeating the analysis without these patients gave simila
 ```{r}
 #| label: exclude-possible-outside-pharmacy
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("exclude-possible-outside-pharmacy")
 ```
