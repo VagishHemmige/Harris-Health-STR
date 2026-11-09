@@ -37,7 +37,7 @@ rename CurrentRegimen`i' CurrentDrug`i'Name
 generate CurrentDrug`i'CurrentDispense=0
 }
 
-//This code merges the ~147 Pharmacy fill files with the active database
+//This code merges the Pharmacy fill files with the active database
 forvalues counter=1(1)$MaxNumDrugs {
 display "Currently on loop iteration " `counter' "..."
 merge m:1 studyid using Pharmacy`counter'.dta

@@ -1,5 +1,5 @@
 //Flash-Zerai data set
-//This snippet of code breaks up the single pharmacy file, which is too large to merge, into ~147 bite size chunks
+//This snippet of code breaks up the single pharmacy file, which is too large to merge, into bite size chunks
 //12-16-2014
 
 forvalues counter=1(1)$MaxNumDrugs {

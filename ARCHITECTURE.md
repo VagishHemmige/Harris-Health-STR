@@ -2,7 +2,7 @@
 
 How the R translation is built: the scripts, the order they run in, and the objects they pass. What the analysis is meant to do is in `analysis-plan.md`; how to work here is in `AGENTS.md`.
 
-Revision: November 2026, covering `R/` and `quarto/` at the first commit.
+Revision: November 2026, covering `R/` and `quarto/` as of commit fb51d8e (main after PR #11).
 
 ## Running it
 
@@ -11,12 +11,14 @@ Rscript R/synthetic/make_synthetic_data.R   # fake input files in data-synthetic
 Rscript R/main.R                            # the translation, about 30 seconds on 400 synthetic patients
 ```
 
-`R/main.R` sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables.
+`R/main.R` sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables. `.github/workflows/check-synthetic.yml` runs both commands on GitHub for every branch push.
 
 ## Data flow
 
 ```mermaid
 flowchart TD
+  accTitle: Data flow between the R scripts
+  accDescr: The dispensing file and the corrections file feed 01_regimens, which passes fills and regimen episodes to 04. The CD4, viral load, demographics, insurance and psychiatry files feed 02, which passes labs and baseline to 03 and baseline and insurance categories to 06. 03 passes person-days to 04; 04 passes daily data to 05; 05 passes analytic days to 06. 06 passes cohort days, patients and the cohort flow to 07, and cohort days to 08 and 09. 07 passes patients with weights to 08 and the propensity model to 09. 08 passes patients with outcomes to 09. tables.R collects the tables from 08 and 09 and writes CSV files.
   subgraph inputs ["Inputs (data_dir)"]
     D[Dispensing CSV]
     C[CD4 CSV]
@@ -42,6 +44,7 @@ flowchart TD
   R6 -->|cohort_days, patients, cohort_flow| R7[07_propensity.R]
   R7 -->|patients + ipw| R8[08_outcomes.R]
   R6 -->|cohort_days| R8
+  R6 -->|cohort_days| R9
   R8 -->|patients + outcomes| R9[09_sensitivity.R]
   R7 -->|propensity_model| R9
   R9 --> T[tables.R]
@@ -65,7 +68,7 @@ flowchart TD
 | `07_propensity.R` | Final Analysis, baseline and propensity | `patients` | `baseline_tests`, `propensity_model`, `patients` + `propensity_score`, `ipw`; `weighted_balance`, `weighted_categories` |
 | `08_outcomes.R` | Final Analysis, outcomes | `cohort_days`, `patients` | `patients` + outcomes; `outcome_summary`, `outcome_models`, `suppression_at_switch` |
 | `09_sensitivity.R` | Final Analysis, sensitivity | `cohort_days`, `patients`, `propensity_model` | `suppression_by_start_year`, `str_by_start_year`, `psych_models`, `outside_pharmacy_summary`, `outside_pharmacy_models` |
-| `tables.R` | (the Stata wrote results to logs) | the tables above | CSV files in `tables/` |
+| `tables.R` | (the Stata wrote results to logs) | `patients` and the results above | `table_1_baseline` and `table_2_outcomes` (gtsummary) as .docx and .html, and every result as CSV, in `tables/` |
 
 `R/synthetic/make_synthetic_data.R` is a utility outside the workflow: it writes six CSVs and an example corrections file with the original column names, filled with random values.
 
@@ -88,6 +91,7 @@ quarto/
   published_results.qmd  # each published number and the code step behind it
   stata_map.csv          # do-file sections (line ranges) and the R chunk labels that replace them
   _stata_links.R         # builds the sectioned Stata pages and the Stata blocks under each R step from stata_map.csv
+  _function_links.R      # links each helper function to the R steps that call it, and back, by reading R/ as text
   analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd
 stata/                   # the do-files behind the paper, patient-level details removed
 docs/                    # rendered site (not committed)

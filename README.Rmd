@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 Teaching material for Hemmige V, Flash CA, Carter J, Giordano TP, Zerai T. Single tablet HIV regimens facilitate virologic suppression and retention in care among treatment naive patients. *AIDS Care.* 2018;30(8):1017-1024. [doi:10.1080/09540121.2018.1442554](https://doi.org/10.1080/09540121.2018.1442554).
 
-The study compared patients starting a single-tablet regimen with those starting three pills once a day, using pharmacy fills and laboratory results from a Harris Health System HIV clinic. This repository holds the original Stata code, with patient-level details removed, and a step-by-step translation into R.
+The study compared patients starting a single-tablet regimen with those starting three or four pills once a day, using pharmacy fills and laboratory results from a Harris Health System HIV clinic. This repository holds the original Stata code, with patient-level details removed, and a step-by-step translation into R.
 
 The website, which explains every step and shows the R next to the Stata it replaces, is at:
 https://vagishhemmige.github.io/Harris-Health-STR/

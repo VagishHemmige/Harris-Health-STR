@@ -17,7 +17,7 @@ This R script file is itself reliant on the following helper files:
 
 Translated from [`stata/Do Step 0B Current Regimen.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do), with the drug-name fixes also in [`Do Step 1A Pharmacy Part 1.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do).
 
-The code sections below are imported directly from that script when this page is rendered.
+The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.
 :::
 
 ```{r}

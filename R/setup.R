@@ -12,6 +12,7 @@ library(stringr)    # text: drug names and regimen names
 library(lubridate)  # dates
 library(broom)      # tidy model output
 library(survey)     # weighted (IPW) logistic regression with robust standard errors
+library(gtsummary)  # publication tables (tables.R); also needs gt, flextable, cardx and broom.helpers installed
 
 ## ---- define-paths
 # The original analysis read six de-identified CSV extracts. Here they are read

@@ -1,0 +1,59 @@
+# Runs the whole R translation on synthetic data: makes the fake input files,
+# runs R/main.R, and keeps the tables it writes for a person to look at.
+# Synthetic data only; the real extracts are never in this repository.
+name: Check R on synthetic data
+
+on:
+  push:
+    branches-ignore: [main, gh-pages]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install the packages the scripts load
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::dplyr
+            any::tidyr
+            any::readr
+            any::stringr
+            any::lubridate
+            any::broom
+            any::survey
+            any::purrr
+            any::gtsummary
+            any::cardx
+            any::broom.helpers
+            any::gt
+            any::flextable
+
+      - name: Make synthetic data and run the translation
+        run: |
+          Rscript R/synthetic/make_synthetic_data.R
+          Rscript R/main.R
+
+      - name: Print the publication tables (synthetic numbers)
+        run: |
+          for f in tables/*_formatted.csv; do echo "== $f"; cat "$f"; echo; done
+
+      - name: Keep the synthetic tables
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-tables
+          path: tables/

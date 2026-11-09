@@ -46,7 +46,7 @@ drop drugname
 encode drugconstituents, generate(DrugConstituents)
 drop drugconstituents
 
-//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject (~147):
+//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject:
 quietly summarize N
 global MaxNumDrugs `r(max)'
 display "Maximum number of drugs is: " $MaxNumDrugs

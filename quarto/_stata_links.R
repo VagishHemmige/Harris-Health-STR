@@ -65,10 +65,12 @@ show_stata_file <- function(file_name, fold_over = 25) {
 }
 
 # On an R page, after a chunk: the Stata it replaces, folded, with a link to
-# that section in context. Also gives the R step an anchor (#r-<label>) for the
+# that section in context, after the links to helper functions
+# (_function_links.R). Also gives the R step an anchor (#r-<label>) for the
 # links from the Stata pages.
 stata_for <- function(label) {
   cat("\n\n::: {#r-", label, " .stata-crosslink}\n\n", sep = "")
+  function_links(label)
   has_label <- grepl(paste0("(^|;)", label, "(;|$)"), stata_map$r_labels)
   sections <- stata_map[has_label, ]
   for (row in seq_len(nrow(sections))) {
@@ -82,3 +84,5 @@ stata_for <- function(label) {
   }
   cat(":::\n\n")
 }
+
+source("_function_links.R")

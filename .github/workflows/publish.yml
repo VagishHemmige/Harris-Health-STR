@@ -1,6 +1,7 @@
 # Renders the Quarto site and publishes it to the gh-pages branch.
 # The site only imports code from R/ and stata/ and never runs the analysis,
-# so it needs R with knitr and rmarkdown but no data and no analysis packages.
+# so it needs R with knitr and rmarkdown, and ggplot2 for the teaching figures
+# (drawn from made-up numbers), but no data and no analysis packages.
 name: Publish website
 
 on:
@@ -26,12 +27,13 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install knitr and rmarkdown
+      - name: Install knitr, rmarkdown and ggplot2
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
             any::knitr
             any::rmarkdown
+            any::ggplot2
 
       - name: Render and publish to gh-pages
         uses: quarto-dev/quarto-actions/publish@v2

@@ -183,3 +183,21 @@ odds_ratio_for_str <- function(patients, outcome, weight = NULL) {
               conf_high = exp(estimate + qnorm(0.975) * std.error),
               p_value = 2 * pnorm(-abs(estimate / std.error)))
 }
+
+## ---- tidy-wald-z
+# A tidier for gtsummary's model tables that reports what Stata's logistic
+# reports: Wald confidence intervals and p-values from the normal distribution.
+# broom's own glm intervals are profile likelihood, and svyglm's use the t
+# distribution, so without this the tables would differ slightly from Stata
+# and from odds_ratio_for_str().
+tidy_wald_z <- function(x, exponentiate = FALSE, conf.level = 0.95, ...) {
+  z <- stats::qnorm(1 - (1 - conf.level) / 2)
+  broom::tidy(x) |>
+    dplyr::mutate(
+      conf.low = estimate - z * std.error,
+      conf.high = estimate + z * std.error,
+      p.value = 2 * stats::pnorm(-abs(estimate / std.error)),
+      dplyr::across(c(estimate, conf.low, conf.high),
+                    \(value) if (exponentiate) exp(value) else value)
+    )
+}
