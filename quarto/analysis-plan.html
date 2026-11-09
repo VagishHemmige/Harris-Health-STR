@@ -92,7 +92,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../quarto/architecture.html" rel="next">
-<link href="../quarto/stata_final_analysis.html" rel="prev">
+<link href="../quarto/published_results.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
@@ -397,9 +397,24 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-8-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Results</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/published_results.html" class="sidebar-item-text sidebar-link"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="menu-text">Published results and the code behind them</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../quarto/analysis-plan.html" class="sidebar-item-text sidebar-link active"><i class="bi bi-file-earmark-ruled" role="img">
@@ -508,7 +523,7 @@ gives this page GitHub-style IDs and those links work on both.
 <section id="scope-and-reporting-framework" class="level2">
 <h2 class="anchored" data-anchor-id="scope-and-reporting-framework">Scope and reporting framework</h2>
 <p>This document is the authoritative specification of the study’s scientific objectives, population, definitions, estimands and statistical methods. <code>ARCHITECTURE.md</code> documents the implementation, <code>AGENTS.md</code> the working conventions, and GitHub Issues any open questions. Neither file supersedes this plan.</p>
-<p>Where the code does something the paper’s methods do not state, this plan describes what the code does and says so, marked <strong>Differs from paper</strong>.</p>
+<p>The code is the record of what was done. Where it is more specific than the paper’s methods, this plan states what the code does, marked <strong>From the code</strong>.</p>
 <p>Reporting followed STROBE <span class="citation" data-cites="vonelm2007strobe">(<a href="#ref-vonelm2007strobe" role="doc-biblioref"><span class="nocase">Elm et al.</span> 2007</a>)</span>; RECORD <span class="citation" data-cites="benchimol2015record">(<a href="#ref-benchimol2015record" role="doc-biblioref"><span class="nocase">Benchimol et al.</span> 2015</a>)</span> applies to studies of routinely collected data like this one. The reporting map below links checklist items to sections of this plan.</p>
 </section>
 <section id="1-objective" class="level2">
@@ -543,8 +558,8 @@ gives this page GitHub-style IDs and those links work on both.
 <ol type="1">
 <li>Initial regimen in the window is taken twice daily (any twice-daily product), or the first regimen started before the window.</li>
 <li>Initial regimen is not one of: Atripla; Norvir/Prezista/Truvada; Norvir/Reyataz/Truvada.</li>
-<li>Recorded as having had HIV care elsewhere, or that field missing. <strong>Differs from paper:</strong> not stated in the paper’s methods.</li>
-<li>Insurance status missing. <strong>Differs from paper:</strong> not stated in the paper’s methods.</li>
+<li>Recorded as having had HIV care elsewhere, or that field missing. <strong>From the code:</strong> the paper’s methods do not mention this exclusion.</li>
+<li>Insurance status missing. <strong>From the code:</strong> the paper’s methods do not mention this exclusion.</li>
 </ol>
 <p>Index event (time zero): the first day of the first regimen (first fill).</p>
 </section>
@@ -570,17 +585,18 @@ gives this page GitHub-style IDs and those links work on both.
 <ul>
 <li><strong>Pills on hand</strong>, per drug: every fill is 30 pills; +30 on a fill day, -1 per day, never below zero; a fill when none are left gives 30; pills of the same drug carry into a new regimen.</li>
 <li><strong>Day covered:</strong> every drug in the current regimen on hand.</li>
-<li><strong>Virologically suppressed on a day:</strong> last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. <strong>Differs from paper:</strong> the paper says &lt;400.</li>
+<li><strong>Virologically suppressed on a day:</strong> last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. <strong>From the code:</strong> the paper’s text says &lt;400.</li>
 </ul>
 <p>Patient outcomes:</p>
 <ul>
 <li><strong>Retention in care, year one:</strong> at least two viral loads in days 0-364 after time zero, more than 90 days apart (HRSA-style definition using viral load tests).</li>
 <li><strong>Viral suppression, year one:</strong> suppressed on at least one day in days 0-364.</li>
-<li><strong>Viral suppression on the initial regimen:</strong> suppressed on at least one day while on the initial regimen. <strong>Differs from paper:</strong> uses all follow-up to 31 December 2013, not only year one.</li>
-<li><strong>Adherence:</strong> PDC ≥ 0.80, with PDC the proportion of days covered. <strong>Differs from paper:</strong> averaged over all follow-up to 31 December 2013, not only year one.</li>
-<li><strong>Adherence on the initial regimen:</strong> proportion of days that are both covered and on the initial regimen ≥ 0.80, over all follow-up.</li>
-<li><strong>Regimen change:</strong> any change of regimen during follow-up (descriptive).</li>
+<li><strong>Viral suppression on the initial regimen:</strong> suppressed on at least one day in days 0-364 while on the initial regimen.</li>
+<li><strong>Adherence:</strong> PDC ≥ 0.80, with PDC the proportion of days 0-364 covered.</li>
+<li><strong>Adherence on the initial regimen:</strong> proportion of days 0-364 that are both covered and on the initial regimen ≥ 0.80.</li>
+<li><strong>Regimen change:</strong> any change of regimen in days 0-364 (descriptive); suppression on the day of the first switch.</li>
 </ul>
+<p>All patient outcomes use days 0-364. The saved <code>Do Final Analysis.do</code> computes suppression on the initial regimen, both adherence measures and the 50 copies/mL sensitivity outcome over all follow-up to 31 December 2013; the 2015 version of the same calculations restricted the data to the first year, as the paper reports. This plan follows the paper.</p>
 </section>
 <section id="8-statistical-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="8-statistical-analysis">8. Statistical analysis</h2>
@@ -597,7 +613,7 @@ gives this page GitHub-style IDs and those links work on both.
 <section id="9-sensitivity-analyses" class="level2">
 <h2 class="anchored" data-anchor-id="9-sensitivity-analyses">9. Sensitivity analyses</h2>
 <ol type="1">
-<li><strong>Assay threshold:</strong> suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. <strong>Differs from paper:</strong> “ever suppressed” over all follow-up.</li>
+<li><strong>Assay threshold:</strong> suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. Suppression is counted in days 0-364, as in the main analysis.</li>
 <li><strong>Psychiatric history:</strong> propensity model adding any psychiatry visit; retention and year-one suppression re-estimated with the new weights. Tests confounding by mental illness.</li>
 <li><strong>Outside pharmacy:</strong> excluding patients with a viral load ≤400 measured 90 or more days after their last fill of a drug in the current regimen, at any time in follow-up; main models re-estimated, unweighted and with the original weights. Tests whether fills elsewhere bias the outcomes.</li>
 </ol>
@@ -699,7 +715,7 @@ gives this page GitHub-style IDs and those links work on both.
 <span class="nocase">Elm, Erik von, Douglas G Altman, Matthias Egger, et al.</span> 2007. <span>“The <span class="nocase">Strengthening the Reporting of Observational Studies in Epidemiology (STROBE)</span> Statement: Guidelines for Reporting Observational Studies.”</span> <em>Lancet</em> 370 (9596): 1453–57. <a href="https://doi.org/10.1016/S0140-6736(07)61602-X">https://doi.org/10.1016/S0140-6736(07)61602-X</a>.
 </div>
 <div id="ref-hemmige2018str" class="csl-entry" role="listitem">
-Hemmige, Vagish, Charlene A Flash, Jacquelyn Carter, Thomas P Giordano, and Thomas Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Naive Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
+Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Na<span>ı̈</span>ve Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1231,8 +1247,8 @@ Hemmige, Vagish, Charlene A Flash, Jacquelyn Carter, Thomas P Giordano, and Thom
   </script>
 <nav class="page-navigation column-body" aria-label="Page">
   <div class="nav-page nav-page-previous">
-      <a href="../quarto/stata_final_analysis.html" class="pagination-link" aria-label="Final Analysis">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Final Analysis</span>
+      <a href="../quarto/published_results.html" class="pagination-link" aria-label="Published results and the code behind them">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Published results and the code behind them</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

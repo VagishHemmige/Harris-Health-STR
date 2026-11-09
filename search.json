@@ -298,7 +298,7 @@
     "href": "quarto/06_cohort.html#exclusions",
     "title": "6. Cohort",
     "section": "Exclusions",
-    "text": "Exclusions\nIn the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.\nOne Stata habit needs care. drop if InitialRegimenBID drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise drop if prevcareelsewhere drops patients with that field missing. The R filters keep only an explicit “no” (%in% FALSE, %in% 0) to match.\nCurrent code: the exclusions for prior care elsewhere and missing insurance are in the code but not in the paper’s methods.\n\n\nClick to show/hide R Code\n# In the order Final Analysis.do applies them. Stata's `drop if x` also drops\n# patients whose x is missing, so each filter keeps only an explicit \"no\".\ncohort_days &lt;- cohort_days |&gt; filter(initial_regimen_bid %in% FALSE)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Starting regimen taken once daily\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(initial_regimen %in% manuscript_regimens)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Started one of the three compared regimens\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(prior_care_elsewhere %in% 0)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"No prior HIV care elsewhere\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(!is.na(insurance_status))\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Insurance status recorded\"))",
+    "text": "Exclusions\nIn the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.\nOne Stata habit needs care. drop if InitialRegimenBID drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise drop if prevcareelsewhere drops patients with that field missing. The R filters keep only an explicit “no” (%in% FALSE, %in% 0) to match.\nFrom the code: the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper’s methods; the code is the record of what was done.\n\n\nClick to show/hide R Code\n# In the order Final Analysis.do applies them. Stata's `drop if x` also drops\n# patients whose x is missing, so each filter keeps only an explicit \"no\".\ncohort_days &lt;- cohort_days |&gt; filter(initial_regimen_bid %in% FALSE)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Starting regimen taken once daily\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(initial_regimen %in% manuscript_regimens)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Started one of the three compared regimens\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(prior_care_elsewhere %in% 0)\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"No prior HIV care elsewhere\"))\n\ncohort_days &lt;- cohort_days |&gt; filter(!is.na(insurance_status))\ncohort_flow &lt;- bind_rows(cohort_flow,\n                         count_patients(cohort_days, \"Insurance status recorded\"))",
     "crumbs": [
       "Code",
       "The published analysis",
@@ -594,11 +594,11 @@
     ]
   },
   {
-    "objectID": "quarto/stata_overview.html#things-the-code-does-that-the-paper-does-not-say",
-    "href": "quarto/stata_overview.html#things-the-code-does-that-the-paper-does-not-say",
+    "objectID": "quarto/stata_overview.html#where-the-code-is-more-specific-than-the-paper",
+    "href": "quarto/stata_overview.html#where-the-code-is-more-specific-than-the-paper",
     "title": "Which file does what",
-    "section": "Things the code does that the paper does not say",
-    "text": "Things the code does that the paper does not say\nKept as they are in both the Stata and the R:\n\nPatients with prior care elsewhere and patients with no insurance status are excluded.\nViral suppression is 400 copies/mL or less, not less than 400.\nSuppression on the initial regimen and the proportion of days covered are calculated over all follow-up to the end of 2013, not the first year.\nThe 50 copies/mL sensitivity analysis counts suppression at any time, not the first year.",
+    "section": "Where the code is more specific than the paper",
+    "text": "Where the code is more specific than the paper\nThe code is the record of what was done, so these are kept as they are in both the Stata and the R:\n\nPatients with prior care elsewhere and patients with no insurance status are excluded.\nViral suppression is 400 copies/mL or less, not less than 400.",
     "crumbs": [
       "Code",
       "Original Stata code",
@@ -610,7 +610,7 @@
     "href": "quarto/stata_overview.html#slips-in-the-code",
     "title": "Which file does what",
     "section": "Slips in the code",
-    "text": "Slips in the code\n\nThe models meant to use the psychiatry-adjusted weights (IPW2) use IPW. The R uses IPW2 (step 9).\n(CurrentDrug4CurrentDispense) is missing its ==30. It does no harm, because the value is always 0 or 30.",
+    "text": "Slips in the code\n\nFollow-up window. The saved file computes five outcomes over all of a patient’s days to the end of 2013, not the first year: regimen change (lines 63-64), suppression on the initial regimen (161-162), the proportion of days covered (167), days covered on the initial regimen (196-197), and the 50 copies/mL suppression (177). Each is a by studyid: egen with nothing limiting it to year one, unlike retention and year-one suppression, which go through Quarter. The 2015 version of the same calculations ran after keep if DaysSinceARTInitiation&lt;365, which is missing here; Final Analysis.do was run by hand, and the R assumes that step was run but not saved. The paper reports these as first-year outcomes, so the R computes them for year one (step 8).\nThe models meant to use the psychiatry-adjusted weights (IPW2) use IPW. The R uses IPW2 (step 9).\n(CurrentDrug4CurrentDispense) is missing its ==30. It does no harm, because the value is always 0 or 30.",
     "crumbs": [
       "Code",
       "Original Stata code",
@@ -630,59 +630,236 @@
     ]
   },
   {
-    "objectID": "quarto/repository-blueprint.html",
-    "href": "quarto/repository-blueprint.html",
-    "title": "",
+    "objectID": "quarto/published_results.html",
+    "href": "quarto/published_results.html",
+    "title": "Published results and the code behind them",
     "section": "",
-    "text": "Project documentsRepository blueprint Code",
+    "text": "ResultsWhere these numbers come from\n\n\n\nEvery number on this page is quoted from the published article (Hemmige et al. 2018), with its place there. None was produced by the code in this repository, which has not been run on the study data. The article’s tables are not reproduced; read them in the article (free in PubMed Central).\nThis page is a map from each reported result to the step of the code that computes it, so that a reader can see what each number is and an authorized analyst can check the R version against the article. “Final Analysis.do” is the published analysis; the R steps translate it.",
     "crumbs": [
-      "Project documents",
-      "Repository blueprint"
+      "Results",
+      "Published results and the code behind them"
     ]
   },
   {
-    "objectID": "quarto/repository-blueprint.html#analytical-scripts",
-    "href": "quarto/repository-blueprint.html#analytical-scripts",
-    "title": "",
-    "section": "Analytical scripts",
-    "text": "Analytical scripts\n\nR/main.R sources definitive scripts in dependency order.\nTypical workflow: setup → cohort construction → processing → modeling → outputs.\nStudy-specific scripts may be grouped into subdirectories by analytical stage.\nR/tables.R and R/figures.R may generate outputs directly or orchestrate specialized scripts.",
+    "objectID": "quarto/published_results.html#the-cohort",
+    "href": "quarto/published_results.html#the-cohort",
+    "title": "Published results and the code behind them",
+    "section": "The cohort",
+    "text": "The cohort\n\n\n\nResult (article, Results, first two paragraphs)\nComputed by\n\n\n\n\n2,095 patients entered care in the period; 1,028 met the inclusion criteria\napply-exclusions (cohort_flow gives the patients left after each exclusion). The 2,095 is not in the code.\n\n\nSTR more likely if male, younger, lower baseline viral load, higher baseline CD4, not injecting drugs\ntest-baseline-differences\n\n\nAfter weighting, the STR and MTR groups were much more similar\ncheck-weighted-balance\n\n\n622 (60.5%) STR patients, all on tenofovir/emtricitabine/efavirenz\ndefine-exposure-and-time (str); counts of initial_regimen in patients\n\n\n410 (39.5%) MTR patients: 65.2% atazanavir/ritonavir and 34.8% darunavir/ritonavir, each with tenofovir/emtricitabine\nThe same\n\n\n\nThe Results give 410 MTR patients and the abstract 406; 622 + 406 = 1,028, the cohort size the article reports. Both are quoted as the article has them.",
     "crumbs": [
-      "Project documents",
-      "Repository blueprint"
+      "Results",
+      "Published results and the code behind them"
     ]
   },
   {
-    "objectID": "quarto/repository-blueprint.html#documentation",
-    "href": "quarto/repository-blueprint.html#documentation",
-    "title": "",
-    "section": "Documentation",
-    "text": "Documentation\n\nDocument definitive analytical scripts with explanatory Quarto pages; exploratory scripts need not have pages.\nUse Cryptococcus-cost-analysis as an example for Quarto supporting files, chunk imports, callouts, and formatting—not scientific methods.\nQuarto source and rendered output locations may vary by project.",
+    "objectID": "quarto/published_results.html#retention-and-viral-suppression",
+    "href": "quarto/published_results.html#retention-and-viral-suppression",
+    "title": "Published results and the code behind them",
+    "section": "Retention and viral suppression",
+    "text": "Retention and viral suppression\n\n\n\nResult (article, Results, third paragraph)\nComputed by\n\n\n\n\nRetention in care: 80.7% STR vs 72.7% MTR; OR 1.57 (95% CI 1.17-2.11), p = 0.003; adjusted OR 1.49 (1.10-2.02), p = 0.011\ndefine-retention (retained_year_one); fit-outcome-models\n\n\nSuppression at any point in year one: 84.4% vs 77.6%; OR 1.56 (1.14-2.15), p = 0.006; adjusted OR 1.41 (1.02-1.96), p = 0.04\ndefine-patient-outcomes (vl_suppressed_year_one); fit-outcome-models. The code, the record of what was done, counts a viral load of 400 or less; the article’s text says below 400.\n\n\nSuppression on the original regimen: 79.4% vs 72.9%; OR 1.43 (1.07-1.92), p = 0.016; adjusted OR 1.28 (0.95-1.73), p = 0.11\nvl_suppressed_on_initial_regimen, the same two steps, in days 0-364. The saved Stata looked at all follow-up (why the R differs).",
     "crumbs": [
-      "Project documents",
-      "Repository blueprint"
+      "Results",
+      "Published results and the code behind them"
     ]
   },
   {
-    "objectID": "quarto/repository-blueprint.html#outputs-and-version-control",
-    "href": "quarto/repository-blueprint.html#outputs-and-version-control",
-    "title": "",
-    "section": "Outputs and version control",
-    "text": "Outputs and version control\n\nTrack approved, nonrestricted outputs when useful for publication; otherwise retain them locally and exclude them from Git.\n.gitignore: Exclude restricted data, credentials, caches, temporary files, and generated outputs unless intentionally tracked (e.g., .Rproj.user/, .Rhistory, .RData, .httr-oauth, .quarto/, cache/, figures/, tables/, *.quarto_ipynb); verify exclusions cover actual output paths without hiding necessary source or reference files.",
+    "objectID": "quarto/published_results.html#adherence",
+    "href": "quarto/published_results.html#adherence",
+    "title": "Published results and the code behind them",
+    "section": "Adherence",
+    "text": "Adherence\n\n\n\nResult (article, Results, fourth paragraph)\nComputed by\n\n\n\n\nAt least 80% of days covered for the year: 33.0% STR vs 30.1% MTR; OR 1.14 (0.87-1.50), p = 0.328; adjusted OR 1.04 (0.79-1.38), p = 0.77\nadherent_pdc_80 in define-patient-outcomes; fit-outcome-models, over days 0-364. The saved Stata averaged over all follow-up (why the R differs).\n\n\nAt least 80% of days covered on the initial regimen: 29.6% vs 25.9%; OR 1.20 (0.91-1.60), p = 0.195; adjusted OR 1.08 (0.81-1.45), p = 0.586\nadherent_pdc_80_initial, the same two steps, over days 0-364\n\n\nSuppressed despite no fill in the previous 90 days: 13.3% MTR vs 15.8% STR, p = 0.28\nflag-possible-outside-pharmacy (possible_outside_pharmacy, outside_pharmacy_test)\n\n\nRetention and suppression rerun without those patients: similar results (data not shown)\nexclude-possible-outside-pharmacy. The article’s models were run in a scratch file not kept here.\n\n\n\nThe abstract calls the adherence measure a medication possession ratio; the Methods and Results call it the proportion of days covered, which is what the code computes.",
     "crumbs": [
-      "Project documents",
-      "Repository blueprint"
+      "Results",
+      "Published results and the code behind them"
     ]
   },
   {
-    "objectID": "quarto/stata_final_analysis.html",
-    "href": "quarto/stata_final_analysis.html",
-    "title": "Final Analysis",
+    "objectID": "quarto/published_results.html#sensitivity-analyses",
+    "href": "quarto/published_results.html#sensitivity-analyses",
+    "title": "Published results and the code behind them",
+    "section": "Sensitivity analyses",
+    "text": "Sensitivity analyses\n\n\n\nResult (article, Results, fifth paragraph, and Discussion)\nComputed by\n\n\n\n\nFewer patients with psychiatry visits received an STR: 22.5% vs 28.3%, p = 0.035\npsych_test in add-psych-visits-to-propensity\n\n\nAdding psychiatry visits to the propensity score did not change the odds ratios meaningfully (data not shown)\npsych_models, the same step. Final Analysis.do fitted these models with the original weights; the R uses the new ones.\n\n\nYear by year, with 400 copies/mL for 2008 and 50 afterwards: suppression lower, STR advantage unchanged (data not shown)\nsuppression-threshold-by-year, in days 0-364\n\n\nSeparate analyses for men and women: little change (Discussion)\nNot in the kept code; run in a scratch file not kept here",
+    "crumbs": [
+      "Results",
+      "Published results and the code behind them"
+    ]
+  },
+  {
+    "objectID": "quarto/published_results.html#regimen-switches",
+    "href": "quarto/published_results.html#regimen-switches",
+    "title": "Published results and the code behind them",
+    "section": "Regimen switches",
+    "text": "Regimen switches\n\n\n\nResult (article, Results, last paragraph)\nComputed by\n\n\n\n\nSwitched within the first year: 53 MTR (13.1%) vs 97 STR (15.6%), p = 0.26\nchanged_regimen in define-patient-outcomes, in days 0-364 (Final Analysis.do counted a switch at any time)\n\n\nSuppressed at the time of switch: 22 of 53 MTR (41.5%) vs 34 of 97 STR (35.1%), p = 0.43\nsuppression-at-switch, for switches in year one\n\n\nMedian days to switch: 162 (IQR 90-244) STR vs 140 (42-214) MTR, p = 0.17\nNot in the kept code\n\n\n3 STR patients switched to another STR; 9 MTR patients switched to an STR\nNot in the kept code\n\n\n\nThe rows marked “not in the kept code” came from do-files that are not part of this repository, because they did not feed the published analysis.",
+    "crumbs": [
+      "Results",
+      "Published results and the code behind them"
+    ]
+  },
+  {
+    "objectID": "quarto/published_results.html#references",
+    "href": "quarto/published_results.html#references",
+    "title": "Published results and the code behind them",
+    "section": "References",
+    "text": "References\n\n\nHemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. “Single Tablet HIV Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Naı̈ve Patients.” AIDS Care 30 (8): 1017–24. https://doi.org/10.1080/09540121.2018.1442554.",
+    "crumbs": [
+      "Results",
+      "Published results and the code behind them"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html",
+    "href": "quarto/tables.html",
+    "title": "Tables",
     "section": "",
-    "text": "The do-file behind the published paper. It starts from the “Data Analytic file” made by Step 8. It was run by hand a section at a time, so it has a stop line partway down (now a comment) and creates VirologicallySuppressed2 twice; read it as a record, not a script that runs straight through. The R translation is in steps 6 to 9.\n\n\nDo Final Analysis.do (223 lines)\n\nView on GitHub\n\nuse \"Data Analytic file $DateOfAnalysis.dta\", clear\n\n\n\ngenerate VirologicallySuppressed2=0\n//The next line states that you are VL suppressed on a date if your last VL was under 400 (some pts had labs under the old system)\n//, and it was either measured in the last 90 days or it will be measured again in the next 90 days and will be suppressed then as well.\n//The new variable chooses the marker for VL suppression by year\n\n\n\n\ndrop undetectable IntakeDate FirstUndetectDate\ngenerate InitialRegimen=CurrentRegimen if CurrentRegimenNumber==1\ndrop if CurrentRegimenNumber==.\nbysort studyid (CurrentDate): carryforward InitialRegimen, replace\ngenerate FirstObservationOfSubject=(M==1)&(CurrentRegimenNumber==1)\ngenerate InitialRegimenBID= CurrentBIDRegimen if CurrentRegimenNumber==1\nby studyid: carryforward InitialRegimenBID, replace\ntab InitialRegimenBID if FirstObservationOfSubject\ndrop if InitialRegimenBID\ndrop InitialRegimenBID\nkeep if ((InitialRegimen==\"Atripla\")|(InitialRegimen==\"Norvir/Prezista/Truvada\")|(InitialRegimen==\"Norvir/Reyataz/Truvada\"))\ntab prevcareelsewhere if FirstObservationOfSubject\ndisplay 1158-1046\ndrop if prevcareelsewhere\n\ntab InitialRegimen if (M==1)&(CurrentRegimenNumber==1)\ngenerate InitialRegimenSTR= (InitialRegimen==\"Stribild\")|(InitialRegimen==\"Atripla\")|(InitialRegimen==\"Complera\")\ntab InitialRegimenSTR if FirstObservationOfSubject\ngenerate StillTakingInitialRegimen= (CurrentRegimenNumber==1)\ngenerate DateofARTInitiation=CurrentDate if FirstObservationOfSubject\nby studyid: carryforward DateofARTInitiation, replace\nformat DateofARTInitiation %tdnn/dd/YY\ngenerate YearofARTInitiation=year( DateofARTInitiation)\ngenerate DaysSinceARTInitiation= CurrentDate-DateofARTInitiation\ngenerate WeeksSinceARTInitiation= DaysSinceARTInitiation/7\n\ntab Insurance if FirstObs\ntab Insurance if FirstObs, missing\ntab Insurance InitialRegimenSTR if FirstObs, missing\ntab Insurance InitialRegimenSTR if FirstObs, missing row\nlogit InitialRegimenSTR i.Insurance if FirstObs\nlogit InitialRegimenSTR i3.Insurance if FirstObs\ndrop if Insurance==.\n\n\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=400))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=400 ) )&(YearofARTInitiation==2008)\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=50))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=50 ) )&(YearofARTInitiation&gt;2008)\n\n\n\ntab InitialRegimenSTR if FirstObs\n\n//Some quarter analysis\negen Quarter = cut( DaysSinceARTInitiation ), at(0,1,92,183,274,365) icodes label\nbysort studyid Quarter (CurrentDate): egen ProportionDaysCoveredInQuarter=mean( DayIsCovered)\nbysort studyid Quarter (CurrentDate): egen AchievedVLSuppressionQuarter=max(VirologicallySuppressed)\nreplace AchievedVLSuppressionQuarter=. if Quarter==.\n\n//Changing regimen\nby studyid: egen CurrentRegimenNumberSD=sd( CurrentRegimenNumber)\ngenerate ChangesRegimen=(CurrentRegimenNumberSD~=0)\ndrop CurrentRegimenNumberSD\n\n//We analyze how many individuals change their regimen:\ntab InitialRegimenSTR ChangesRegimen if FirstObservationOfSubject, row column chi2\n\n//We compare demographics of people who do and don't receive an STR\ntab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR hepc if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR Ethnicity if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR RiskFactor if FirstObservationOfSubject, row column chi2\nsummarize age if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize age if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest age if FirstObservation, by(InitialRegimenSTR)\nsummarize LVCFViralLoad if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest LVCFViralLoad if FirstObservation, by(InitialRegimenSTR)\nranksum LVCFViralLoad if FirstObservation, by(InitialRegimenSTR)\nsummarize LVCFCD4 if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize LVCFCD4 if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest LVCFCD4 if FirstObservation, by(InitialRegimenSTR)\nranksum LVCFCD4 if FirstObservation, by(InitialRegimenSTR)\ntab Insurance InitialRegimenSTR if FirstObs, row chi2\n\n//We create a variable which categorizes age:\negen AgeCategorical = cut( age), at(0, 25,35,45,55,65, 100) icodes label\ntab InitialRegimenSTR AgeCategorical if FirstObservationOfSubject, row column chi2\n\n//We create a variable which categorizes initial viral load\negen InitialViralLoadCategorical = cut( LVCFViralLoad ) if FirstObservationOfSubject, at(0, 401,1000,10000,100000,1000000,10000001) icodes label\ntab InitialRegimenSTR InitialViralLoadCategorical if FirstObservationOfSubject, row column chi2\nbysort studyid (CurrentDate): carryforward InitialViralLoadCategorical, replace\n\n//We create a variable which categorizes initial CD4\negen InitialCD4Categorical = cut( LVCFCD4 ) if FirstObservationOfSubject, at(0, 50,100,200,500,1000000) icodes label\ntab InitialRegimenSTR InitialCD4Categorical if FirstObservationOfSubject, row column chi2\nbysort studyid (CurrentDate): carryforward InitialCD4Categorical, replace\n\n//We see if patients who switch to new regimens are virologically suppressed or not:\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)&(InitialRegimenSTR==1)\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)&(InitialRegimenSTR==0)\nlogistic VirologicallySuppressed InitialRegimenSTR if (CurrentRegimenNumber==2)&(M==1)\n\n//We calculate propensity score and inverse probability weights (IPW)\nlogistic InitialRegimenSTR hepc Gender Black Hispanic IDU MSM i.AgeCategorical i.InitialViralLoadCategorical i.InitialCD4Categorical i3.Insurance if FirstObservationOfSubject\npredict PropensityScore, p\ngenerate IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)\n\n//We compare demographics of people who do and don't receive an STR, now using the IPW weighting scheme\ntab InitialRegimenSTR Gender if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR hepc if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR Ethnicity if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR RiskFactor if FirstObservationOfSubject [aw=IPW], row column\nsummarize age if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize age if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFCD4 if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFCD4 if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\ntab InitialRegimenSTR AgeCategorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR InitialViralLoadCategorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR InitialCD4Categorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR Insurance if FirstObservationOfSubject [aw=IPW], row column\n\n\n\n//We calculate still in care first year based on HRSA definitions\ngenerate IsViralLoadMeasurementDate= CurrentVL&lt;.\nreplace IsViralLoadMeasurementDate=. if IsViralLoadMeasurementDate==0\nreplace IsViralLoadMeasurementDate=. if Quarter==.\nby studyid: egen TotalNumberVLMeasured=sum( IsViralLoadMeasurementDate)\ngenerate ViralLoadMeasurementDate= IsViralLoadMeasurementDate*CurrentDate\nreplace ViralLoadMeasurementDate=. if Quarter==.\nby studyid: egen FirstVLMeasurementDate=min( ViralLoadMeasurementDate)\nby studyid: egen LastVLMeasurementDate=max( ViralLoadMeasurementDate)\ngenerate GapBetweenFirstLastVL= LastVLMeasurementDate- FirstVLMeasurementDate\ngenerate RetainedInCareFirstYear=0\nreplace RetainedInCareFirstYear=1 if (( TotalNumberVLMeasured&gt;=2)&( GapBetweenFirstLastVL&gt;90 ))\ndrop IsViralLoadMeasurementDate TotalNumberVLMeasured ViralLoadMeasurementDate FirstVLMeasurementDate LastVLMeasurementDate GapBetweenFirstLastVL\n\n// [A line that deliberately stopped the do-file here was removed.]\n///Data analysis\ntab RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject, row column chi2\ndisplay \"logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\"\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\ndisplay \"logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\"\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\n//We now see if rates of ever achieving VL suppression in the first year differ between the two regimens:\nby studyid: egen AchievedVLSuppressionYear=max(AchievedVLSuppressionQuarter)\ntab AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject, row column chi2\ndisplay \"logistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject\"\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject\ndisplay \"logistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\"\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\ngenerate VirologicallySuppInitReg= StillTakingInitialRegimen* VirologicallySuppressed\nby studyid: egen AchievedVLSuppInitReg=max(VirologicallySuppInitReg)\ntab AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject, chi row column\nlogistic AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject\nlogistic AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\nby studyid: egen PropDC=mean(DayIsCovered)\ngenerate PropDCOver80=.\nreplace PropDCOver80=1 if (PropDC&gt;=0.8)&( PropDC~=. )\nreplace PropDCOver80=0 if (PropDC&lt;0.8)\ntab PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject, row column chi2\nlogistic PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject\nlogistic PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate VirologicallySuppressed2=0\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=400))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=400 ) )&(YearofARTInitiation==2008)\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=50))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=50 ) )&(YearofARTInitiation&gt;2008)\nby studyid: egen AchievedVLSupp2=max(VirologicallySuppressed2)\nlogistic InitialRegimenSTR i.YearofARTInitiation\ntab InitialRegimenSTR YearofARTInitiation\nlogistic InitialRegimenSTR i.YearofARTInitiation if FirstObs\ntab InitialRegimenSTR YearofARTInitiation if FirstObs\ntab InitialRegimenSTR YearofARTInitiation if FirstObs, column\ntab InitialRegimenSTR AchievedVLSupp2 if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2008) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2009) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2010) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2011) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2012) , row column chi2\ngenerate HadPsychDate=(PsychDate1~=.)\ntab InitialRegimenSTR HadPsychDate if FirstObs, row column chi2\nlogistic InitialRegimenSTR hepc Gender Black Hispanic IDU MSM i.AgeCategorical i.InitialViralLoadCategorical i.InitialCD4Categorical i3.Insurance HadPsychDate if FirstObservationOfSubject\npredict PropensityScore2, p\ngenerate IPW2=(InitialRegimenSTR/PropensityScore2)+(1-InitialRegimenSTR)/(1-PropensityScore2)\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate DayCoveredInitRegimen= DayIsCovered* StillTakingInitialRegimen\nby studyid: egen PropDCInitRegimen=mean(DayCoveredInitRegimen)\ngenerate PropDCOver80InitReg=.\nreplace PropDCOver80InitReg=1 if (PropDCInitRegimen&gt;=0.8)&( PropDCInitRegimen~=. )\nreplace PropDCOver80InitReg=0 if (PropDCInitRegimen&lt;0.8)\ntab PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject, row column chi2\nlogistic PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject\nlogistic PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate CurrentDrugDispenseDate= (CurrentDrug1CurrentDispense==30)|( CurrentDrug2CurrentDispense==30)| (CurrentDrug3CurrentDispense==30)| (CurrentDrug4CurrentDispense)|( CurrentDrug5CurrentDispense==30)|( CurrentDrug6CurrentDispense==30)\ntab CurrentDrugDispenseDate\ngenerate DaysSinceLastDispense=.\nreplace DaysSinceLastDispense=0 if CurrentDrugDispenseDate\nby studyid: replace DaysSinceLastDispense =1+ DaysSinceLastDispense[_n-1] if DaysSinceLastDispense==.\ngenerate NegCurrentDate=-CurrentDate\nsort studyid NegCurrentDate\ngenerate DaysUntilNextDispense=.\nreplace DaysUntilNextDispense=0 if CurrentDrugDispenseDate\nby studyid: replace DaysUntilNextDispense =1+ DaysUntilNextDispense[_n-1] if DaysUntilNextDispense==.\ndrop NegCurrentDate\nsort studyid CurrentDate\ngenerate GapBetweenFills= DaysSinceLastDispense+ DaysUntilNextDispense\ntab CurrentVL if DaysSinceLastDispense&gt;90\ntab studyid if (CurrentVL&lt;=400)&(DaysSinceLastDispense&gt;=90)\ngenerate VLSuppressedNoFill=(CurrentVL&lt;=400)&(DaysSinceLastDispense&gt;=90)\ntab VLSuppressedNoFill, nomissing\nby studyid: egen SwitchesPharmacy=max( VLSuppressedNoFill)\ntab SwitchesPharmacy if FirstObservationOfSubject\ntab SwitchesPharmacy InitialRegimenSTR if FirstObservationOfSubject, row column chi2",
+    "text": "This script writes the analysis tables to tables/ as CSV files. The Stata wrote its results to log files.",
     "crumbs": [
       "Code",
-      "Original Stata code",
-      "Final Analysis"
+      "Tables",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html#write-the-tables",
+    "href": "quarto/tables.html#write-the-tables",
+    "title": "Tables",
+    "section": "Write the tables",
+    "text": "Write the tables\nA named list holds every table, and a loop over its names writes each one. tables/ is ignored by Git: tables made from real data would need clearing before release, and tables made from synthetic data mean nothing.\n\n\nClick to show/hide R Code\ndir.create(tables_dir, showWarnings = FALSE)\n\noutput_tables &lt;- list(\n  cohort_flow = cohort_flow,\n  baseline_tests = baseline_tests,\n  weighted_balance = weighted_balance,\n  outcome_summary = outcome_summary,\n  outcome_models = outcome_models,\n  psych_models = psych_models,\n  outside_pharmacy_models = outside_pharmacy_models,\n  suppression_by_start_year = suppression_by_start_year\n)\n\nfor (table_name in names(output_tables)) {\n  write_csv(output_tables[[table_name]], file.path(tables_dir, str_c(table_name, \".csv\")))\n}",
+    "crumbs": [
+      "Code",
+      "Tables",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html",
+    "href": "quarto/08_outcomes.html",
+    "title": "8. Outcomes",
+    "section": "",
+    "text": "This script defines each patient’s outcomes and compares the STR and multi-tablet groups, unadjusted and weighted: the analyses behind the paper’s Table 3. It adds outcome columns to patients and produces outcome_summary and outcome_models.",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html#retention-in-care",
+    "href": "quarto/08_outcomes.html#retention-in-care",
+    "title": "8. Outcomes",
+    "section": "Retention in care",
+    "text": "Retention in care\nAt least two viral loads in days 0-364, more than 90 days apart. Stata needed eleven lines: mark viral load days, blank out the rest, count them, multiply the indicator by the date to get measurement dates, take the minimum and maximum, subtract, and drop the helper variables. Filtering to first-year test days and summarising per patient says it in one step.\n\n\nClick to show/hide R Code\n# HRSA definition: at least two viral loads in the first year after ART start\n# (days 0-364), more than 90 days apart.\nretention &lt;- cohort_days |&gt;\n  filter(first_year, !is.na(current_vl)) |&gt;\n  group_by(studyid) |&gt;\n  summarise(\n    first_year_vl_tests = n(),\n    first_to_last_vl_days = as.numeric(max(date) - min(date)),\n    .groups = \"drop\"\n  )",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html#other-outcomes",
+    "href": "quarto/08_outcomes.html#other-outcomes",
+    "title": "8. Outcomes",
+    "section": "Other outcomes",
+    "text": "Other outcomes\nEach by studyid: egen x = max(...) or mean(...) in Stata becomes one line of a per-patient summarise(). any() is the R counterpart of max() over a 0/1 variable.\nEvery outcome uses the first year, days 0-364, as the paper describes: the data are filtered to first_year before summarising. This is a deliberate departure from the saved Stata. Its egen lines for suppression on the initial regimen, days covered and regimen change ran over every one of a patient’s days to the end of 2013, so a patient who started in 2008 would contribute up to six years and one who started late in 2011 two, and every day after a patient stopped filling would count as uncovered. The 2015 version of the same code limited the data to the first year first; the saved file lacks that step (details).\n\n\nClick to show/hide R Code\n# Every outcome uses the first year after ART start (days 0-364), as the paper\n# describes. The saved Final Analysis.do computes suppression on the initial\n# regimen, the proportion of days covered and regimen change over all of a\n# patient's days to the end of 2013, because its `by studyid: egen` lines have\n# no first-year restriction; the 2015 version of the same code restricted the\n# data to year one first. See the \"Which file does what\" page.\npatient_outcomes &lt;- cohort_days |&gt;\n  filter(first_year) |&gt;\n  group_by(studyid) |&gt;\n  summarise(\n    vl_suppressed_year_one = any(vl_suppressed),\n    vl_suppressed_on_initial_regimen = any(vl_suppressed & on_initial_regimen),\n    proportion_days_covered = mean(day_covered),\n    proportion_days_covered_initial = mean(day_covered & on_initial_regimen),\n    changed_regimen = n_distinct(regimen_number) &gt; 1,\n    .groups = \"drop\"\n  )\n\npatients &lt;- patients |&gt;\n  left_join(retention, by = \"studyid\") |&gt;\n  left_join(patient_outcomes, by = \"studyid\") |&gt;\n  mutate(\n    retained_year_one = coalesce(first_year_vl_tests &gt;= 2 &\n                                   first_to_last_vl_days &gt; retention_min_gap_days, FALSE),\n    adherent_pdc_80 = proportion_days_covered &gt;= pdc_adherent,\n    adherent_pdc_80_initial = proportion_days_covered_initial &gt;= pdc_adherent\n  )",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html#suppression-at-the-first-switch",
+    "href": "quarto/08_outcomes.html#suppression-at-the-first-switch",
+    "title": "8. Outcomes",
+    "section": "Suppression at the first switch",
+    "text": "Suppression at the first switch\nWere patients who switched in the first year suppressed on the day they switched?\n\n\nClick to show/hide R Code\n# Among patients who switched in year one, were they suppressed on the day\n# they switched to a second regimen?\nsuppression_at_switch &lt;- cohort_days |&gt;\n  filter(first_year, regimen_number == 2, day_in_regimen == 1) |&gt;\n  count(str, vl_suppressed)",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html#outcome-summary",
+    "href": "quarto/08_outcomes.html#outcome-summary",
+    "title": "8. Outcomes",
+    "section": "Outcome summary",
+    "text": "Outcome summary\nCounts and percentages by group, as in the tab outcome InitialRegimenSTR, row column chi2 lines.\n\n\nClick to show/hide R Code\noutcome_names &lt;- c(\"retained_year_one\", \"vl_suppressed_year_one\",\n                   \"vl_suppressed_on_initial_regimen\", \"adherent_pdc_80\",\n                   \"adherent_pdc_80_initial\", \"changed_regimen\")\n\noutcome_summary &lt;- patients |&gt;\n  select(str, all_of(outcome_names)) |&gt;\n  pivot_longer(-str, names_to = \"outcome\", values_to = \"achieved\") |&gt;\n  group_by(outcome, str) |&gt;\n  summarise(patients = n(), achieved = sum(achieved, na.rm = TRUE),\n            percent = 100 * achieved / patients, .groups = \"drop\")",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/08_outcomes.html#odds-ratios",
+    "href": "quarto/08_outcomes.html#odds-ratios",
+    "title": "8. Outcomes",
+    "section": "Odds ratios",
+    "text": "Odds ratios\nFor each outcome, one unadjusted and one weighted logistic regression, collected in a table. In Stata each was a pair of lines repeated for every outcome:\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\nA loop over outcome names keeps every result in one table instead of in a log file.\n\n\nClick to show/hide R Code\noutcome_models &lt;- list()\nfor (outcome in outcome_names) {\n  outcome_models[[outcome]] &lt;- bind_rows(\n    odds_ratio_for_str(patients, outcome),\n    odds_ratio_for_str(patients, outcome, weight = \"ipw\")\n  )\n}\noutcome_models &lt;- bind_rows(outcome_models)",
+    "crumbs": [
+      "Code",
+      "The published analysis",
+      "8. Outcomes"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Overview",
+    "section": "",
+    "text": "This site teaches the code behind a published study by translating the original Stata analysis into R, step by step. The paper is Hemmige et al. (2018).",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#clinical-background",
+    "href": "index.html#clinical-background",
+    "title": "Overview",
+    "section": "Clinical background",
+    "text": "Clinical background\nSingle-tablet regimens (STRs) combine a complete antiretroviral regimen in one pill taken once a day. When the study was done, the only first-line STR in wide use at the clinic was efavirenz/tenofovir/emtricitabine (Atripla); the usual alternatives were a ritonavir-boosted protease inhibitor (darunavir or atazanavir) taken with tenofovir/emtricitabine (Truvada), which is three pills once a day. The question was whether starting on one pill rather than three made a difference to staying in care and reaching an undetectable viral load in the first year. More on the clinical background page.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#what-this-analysis-does",
+    "href": "index.html#what-this-analysis-does",
+    "title": "Overview",
+    "section": "What this analysis does",
+    "text": "What this analysis does\nIt uses pharmacy fills, CD4 counts and viral loads from Thomas Street Health Center, a Harris Health System HIV clinic in Houston, for patients starting antiretroviral therapy (ART) in 2008-2011. It compares patients who started Atripla with those who started a boosted protease inhibitor with Truvada, on retention in care, viral suppression and medication coverage.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#methods",
+    "href": "index.html#methods",
+    "title": "Overview",
+    "section": "Methods",
+    "text": "Methods\nEvery patient becomes one row per day from 2008 to 2013, and each day records the regimen, whether pills were on hand, and the most recent labs. Outcomes are then compared between the two groups with and without inverse probability of treatment weights from a propensity score. Study design and methods explains each step in plain language, and the analysis plan is the formal specification.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use-this-site",
+    "href": "index.html#how-to-use-this-site",
+    "title": "Overview",
+    "section": "How to use this site",
+    "text": "How to use this site\n\nCode pages follow the R scripts in the order R/main.R runs them. Each one explains a step and shows the R code next to the Stata it replaces.\nOriginal Stata code shows the do-files behind the paper as they were, with patient-level details removed, and how they fit together.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#status",
+    "href": "index.html#status",
+    "title": "Overview",
+    "section": "Status",
+    "text": "Status\nTeaching material for a completed, published study. The R code has been run only on synthetic data; it has not been used to reproduce the published numbers, and no real data or results from it are in this repository.",
+    "crumbs": [
+      "Home"
     ]
   },
   {
@@ -770,159 +947,59 @@
     ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Overview",
+    "objectID": "quarto/stata_final_analysis.html",
+    "href": "quarto/stata_final_analysis.html",
+    "title": "Final Analysis",
     "section": "",
-    "text": "This site teaches the code behind a published study by translating the original Stata analysis into R, step by step. The paper is Hemmige et al. (2018).",
+    "text": "The do-file behind the published paper. It starts from the “Data Analytic file” made by Step 8. It was run by hand a section at a time, so it has a stop line partway down (now a comment) and creates VirologicallySuppressed2 twice; read it as a record, not a script that runs straight through. The R translation is in steps 6 to 9.\n\n\nDo Final Analysis.do (223 lines)\n\nView on GitHub\n\nuse \"Data Analytic file $DateOfAnalysis.dta\", clear\n\n\n\ngenerate VirologicallySuppressed2=0\n//The next line states that you are VL suppressed on a date if your last VL was under 400 (some pts had labs under the old system)\n//, and it was either measured in the last 90 days or it will be measured again in the next 90 days and will be suppressed then as well.\n//The new variable chooses the marker for VL suppression by year\n\n\n\n\ndrop undetectable IntakeDate FirstUndetectDate\ngenerate InitialRegimen=CurrentRegimen if CurrentRegimenNumber==1\ndrop if CurrentRegimenNumber==.\nbysort studyid (CurrentDate): carryforward InitialRegimen, replace\ngenerate FirstObservationOfSubject=(M==1)&(CurrentRegimenNumber==1)\ngenerate InitialRegimenBID= CurrentBIDRegimen if CurrentRegimenNumber==1\nby studyid: carryforward InitialRegimenBID, replace\ntab InitialRegimenBID if FirstObservationOfSubject\ndrop if InitialRegimenBID\ndrop InitialRegimenBID\nkeep if ((InitialRegimen==\"Atripla\")|(InitialRegimen==\"Norvir/Prezista/Truvada\")|(InitialRegimen==\"Norvir/Reyataz/Truvada\"))\ntab prevcareelsewhere if FirstObservationOfSubject\ndisplay 1158-1046\ndrop if prevcareelsewhere\n\ntab InitialRegimen if (M==1)&(CurrentRegimenNumber==1)\ngenerate InitialRegimenSTR= (InitialRegimen==\"Stribild\")|(InitialRegimen==\"Atripla\")|(InitialRegimen==\"Complera\")\ntab InitialRegimenSTR if FirstObservationOfSubject\ngenerate StillTakingInitialRegimen= (CurrentRegimenNumber==1)\ngenerate DateofARTInitiation=CurrentDate if FirstObservationOfSubject\nby studyid: carryforward DateofARTInitiation, replace\nformat DateofARTInitiation %tdnn/dd/YY\ngenerate YearofARTInitiation=year( DateofARTInitiation)\ngenerate DaysSinceARTInitiation= CurrentDate-DateofARTInitiation\ngenerate WeeksSinceARTInitiation= DaysSinceARTInitiation/7\n\ntab Insurance if FirstObs\ntab Insurance if FirstObs, missing\ntab Insurance InitialRegimenSTR if FirstObs, missing\ntab Insurance InitialRegimenSTR if FirstObs, missing row\nlogit InitialRegimenSTR i.Insurance if FirstObs\nlogit InitialRegimenSTR i3.Insurance if FirstObs\ndrop if Insurance==.\n\n\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=400))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=400 ) )&(YearofARTInitiation==2008)\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=50))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=50 ) )&(YearofARTInitiation&gt;2008)\n\n\n\ntab InitialRegimenSTR if FirstObs\n\n//Some quarter analysis\negen Quarter = cut( DaysSinceARTInitiation ), at(0,1,92,183,274,365) icodes label\nbysort studyid Quarter (CurrentDate): egen ProportionDaysCoveredInQuarter=mean( DayIsCovered)\nbysort studyid Quarter (CurrentDate): egen AchievedVLSuppressionQuarter=max(VirologicallySuppressed)\nreplace AchievedVLSuppressionQuarter=. if Quarter==.\n\n//Changing regimen\nby studyid: egen CurrentRegimenNumberSD=sd( CurrentRegimenNumber)\ngenerate ChangesRegimen=(CurrentRegimenNumberSD~=0)\ndrop CurrentRegimenNumberSD\n\n//We analyze how many individuals change their regimen:\ntab InitialRegimenSTR ChangesRegimen if FirstObservationOfSubject, row column chi2\n\n//We compare demographics of people who do and don't receive an STR\ntab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR hepc if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR Ethnicity if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR RiskFactor if FirstObservationOfSubject, row column chi2\nsummarize age if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize age if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest age if FirstObservation, by(InitialRegimenSTR)\nsummarize LVCFViralLoad if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest LVCFViralLoad if FirstObservation, by(InitialRegimenSTR)\nranksum LVCFViralLoad if FirstObservation, by(InitialRegimenSTR)\nsummarize LVCFCD4 if (InitialRegimenSTR==0)&FirstObservationOfSubject, detail\nsummarize LVCFCD4 if (InitialRegimenSTR==1)&FirstObservationOfSubject, detail\nttest LVCFCD4 if FirstObservation, by(InitialRegimenSTR)\nranksum LVCFCD4 if FirstObservation, by(InitialRegimenSTR)\ntab Insurance InitialRegimenSTR if FirstObs, row chi2\n\n//We create a variable which categorizes age:\negen AgeCategorical = cut( age), at(0, 25,35,45,55,65, 100) icodes label\ntab InitialRegimenSTR AgeCategorical if FirstObservationOfSubject, row column chi2\n\n//We create a variable which categorizes initial viral load\negen InitialViralLoadCategorical = cut( LVCFViralLoad ) if FirstObservationOfSubject, at(0, 401,1000,10000,100000,1000000,10000001) icodes label\ntab InitialRegimenSTR InitialViralLoadCategorical if FirstObservationOfSubject, row column chi2\nbysort studyid (CurrentDate): carryforward InitialViralLoadCategorical, replace\n\n//We create a variable which categorizes initial CD4\negen InitialCD4Categorical = cut( LVCFCD4 ) if FirstObservationOfSubject, at(0, 50,100,200,500,1000000) icodes label\ntab InitialRegimenSTR InitialCD4Categorical if FirstObservationOfSubject, row column chi2\nbysort studyid (CurrentDate): carryforward InitialCD4Categorical, replace\n\n//We see if patients who switch to new regimens are virologically suppressed or not:\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)&(InitialRegimenSTR==1)\ntab VirologicallySuppressed if (CurrentRegimenNumber==2)&(M==1)&(InitialRegimenSTR==0)\nlogistic VirologicallySuppressed InitialRegimenSTR if (CurrentRegimenNumber==2)&(M==1)\n\n//We calculate propensity score and inverse probability weights (IPW)\nlogistic InitialRegimenSTR hepc Gender Black Hispanic IDU MSM i.AgeCategorical i.InitialViralLoadCategorical i.InitialCD4Categorical i3.Insurance if FirstObservationOfSubject\npredict PropensityScore, p\ngenerate IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)\n\n//We compare demographics of people who do and don't receive an STR, now using the IPW weighting scheme\ntab InitialRegimenSTR Gender if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR hepc if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR Ethnicity if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR RiskFactor if FirstObservationOfSubject [aw=IPW], row column\nsummarize age if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize age if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFViralLoad if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFCD4 if (InitialRegimenSTR==0)&FirstObservationOfSubject [aw=IPW], detail\nsummarize LVCFCD4 if (InitialRegimenSTR==1)&FirstObservationOfSubject [aw=IPW], detail\ntab InitialRegimenSTR AgeCategorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR InitialViralLoadCategorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR InitialCD4Categorical if FirstObservationOfSubject [aw=IPW], row column\ntab InitialRegimenSTR Insurance if FirstObservationOfSubject [aw=IPW], row column\n\n\n\n//We calculate still in care first year based on HRSA definitions\ngenerate IsViralLoadMeasurementDate= CurrentVL&lt;.\nreplace IsViralLoadMeasurementDate=. if IsViralLoadMeasurementDate==0\nreplace IsViralLoadMeasurementDate=. if Quarter==.\nby studyid: egen TotalNumberVLMeasured=sum( IsViralLoadMeasurementDate)\ngenerate ViralLoadMeasurementDate= IsViralLoadMeasurementDate*CurrentDate\nreplace ViralLoadMeasurementDate=. if Quarter==.\nby studyid: egen FirstVLMeasurementDate=min( ViralLoadMeasurementDate)\nby studyid: egen LastVLMeasurementDate=max( ViralLoadMeasurementDate)\ngenerate GapBetweenFirstLastVL= LastVLMeasurementDate- FirstVLMeasurementDate\ngenerate RetainedInCareFirstYear=0\nreplace RetainedInCareFirstYear=1 if (( TotalNumberVLMeasured&gt;=2)&( GapBetweenFirstLastVL&gt;90 ))\ndrop IsViralLoadMeasurementDate TotalNumberVLMeasured ViralLoadMeasurementDate FirstVLMeasurementDate LastVLMeasurementDate GapBetweenFirstLastVL\n\n// [A line that deliberately stopped the do-file here was removed.]\n///Data analysis\ntab RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject, row column chi2\ndisplay \"logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\"\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\ndisplay \"logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\"\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\n//We now see if rates of ever achieving VL suppression in the first year differ between the two regimens:\nby studyid: egen AchievedVLSuppressionYear=max(AchievedVLSuppressionQuarter)\ntab AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject, row column chi2\ndisplay \"logistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject\"\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject\ndisplay \"logistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\"\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\ngenerate VirologicallySuppInitReg= StillTakingInitialRegimen* VirologicallySuppressed\nby studyid: egen AchievedVLSuppInitReg=max(VirologicallySuppInitReg)\ntab AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject, chi row column\nlogistic AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject\nlogistic AchievedVLSuppInitReg InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\n\nby studyid: egen PropDC=mean(DayIsCovered)\ngenerate PropDCOver80=.\nreplace PropDCOver80=1 if (PropDC&gt;=0.8)&( PropDC~=. )\nreplace PropDCOver80=0 if (PropDC&lt;0.8)\ntab PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject, row column chi2\nlogistic PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject\nlogistic PropDCOver80 InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate VirologicallySuppressed2=0\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=400))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=400 ) )&(YearofARTInitiation==2008)\nreplace VirologicallySuppressed2=1 if ((LVCFViralLoad&lt;=50))&( CurrentDaysSinceLastViralLoad&lt;=90 | ( CurrentDaysUntilNextVL&lt;=90 & NextViralLoad&lt;=50 ) )&(YearofARTInitiation&gt;2008)\nby studyid: egen AchievedVLSupp2=max(VirologicallySuppressed2)\nlogistic InitialRegimenSTR i.YearofARTInitiation\ntab InitialRegimenSTR YearofARTInitiation\nlogistic InitialRegimenSTR i.YearofARTInitiation if FirstObs\ntab InitialRegimenSTR YearofARTInitiation if FirstObs\ntab InitialRegimenSTR YearofARTInitiation if FirstObs, column\ntab InitialRegimenSTR AchievedVLSupp2 if FirstObservationOfSubject, row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2008) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2009) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2010) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2011) , row column chi2\ntab InitialRegimenSTR AchievedVLSupp2 if (FirstObservationOfSubject)&( YearofARTInitiation==2012) , row column chi2\ngenerate HadPsychDate=(PsychDate1~=.)\ntab InitialRegimenSTR HadPsychDate if FirstObs, row column chi2\nlogistic InitialRegimenSTR hepc Gender Black Hispanic IDU MSM i.AgeCategorical i.InitialViralLoadCategorical i.InitialCD4Categorical i3.Insurance HadPsychDate if FirstObservationOfSubject\npredict PropensityScore2, p\ngenerate IPW2=(InitialRegimenSTR/PropensityScore2)+(1-InitialRegimenSTR)/(1-PropensityScore2)\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\nlogistic AchievedVLSuppressionYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate DayCoveredInitRegimen= DayIsCovered* StillTakingInitialRegimen\nby studyid: egen PropDCInitRegimen=mean(DayCoveredInitRegimen)\ngenerate PropDCOver80InitReg=.\nreplace PropDCOver80InitReg=1 if (PropDCInitRegimen&gt;=0.8)&( PropDCInitRegimen~=. )\nreplace PropDCOver80InitReg=0 if (PropDCInitRegimen&lt;0.8)\ntab PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject, row column chi2\nlogistic PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject\nlogistic PropDCOver80InitReg InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\ngenerate CurrentDrugDispenseDate= (CurrentDrug1CurrentDispense==30)|( CurrentDrug2CurrentDispense==30)| (CurrentDrug3CurrentDispense==30)| (CurrentDrug4CurrentDispense)|( CurrentDrug5CurrentDispense==30)|( CurrentDrug6CurrentDispense==30)\ntab CurrentDrugDispenseDate\ngenerate DaysSinceLastDispense=.\nreplace DaysSinceLastDispense=0 if CurrentDrugDispenseDate\nby studyid: replace DaysSinceLastDispense =1+ DaysSinceLastDispense[_n-1] if DaysSinceLastDispense==.\ngenerate NegCurrentDate=-CurrentDate\nsort studyid NegCurrentDate\ngenerate DaysUntilNextDispense=.\nreplace DaysUntilNextDispense=0 if CurrentDrugDispenseDate\nby studyid: replace DaysUntilNextDispense =1+ DaysUntilNextDispense[_n-1] if DaysUntilNextDispense==.\ndrop NegCurrentDate\nsort studyid CurrentDate\ngenerate GapBetweenFills= DaysSinceLastDispense+ DaysUntilNextDispense\ntab CurrentVL if DaysSinceLastDispense&gt;90\ntab studyid if (CurrentVL&lt;=400)&(DaysSinceLastDispense&gt;=90)\ngenerate VLSuppressedNoFill=(CurrentVL&lt;=400)&(DaysSinceLastDispense&gt;=90)\ntab VLSuppressedNoFill, nomissing\nby studyid: egen SwitchesPharmacy=max( VLSuppressedNoFill)\ntab SwitchesPharmacy if FirstObservationOfSubject\ntab SwitchesPharmacy InitialRegimenSTR if FirstObservationOfSubject, row column chi2",
     "crumbs": [
-      "Home"
+      "Code",
+      "Original Stata code",
+      "Final Analysis"
     ]
   },
   {
-    "objectID": "index.html#clinical-background",
-    "href": "index.html#clinical-background",
-    "title": "Overview",
-    "section": "Clinical background",
-    "text": "Clinical background\nSingle-tablet regimens (STRs) combine a complete antiretroviral regimen in one pill taken once a day. When the study was done, the only first-line STR in wide use at the clinic was efavirenz/tenofovir/emtricitabine (Atripla); the usual alternatives were a ritonavir-boosted protease inhibitor (darunavir or atazanavir) taken with tenofovir/emtricitabine (Truvada), which is three pills once a day. The question was whether starting on one pill rather than three made a difference to staying in care and reaching an undetectable viral load in the first year. More on the clinical background page.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#what-this-analysis-does",
-    "href": "index.html#what-this-analysis-does",
-    "title": "Overview",
-    "section": "What this analysis does",
-    "text": "What this analysis does\nIt uses pharmacy fills, CD4 counts and viral loads from Thomas Street Health Center, a Harris Health System HIV clinic in Houston, for patients starting antiretroviral therapy (ART) in 2008-2011. It compares patients who started Atripla with those who started a boosted protease inhibitor with Truvada, on retention in care, viral suppression and medication coverage.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#methods",
-    "href": "index.html#methods",
-    "title": "Overview",
-    "section": "Methods",
-    "text": "Methods\nEvery patient becomes one row per day from 2008 to 2013, and each day records the regimen, whether pills were on hand, and the most recent labs. Outcomes are then compared between the two groups with and without inverse probability of treatment weights from a propensity score. Study design and methods explains each step in plain language, and the analysis plan is the formal specification.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#how-to-use-this-site",
-    "href": "index.html#how-to-use-this-site",
-    "title": "Overview",
-    "section": "How to use this site",
-    "text": "How to use this site\n\nCode pages follow the R scripts in the order R/main.R runs them. Each one explains a step and shows the R code next to the Stata it replaces.\nOriginal Stata code shows the do-files behind the paper as they were, with patient-level details removed, and how they fit together.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#status",
-    "href": "index.html#status",
-    "title": "Overview",
-    "section": "Status",
-    "text": "Status\nTeaching material for a completed, published study. The R code has been run only on synthetic data; it has not been used to reproduce the published numbers, and no real data or results from it are in this repository.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "quarto/08_outcomes.html",
-    "href": "quarto/08_outcomes.html",
-    "title": "8. Outcomes",
+    "objectID": "quarto/repository-blueprint.html",
+    "href": "quarto/repository-blueprint.html",
+    "title": "",
     "section": "",
-    "text": "This script defines each patient’s outcomes and compares the STR and multi-tablet groups, unadjusted and weighted: the analyses behind the paper’s Table 3. It adds outcome columns to patients and produces outcome_summary and outcome_models.",
+    "text": "Project documentsRepository blueprint Code",
     "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
+      "Project documents",
+      "Repository blueprint"
     ]
   },
   {
-    "objectID": "quarto/08_outcomes.html#retention-in-care",
-    "href": "quarto/08_outcomes.html#retention-in-care",
-    "title": "8. Outcomes",
-    "section": "Retention in care",
-    "text": "Retention in care\nAt least two viral loads in days 0-364, more than 90 days apart. Stata needed eleven lines: mark viral load days, blank out the rest, count them, multiply the indicator by the date to get measurement dates, take the minimum and maximum, subtract, and drop the helper variables. Filtering to first-year test days and summarising per patient says it in one step.\n\n\nClick to show/hide R Code\n# HRSA definition: at least two viral loads in the first year after ART start\n# (days 0-364), more than 90 days apart.\nretention &lt;- cohort_days |&gt;\n  filter(first_year, !is.na(current_vl)) |&gt;\n  group_by(studyid) |&gt;\n  summarise(\n    first_year_vl_tests = n(),\n    first_to_last_vl_days = as.numeric(max(date) - min(date)),\n    .groups = \"drop\"\n  )",
+    "objectID": "quarto/repository-blueprint.html#analytical-scripts",
+    "href": "quarto/repository-blueprint.html#analytical-scripts",
+    "title": "",
+    "section": "Analytical scripts",
+    "text": "Analytical scripts\n\nR/main.R sources definitive scripts in dependency order.\nTypical workflow: setup → cohort construction → processing → modeling → outputs.\nStudy-specific scripts may be grouped into subdirectories by analytical stage.\nR/tables.R and R/figures.R may generate outputs directly or orchestrate specialized scripts.",
     "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
+      "Project documents",
+      "Repository blueprint"
     ]
   },
   {
-    "objectID": "quarto/08_outcomes.html#other-outcomes",
-    "href": "quarto/08_outcomes.html#other-outcomes",
-    "title": "8. Outcomes",
-    "section": "Other outcomes",
-    "text": "Other outcomes\nEach by studyid: egen x = max(...) or mean(...) in Stata becomes one line of a per-patient summarise(). any() is the R counterpart of max() over a 0/1 variable.\nCurrent code: the outcomes do not all use the same follow-up. Suppression in year one uses days 0-364 (through quarter), but suppression on the initial regimen and the proportion of days covered are averaged over every day to the end of 2013, because the Stata egen ran over all of a patient’s rows. Patients who started in 2008 contribute up to six years; those who started late in 2011, two.\n\n\nClick to show/hide R Code\n# Note the follow-up each outcome uses, which differs between outcomes in the\n# original code: suppression in year one uses days 0-364; suppression on the\n# initial regimen and proportion of days covered use all follow-up to the end\n# of 2013.\npatient_outcomes &lt;- cohort_days |&gt;\n  group_by(studyid) |&gt;\n  summarise(\n    vl_suppressed_year_one = any(vl_suppressed[first_year]),\n    vl_suppressed_on_initial_regimen = any(vl_suppressed & on_initial_regimen),\n    proportion_days_covered = mean(day_covered),\n    proportion_days_covered_initial = mean(day_covered & on_initial_regimen),\n    changed_regimen = n_distinct(regimen_number) &gt; 1,\n    .groups = \"drop\"\n  )\n\npatients &lt;- patients |&gt;\n  left_join(retention, by = \"studyid\") |&gt;\n  left_join(patient_outcomes, by = \"studyid\") |&gt;\n  mutate(\n    retained_year_one = coalesce(first_year_vl_tests &gt;= 2 &\n                                   first_to_last_vl_days &gt; retention_min_gap_days, FALSE),\n    adherent_pdc_80 = proportion_days_covered &gt;= pdc_adherent,\n    adherent_pdc_80_initial = proportion_days_covered_initial &gt;= pdc_adherent\n  )",
+    "objectID": "quarto/repository-blueprint.html#documentation",
+    "href": "quarto/repository-blueprint.html#documentation",
+    "title": "",
+    "section": "Documentation",
+    "text": "Documentation\n\nDocument definitive analytical scripts with explanatory Quarto pages; exploratory scripts need not have pages.\nUse Cryptococcus-cost-analysis as an example for Quarto supporting files, chunk imports, callouts, and formatting—not scientific methods.\nQuarto source and rendered output locations may vary by project.",
     "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
+      "Project documents",
+      "Repository blueprint"
     ]
   },
   {
-    "objectID": "quarto/08_outcomes.html#suppression-at-the-first-switch",
-    "href": "quarto/08_outcomes.html#suppression-at-the-first-switch",
-    "title": "8. Outcomes",
-    "section": "Suppression at the first switch",
-    "text": "Suppression at the first switch\nWere patients who switched suppressed on the day they switched?\n\n\nClick to show/hide R Code\n# Were patients suppressed on the day they switched to a second regimen?\nsuppression_at_switch &lt;- cohort_days |&gt;\n  filter(regimen_number == 2, day_in_regimen == 1) |&gt;\n  count(str, vl_suppressed)",
+    "objectID": "quarto/repository-blueprint.html#outputs-and-version-control",
+    "href": "quarto/repository-blueprint.html#outputs-and-version-control",
+    "title": "",
+    "section": "Outputs and version control",
+    "text": "Outputs and version control\n\nTrack approved, nonrestricted outputs when useful for publication; otherwise retain them locally and exclude them from Git.\n.gitignore: Exclude restricted data, credentials, caches, temporary files, and generated outputs unless intentionally tracked (e.g., .Rproj.user/, .Rhistory, .RData, .httr-oauth, .quarto/, cache/, figures/, tables/, *.quarto_ipynb); verify exclusions cover actual output paths without hiding necessary source or reference files.",
     "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
-    ]
-  },
-  {
-    "objectID": "quarto/08_outcomes.html#outcome-summary",
-    "href": "quarto/08_outcomes.html#outcome-summary",
-    "title": "8. Outcomes",
-    "section": "Outcome summary",
-    "text": "Outcome summary\nCounts and percentages by group, as in the tab outcome InitialRegimenSTR, row column chi2 lines.\n\n\nClick to show/hide R Code\noutcome_names &lt;- c(\"retained_year_one\", \"vl_suppressed_year_one\",\n                   \"vl_suppressed_on_initial_regimen\", \"adherent_pdc_80\",\n                   \"adherent_pdc_80_initial\", \"changed_regimen\")\n\noutcome_summary &lt;- patients |&gt;\n  select(str, all_of(outcome_names)) |&gt;\n  pivot_longer(-str, names_to = \"outcome\", values_to = \"achieved\") |&gt;\n  group_by(outcome, str) |&gt;\n  summarise(patients = n(), achieved = sum(achieved, na.rm = TRUE),\n            percent = 100 * achieved / patients, .groups = \"drop\")",
-    "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
-    ]
-  },
-  {
-    "objectID": "quarto/08_outcomes.html#odds-ratios",
-    "href": "quarto/08_outcomes.html#odds-ratios",
-    "title": "8. Outcomes",
-    "section": "Odds ratios",
-    "text": "Odds ratios\nFor each outcome, one unadjusted and one weighted logistic regression, collected in a table. In Stata each was a pair of lines repeated for every outcome:\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject\nlogistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]\nA loop over outcome names keeps every result in one table instead of in a log file.\n\n\nClick to show/hide R Code\noutcome_models &lt;- list()\nfor (outcome in outcome_names) {\n  outcome_models[[outcome]] &lt;- bind_rows(\n    odds_ratio_for_str(patients, outcome),\n    odds_ratio_for_str(patients, outcome, weight = \"ipw\")\n  )\n}\noutcome_models &lt;- bind_rows(outcome_models)",
-    "crumbs": [
-      "Code",
-      "The published analysis",
-      "8. Outcomes"
-    ]
-  },
-  {
-    "objectID": "quarto/tables.html",
-    "href": "quarto/tables.html",
-    "title": "Tables",
-    "section": "",
-    "text": "This script writes the analysis tables to tables/ as CSV files. The Stata wrote its results to log files.",
-    "crumbs": [
-      "Code",
-      "Tables",
-      "Tables"
-    ]
-  },
-  {
-    "objectID": "quarto/tables.html#write-the-tables",
-    "href": "quarto/tables.html#write-the-tables",
-    "title": "Tables",
-    "section": "Write the tables",
-    "text": "Write the tables\nA named list holds every table, and a loop over its names writes each one. tables/ is ignored by Git: tables made from real data would need clearing before release, and tables made from synthetic data mean nothing.\n\n\nClick to show/hide R Code\ndir.create(tables_dir, showWarnings = FALSE)\n\noutput_tables &lt;- list(\n  cohort_flow = cohort_flow,\n  baseline_tests = baseline_tests,\n  weighted_balance = weighted_balance,\n  outcome_summary = outcome_summary,\n  outcome_models = outcome_models,\n  psych_models = psych_models,\n  outside_pharmacy_models = outside_pharmacy_models,\n  suppression_by_start_year = suppression_by_start_year\n)\n\nfor (table_name in names(output_tables)) {\n  write_csv(output_tables[[table_name]], file.path(tables_dir, str_c(table_name, \".csv\")))\n}",
-    "crumbs": [
-      "Code",
-      "Tables",
-      "Tables"
+      "Project documents",
+      "Repository blueprint"
     ]
   },
   {
@@ -1013,7 +1090,7 @@
     "href": "quarto/agents.html#the-project",
     "title": "",
     "section": "The project",
-    "text": "The project\nA teaching repository for a published study Hemmige et al., AIDS Care 2018 comparing single-tablet with multi-tablet first-line antiretroviral regimens at Thomas Street Health Center (Harris Health System). The original Stata code is in stata/ with patient-level details removed; R/ is a translation into R, run only on synthetic data. The code and methods are explained on a Quarto website. The study is complete: the R is not used to rerun the published analysis.\n\nanalysis-plan.md is the source of truth for design. It was reconstructed from the paper and the code, and marks where the code differs from the paper. The R translation follows the code; it does not “fix” those differences. If a translation needs to depart from the Stata, say so on the script’s page and in stata_overview.qmd.\nDeciders. Scientific decisions are made by: Vagish Hemmige (all areas; to be confirmed). Anyone may open or contribute to an issue; only a decider settles it.\nThis is an analysis project, not an R package. Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.\nDefault branch: main, protected. Changes reach it only through pull requests.",
+    "text": "The project\nA teaching repository for a published study Hemmige et al., AIDS Care 2018 comparing single-tablet with multi-tablet first-line antiretroviral regimens at Thomas Street Health Center (Harris Health System). The original Stata code is in stata/ with patient-level details removed; R/ is a translation into R, run only on synthetic data. The code and methods are explained on a Quarto website. The study is complete: the R is not used to rerun the published analysis.\n\nanalysis-plan.md is the source of truth for design. It was reconstructed from the paper and the code. The code is the record of what was done; the plan marks where it is more specific than the paper’s methods. The R translation follows the code, except where the saved Stata is evidently a slip against the published method (for example, outcomes the paper reports for year one that the saved file computes over all follow-up); there the R follows the paper. Every such departure is stated on the script’s page and in stata_overview.qmd.\nDeciders. Scientific decisions are made by: Vagish Hemmige (all areas; to be confirmed). Anyone may open or contribute to an issue; only a decider settles it.\nThis is an analysis project, not an R package. Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.\nDefault branch: main, protected. Changes reach it only through pull requests.",
     "crumbs": [
       "Project documents",
       "AGENTS.md"
@@ -1112,7 +1189,7 @@
     "href": "quarto/agents.html#coding-conventions",
     "title": "",
     "section": "Coding conventions",
-    "text": "Coding conventions\n\nFaithful translation first. Each R step reproduces what the Stata did, including choices that differ from the paper. Where R must differ (for example, to use the weights the paper describes), the script comment and its page say so.\nCohort flow: exclusions go through count_patients() in R/06_cohort.R in the plan’s order, so the flow counts and the cohort come from the same code.\nJoins state a relationship where rows could multiply.\nStyle: readable for a clinician-analyst who learned R from online guides: pipes and dplyr/tidyr verbs, case_when(), loops over names or named lists. Required base R (the day-by-day pill count) is in named functions in R/functions.R.",
+    "text": "Coding conventions\n\nFaithful translation first. Each R step reproduces what the Stata did, including choices the paper does not mention. Where the saved Stata is a slip against the published method (the psychiatry weights, the year-one window), the R follows the paper, and the script comment and its page say so.\nCohort flow: exclusions go through count_patients() in R/06_cohort.R in the plan’s order, so the flow counts and the cohort come from the same code.\nJoins state a relationship where rows could multiply.\nStyle: readable for a clinician-analyst who learned R from online guides: pipes and dplyr/tidyr verbs, case_when(), loops over names or named lists. Required base R (the day-by-day pill count) is in named functions in R/functions.R.",
     "crumbs": [
       "Project documents",
       "AGENTS.md"
@@ -1145,7 +1222,7 @@
     "href": "quarto/about.html",
     "title": "About",
     "section": "",
-    "text": "Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as Hemmige et al. (2018). This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.\n\nVagish Hemmige, Charlene A. Flash, Jacquelyn Carter, Thomas P. Giordano and Thomas Zerai (authors of the paper)\n\nScientific questions about the study go to Vagish Hemmige. Known issues are in Issues.",
+    "text": "Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as Hemmige et al. (2018). This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.\n\nVagish Hemmige, Charlene A. Flash, Josephinel Carter, Thomas P. Giordano and Teddy Zerai (authors of the paper)\n\nScientific questions about the study go to Vagish Hemmige. Known issues are in Issues.",
     "crumbs": [
       "About"
     ]
@@ -1155,7 +1232,7 @@
     "href": "quarto/about.html#the-study",
     "title": "About",
     "section": "",
-    "text": "Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as Hemmige et al. (2018). This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.\n\nVagish Hemmige, Charlene A. Flash, Jacquelyn Carter, Thomas P. Giordano and Thomas Zerai (authors of the paper)\n\nScientific questions about the study go to Vagish Hemmige. Known issues are in Issues.",
+    "text": "Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as Hemmige et al. (2018). This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.\n\nVagish Hemmige, Charlene A. Flash, Josephinel Carter, Thomas P. Giordano and Teddy Zerai (authors of the paper)\n\nScientific questions about the study go to Vagish Hemmige. Known issues are in Issues.",
     "crumbs": [
       "About"
     ]
@@ -1185,7 +1262,7 @@
     "href": "quarto/about.html#pages",
     "title": "About",
     "section": "Pages",
-    "text": "Pages\n\nClinical background: pill burden, the regimens compared, and what the study found.\nMethodological background: pharmacy fills, person-day data, retention and suppression measures, propensity weighting.\nStudy design and methods: what this study chose, in plain language, and where the code differs from the paper.\nSetup: packages, file locations and constants.\nFunctions: helper functions, including the pill count.\n1. Regimens from pharmacy fills: regimen names, manual corrections, regimen numbering.\n2. Labs and baseline data: CD4, viral load, demographics, insurance, psychiatry visits.\n3. One row per patient-day: expanding to days, carrying lab values forward and back.\n4. Daily regimen and fills: the current regimen and its drugs on each day.\n5. Pills on hand and daily outcomes: pills on hand, coverage, still in care, suppression.\n6. Cohort: exclusions, time zero, one row per patient.\n7. Propensity score and weights: baseline comparisons, propensity model, weights.\n8. Outcomes: retention, suppression, adherence and the odds ratios.\n9. Sensitivity analyses: lower threshold, psychiatry visits, outside pharmacy.\nTables: writing the tables.\nWhich file does what: the do-files behind the paper, how they fit together, slips found, and what was removed for privacy.\nData build (Steps 0-8) and Final Analysis: the do-files themselves.",
+    "text": "Pages\n\nClinical background: pill burden, the regimens compared, and what the study found.\nMethodological background: pharmacy fills, person-day data, retention and suppression measures, propensity weighting.\nStudy design and methods: what this study chose, in plain language, and where the code differs from the paper.\nSetup: packages, file locations and constants.\nFunctions: helper functions, including the pill count.\n1. Regimens from pharmacy fills: regimen names, manual corrections, regimen numbering.\n2. Labs and baseline data: CD4, viral load, demographics, insurance, psychiatry visits.\n3. One row per patient-day: expanding to days, carrying lab values forward and back.\n4. Daily regimen and fills: the current regimen and its drugs on each day.\n5. Pills on hand and daily outcomes: pills on hand, coverage, still in care, suppression.\n6. Cohort: exclusions, time zero, one row per patient.\n7. Propensity score and weights: baseline comparisons, propensity model, weights.\n8. Outcomes: retention, suppression, adherence and the odds ratios.\n9. Sensitivity analyses: lower threshold, psychiatry visits, outside pharmacy.\nTables: writing the tables.\nPublished results and the code behind them: each number the article reports, and the step of the code that computes it.\nWhich file does what: the do-files behind the paper, how they fit together, slips found, and what was removed for privacy.\nData build (Steps 0-8) and Final Analysis: the do-files themselves.",
     "crumbs": [
       "About"
     ]
@@ -1207,7 +1284,7 @@
     "href": "quarto/09_sensitivity.html#a-lower-threshold-after-2008",
     "title": "9. Sensitivity analyses",
     "section": "A lower threshold after 2008",
-    "text": "A lower threshold after 2008\nThe assay changed after 2008, so patients who started later are held to 50 copies/mL. The same daily rule is reused with a threshold that depends on the year ART started, and results are tabulated by start year, as the Stata did one tab ... if YearofARTInitiation==2008 line at a time.\nCurrent code: this “ever suppressed” uses all follow-up, not only year one.\n\n\nClick to show/hide R Code\n# 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards.\n# As in the Stata code, \"ever suppressed\" here uses all follow-up, not year one.\nsuppression_by_year_threshold &lt;- cohort_days |&gt;\n  mutate(\n    threshold = if_else(art_start_year == 2008, vl_suppression_main, vl_suppression_later),\n    vl_suppressed_year_threshold = vl_suppressed_on_day(\n      lvcf_vl, days_since_last_vl, days_until_next_vl, next_vl,\n      threshold, lab_window_days\n    )\n  ) |&gt;\n  group_by(studyid) |&gt;\n  summarise(vl_suppressed_year_threshold = any(vl_suppressed_year_threshold),\n            .groups = \"drop\")\n\npatients &lt;- patients |&gt;\n  left_join(suppression_by_year_threshold, by = \"studyid\")\n\nsuppression_by_start_year &lt;- patients |&gt;\n  group_by(art_start_year, str) |&gt;\n  summarise(patients = n(), suppressed = sum(vl_suppressed_year_threshold),\n            percent = 100 * suppressed / patients, .groups = \"drop\")",
+    "text": "A lower threshold after 2008\nThe assay changed after 2008, so patients who started later are held to 50 copies/mL. The same daily rule is reused with a threshold that depends on the year ART started, and results are tabulated by start year, as the Stata did one tab ... if YearofARTInitiation==2008 line at a time.\nAs in the main analysis, suppression is counted in the first year; the saved Stata took it over all follow-up (details).\n\n\nClick to show/hide R Code\n# 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards,\n# applied to the year-one suppression outcome as the paper describes. (The saved\n# Stata takes the maximum over all follow-up.)\nsuppression_by_year_threshold &lt;- cohort_days |&gt;\n  filter(first_year) |&gt;\n  mutate(\n    threshold = if_else(art_start_year == 2008, vl_suppression_main, vl_suppression_later),\n    vl_suppressed_year_threshold = vl_suppressed_on_day(\n      lvcf_vl, days_since_last_vl, days_until_next_vl, next_vl,\n      threshold, lab_window_days\n    )\n  ) |&gt;\n  group_by(studyid) |&gt;\n  summarise(vl_suppressed_year_threshold = any(vl_suppressed_year_threshold),\n            .groups = \"drop\")\n\npatients &lt;- patients |&gt;\n  left_join(suppression_by_year_threshold, by = \"studyid\")\n\nsuppression_by_start_year &lt;- patients |&gt;\n  group_by(art_start_year, str) |&gt;\n  summarise(patients = n(), suppressed = sum(vl_suppressed_year_threshold),\n            percent = 100 * suppressed / patients, .groups = \"drop\")",
     "crumbs": [
       "Code",
       "The published analysis",
@@ -1231,7 +1308,7 @@
     "href": "quarto/09_sensitivity.html#adding-psychiatry-visits-to-the-propensity-model",
     "title": "9. Sensitivity analyses",
     "section": "Adding psychiatry visits to the propensity model",
-    "text": "Adding psychiatry visits to the propensity model\nupdate() refits the propensity model with one more term.\nCurrent code: Final Analysis.do computed the new weights (IPW2) but its next two models were written with [pw=IPW], the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.\n\n\nClick to show/hide R Code\n# The paper reports that adding psychiatry clinic visits to the propensity\n# model did not meaningfully change the odds ratios. Final Analysis.do computed\n# these weights (IPW2) but its next two models used the original weights; here\n# the new weights are used, as the paper describes.\npropensity_model_psych &lt;- update(propensity_model, . ~ . + had_psych_visit)\n\npatients &lt;- patients |&gt;\n  mutate(\n    propensity_score_psych = predict(propensity_model_psych, newdata = patients,\n                                     type = \"response\"),\n    ipw_psych = if_else(str, 1 / propensity_score_psych, 1 / (1 - propensity_score_psych))\n  )\n\npsych_models &lt;- bind_rows(\n  odds_ratio_for_str(patients, \"retained_year_one\", weight = \"ipw_psych\"),\n  odds_ratio_for_str(patients, \"vl_suppressed_year_one\", weight = \"ipw_psych\")\n)",
+    "text": "Adding psychiatry visits to the propensity model\nFirst, whether patients with a psychiatry visit were less likely to start the STR, as prescribers may avoid efavirenz in psychiatric illness. Then update() refits the propensity model with one more term.\nR departs from the Stata: Final Analysis.do computed the new weights (IPW2) but its next two models were written with [pw=IPW], the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.\n\n\nClick to show/hide R Code\n# The paper reports that adding psychiatry clinic visits to the propensity\n# model did not meaningfully change the odds ratios. Final Analysis.do computed\n# these weights (IPW2) but its next two models used the original weights; here\n# the new weights are used, as the paper describes.\n# Stata: tab InitialRegimenSTR HadPsychDate if FirstObs, row column chi2\npsych_test &lt;- compare_categorical(patients, \"had_psych_visit\")\n\npropensity_model_psych &lt;- update(propensity_model, . ~ . + had_psych_visit)\n\npatients &lt;- patients |&gt;\n  mutate(\n    propensity_score_psych = predict(propensity_model_psych, newdata = patients,\n                                     type = \"response\"),\n    ipw_psych = if_else(str, 1 / propensity_score_psych, 1 / (1 - propensity_score_psych))\n  )\n\npsych_models &lt;- bind_rows(\n  odds_ratio_for_str(patients, \"retained_year_one\", weight = \"ipw_psych\"),\n  odds_ratio_for_str(patients, \"vl_suppressed_year_one\", weight = \"ipw_psych\")\n)",
     "crumbs": [
       "Code",
       "The published analysis",
@@ -1317,7 +1394,7 @@
     "href": "quarto/study_methods.html#who-is-included",
     "title": "Study design and methods",
     "section": "Who is included",
-    "text": "Who is included\nPatients are included if their first regimen in the window is one of the three compared regimens and is taken once daily. Time zero is the first day of the first regimen.\nSpecified in: §4 Study population.\nCurrent code: the code also excludes patients recorded as having had prior care elsewhere, and patients with no insurance status; the paper’s methods do not mention either exclusion.",
+    "text": "Who is included\nPatients are included if their first regimen in the window is one of the three compared regimens and is taken once daily. Time zero is the first day of the first regimen.\nSpecified in: §4 Study population.\nFrom the code: the code also excludes patients recorded as having had prior care elsewhere, and patients with no insurance status; the paper’s methods do not mention either exclusion.",
     "crumbs": [
       "Study design and methods"
     ]
@@ -1327,7 +1404,7 @@
     "href": "quarto/study_methods.html#outcomes",
     "title": "Study design and methods",
     "section": "Outcomes",
-    "text": "Outcomes\n\nRetention in care in year one: at least two viral loads in days 0-364 after the first fill, more than 90 days apart.\nViral suppression in year one: at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.\nSuppression on the initial regimen: suppressed on a day while still on the first regimen.\nAdherence: proportion of days covered of 80% or more.\n\nSpecified in: §7 Outcomes.\nCurrent code: suppression is defined as 400 copies/mL or less; the paper says less than 400.\nCurrent code: suppression on the initial regimen and the proportion of days covered are computed over all follow-up to the end of 2013, not only the first year as the paper’s table implies.",
+    "text": "Outcomes\n\nRetention in care in year one: at least two viral loads in days 0-364 after the first fill, more than 90 days apart.\nViral suppression in year one: at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.\nSuppression on the initial regimen: suppressed on a day while still on the first regimen.\nAdherence: proportion of days covered of 80% or more in the first year.\n\nR departs from the Stata: every outcome is measured in the first year. The saved Stata file computed some of them over all follow-up, a step assumed run but not saved (details).\nSpecified in: §7 Outcomes.\nFrom the code: suppression is defined as 400 copies/mL or less; the paper’s text says less than 400.",
     "crumbs": [
       "Study design and methods"
     ]
@@ -1347,7 +1424,7 @@
     "href": "quarto/study_methods.html#sensitivity-analyses",
     "title": "Study design and methods",
     "section": "Sensitivity analyses",
-    "text": "Sensitivity analyses\n\nA viral load threshold of 50 copies/mL for patients starting after 2008.\nA propensity model that also includes any psychiatry visit.\nExcluding patients who had a suppressed viral load 90 or more days after their last fill, which suggests they were filling elsewhere.\n\nSpecified in: §9 Sensitivity analyses.\nCurrent code: in the Stata, the models meant to use the weights from the psychiatry propensity model use the main weights instead. The R uses the new weights, as the paper describes.\nCurrent code: the 50 copies/mL analysis counts suppression at any time in follow-up, not only year one.",
+    "text": "Sensitivity analyses\n\nA viral load threshold of 50 copies/mL for patients starting after 2008.\nA propensity model that also includes any psychiatry visit.\nExcluding patients who had a suppressed viral load 90 or more days after their last fill, which suggests they were filling elsewhere.\n\nSpecified in: §9 Sensitivity analyses.\nR departs from the Stata: in the saved Stata, the models meant to use the weights from the psychiatry propensity model use the main weights instead. The R uses the new weights, as the paper describes.",
     "crumbs": [
       "Study design and methods"
     ]
@@ -1464,7 +1541,7 @@
     "href": "quarto/analysis-plan.html#scope-and-reporting-framework",
     "title": "",
     "section": "Scope and reporting framework",
-    "text": "Scope and reporting framework\nThis document is the authoritative specification of the study’s scientific objectives, population, definitions, estimands and statistical methods. ARCHITECTURE.md documents the implementation, AGENTS.md the working conventions, and GitHub Issues any open questions. Neither file supersedes this plan.\nWhere the code does something the paper’s methods do not state, this plan describes what the code does and says so, marked Differs from paper.\nReporting followed STROBE (Elm et al. 2007); RECORD (Benchimol et al. 2015) applies to studies of routinely collected data like this one. The reporting map below links checklist items to sections of this plan.",
+    "text": "Scope and reporting framework\nThis document is the authoritative specification of the study’s scientific objectives, population, definitions, estimands and statistical methods. ARCHITECTURE.md documents the implementation, AGENTS.md the working conventions, and GitHub Issues any open questions. Neither file supersedes this plan.\nThe code is the record of what was done. Where it is more specific than the paper’s methods, this plan states what the code does, marked From the code.\nReporting followed STROBE (Elm et al. 2007); RECORD (Benchimol et al. 2015) applies to studies of routinely collected data like this one. The reporting map below links checklist items to sections of this plan.",
     "crumbs": [
       "Project documents",
       "Analysis plan"
@@ -1508,7 +1585,7 @@
     "href": "quarto/analysis-plan.html#4-study-population",
     "title": "",
     "section": "4. Study population",
-    "text": "4. Study population\nSource population: patients with antiretrovirals dispensed by the clinic pharmacy during the window.\nExclusions, in order (each a flowchart step):\n\nInitial regimen in the window is taken twice daily (any twice-daily product), or the first regimen started before the window.\nInitial regimen is not one of: Atripla; Norvir/Prezista/Truvada; Norvir/Reyataz/Truvada.\nRecorded as having had HIV care elsewhere, or that field missing. Differs from paper: not stated in the paper’s methods.\nInsurance status missing. Differs from paper: not stated in the paper’s methods.\n\nIndex event (time zero): the first day of the first regimen (first fill).",
+    "text": "4. Study population\nSource population: patients with antiretrovirals dispensed by the clinic pharmacy during the window.\nExclusions, in order (each a flowchart step):\n\nInitial regimen in the window is taken twice daily (any twice-daily product), or the first regimen started before the window.\nInitial regimen is not one of: Atripla; Norvir/Prezista/Truvada; Norvir/Reyataz/Truvada.\nRecorded as having had HIV care elsewhere, or that field missing. From the code: the paper’s methods do not mention this exclusion.\nInsurance status missing. From the code: the paper’s methods do not mention this exclusion.\n\nIndex event (time zero): the first day of the first regimen (first fill).",
     "crumbs": [
       "Project documents",
       "Analysis plan"
@@ -1541,7 +1618,7 @@
     "href": "quarto/analysis-plan.html#7-outcomes",
     "title": "",
     "section": "7. Outcomes",
-    "text": "7. Outcomes\nDaily measures, on a grid of one row per patient per day:\n\nPills on hand, per drug: every fill is 30 pills; +30 on a fill day, -1 per day, never below zero; a fill when none are left gives 30; pills of the same drug carry into a new regimen.\nDay covered: every drug in the current regimen on hand.\nVirologically suppressed on a day: last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. Differs from paper: the paper says &lt;400.\n\nPatient outcomes:\n\nRetention in care, year one: at least two viral loads in days 0-364 after time zero, more than 90 days apart (HRSA-style definition using viral load tests).\nViral suppression, year one: suppressed on at least one day in days 0-364.\nViral suppression on the initial regimen: suppressed on at least one day while on the initial regimen. Differs from paper: uses all follow-up to 31 December 2013, not only year one.\nAdherence: PDC ≥ 0.80, with PDC the proportion of days covered. Differs from paper: averaged over all follow-up to 31 December 2013, not only year one.\nAdherence on the initial regimen: proportion of days that are both covered and on the initial regimen ≥ 0.80, over all follow-up.\nRegimen change: any change of regimen during follow-up (descriptive).",
+    "text": "7. Outcomes\nDaily measures, on a grid of one row per patient per day:\n\nPills on hand, per drug: every fill is 30 pills; +30 on a fill day, -1 per day, never below zero; a fill when none are left gives 30; pills of the same drug carry into a new regimen.\nDay covered: every drug in the current regimen on hand.\nVirologically suppressed on a day: last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. From the code: the paper’s text says &lt;400.\n\nPatient outcomes:\n\nRetention in care, year one: at least two viral loads in days 0-364 after time zero, more than 90 days apart (HRSA-style definition using viral load tests).\nViral suppression, year one: suppressed on at least one day in days 0-364.\nViral suppression on the initial regimen: suppressed on at least one day in days 0-364 while on the initial regimen.\nAdherence: PDC ≥ 0.80, with PDC the proportion of days 0-364 covered.\nAdherence on the initial regimen: proportion of days 0-364 that are both covered and on the initial regimen ≥ 0.80.\nRegimen change: any change of regimen in days 0-364 (descriptive); suppression on the day of the first switch.\n\nAll patient outcomes use days 0-364. The saved Do Final Analysis.do computes suppression on the initial regimen, both adherence measures and the 50 copies/mL sensitivity outcome over all follow-up to 31 December 2013; the 2015 version of the same calculations restricted the data to the first year, as the paper reports. This plan follows the paper.",
     "crumbs": [
       "Project documents",
       "Analysis plan"
@@ -1563,7 +1640,7 @@
     "href": "quarto/analysis-plan.html#9-sensitivity-analyses",
     "title": "",
     "section": "9. Sensitivity analyses",
-    "text": "9. Sensitivity analyses\n\nAssay threshold: suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. Differs from paper: “ever suppressed” over all follow-up.\nPsychiatric history: propensity model adding any psychiatry visit; retention and year-one suppression re-estimated with the new weights. Tests confounding by mental illness.\nOutside pharmacy: excluding patients with a viral load ≤400 measured 90 or more days after their last fill of a drug in the current regimen, at any time in follow-up; main models re-estimated, unweighted and with the original weights. Tests whether fills elsewhere bias the outcomes.",
+    "text": "9. Sensitivity analyses\n\nAssay threshold: suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. Suppression is counted in days 0-364, as in the main analysis.\nPsychiatric history: propensity model adding any psychiatry visit; retention and year-one suppression re-estimated with the new weights. Tests confounding by mental illness.\nOutside pharmacy: excluding patients with a viral load ≤400 measured 90 or more days after their last fill of a drug in the current regimen, at any time in follow-up; main models re-estimated, unweighted and with the original weights. Tests whether fills elsewhere bias the outcomes.",
     "crumbs": [
       "Project documents",
       "Analysis plan"
@@ -1706,7 +1783,7 @@
     "href": "quarto/architecture.html#website",
     "title": "",
     "section": "Website",
-    "text": "Website\n_quarto.yml, index.qmd, 404.qmd, styles.css\nquarto/\n  background.qmd, methodological_background.qmd, study_methods.qmd\n  setup.qmd, functions.qmd, 01_regimens.qmd ... 09_sensitivity.qmd, tables.qmd   # one per script\n  stata_overview.qmd, stata_data_build.qmd, stata_final_analysis.qmd\n  _show_stata.R          # prints do-files as code blocks for the Stata pages\n  analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd\nstata/                   # the do-files behind the paper, patient-level details removed\ndocs/                    # rendered site (not committed)\n.github/workflows/publish.yml   # renders the site and publishes it to gh-pages",
+    "text": "Website\n_quarto.yml, index.qmd, 404.qmd, styles.css\nquarto/\n  background.qmd, methodological_background.qmd, study_methods.qmd\n  setup.qmd, functions.qmd, 01_regimens.qmd ... 09_sensitivity.qmd, tables.qmd   # one per script\n  stata_overview.qmd, stata_data_build.qmd, stata_final_analysis.qmd\n  published_results.qmd  # each published number and the code step behind it\n  _show_stata.R          # prints do-files as code blocks for the Stata pages\n  analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd\nstata/                   # the do-files behind the paper, patient-level details removed\ndocs/                    # rendered site (not committed)\n.github/workflows/publish.yml   # renders the site and publishes it to gh-pages",
     "crumbs": [
       "Project documents",
       "Architecture"

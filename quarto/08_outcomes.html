@@ -378,9 +378,24 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-8-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Results</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/published_results.html" class="sidebar-item-text sidebar-link"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="menu-text">Published results and the code behind them</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../quarto/analysis-plan.html" class="sidebar-item-text sidebar-link"><i class="bi bi-file-earmark-ruled" role="img">
@@ -510,47 +525,51 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <section id="other-outcomes" class="level2">
 <h2 class="anchored" data-anchor-id="other-outcomes">Other outcomes</h2>
 <p>Each <code>by studyid: egen x = max(...)</code> or <code>mean(...)</code> in Stata becomes one line of a per-patient <code>summarise()</code>. <code>any()</code> is the R counterpart of <code>max()</code> over a 0/1 variable.</p>
-<p><strong>Current code:</strong> the outcomes do not all use the same follow-up. Suppression in year one uses days 0-364 (through <code>quarter</code>), but suppression on the initial regimen and the proportion of days covered are averaged over every day to the end of 2013, because the Stata <code>egen</code> ran over all of a patient’s rows. Patients who started in 2008 contribute up to six years; those who started late in 2011, two.</p>
+<p>Every outcome uses the first year, days 0-364, as the paper describes: the data are filtered to <code>first_year</code> before summarising. This is a deliberate departure from the saved Stata. Its <code>egen</code> lines for suppression on the initial regimen, days covered and regimen change ran over every one of a patient’s days to the end of 2013, so a patient who started in 2008 would contribute up to six years and one who started late in 2011 two, and every day after a patient stopped filling would count as uncovered. The 2015 version of the same code limited the data to the first year first; the saved file lacks that step (<a href="../quarto/stata_overview.html#slips-in-the-code">details</a>).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the follow-up each outcome uses, which differs between outcomes in the</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># original code: suppression in year one uses days 0-364; suppression on the</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># initial regimen and proportion of days covered use all follow-up to the end</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># of 2013.</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>patient_outcomes <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">vl_suppressed_year_one =</span> <span class="fu">any</span>(vl_suppressed[first_year]),</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">vl_suppressed_on_initial_regimen =</span> <span class="fu">any</span>(vl_suppressed <span class="sc">&amp;</span> on_initial_regimen),</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">proportion_days_covered =</span> <span class="fu">mean</span>(day_covered),</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">proportion_days_covered_initial =</span> <span class="fu">mean</span>(day_covered <span class="sc">&amp;</span> on_initial_regimen),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">changed_regimen =</span> <span class="fu">n_distinct</span>(regimen_number) <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(retention, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(patient_outcomes, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">retained_year_one =</span> <span class="fu">coalesce</span>(first_year_vl_tests <span class="sc">&gt;=</span> <span class="dv">2</span> <span class="sc">&amp;</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                                   first_to_last_vl_days <span class="sc">&gt;</span> retention_min_gap_days, <span class="cn">FALSE</span>),</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">adherent_pdc_80 =</span> proportion_days_covered <span class="sc">&gt;=</span> pdc_adherent,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">adherent_pdc_80_initial =</span> proportion_days_covered_initial <span class="sc">&gt;=</span> pdc_adherent</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Every outcome uses the first year after ART start (days 0-364), as the paper</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># describes. The saved Final Analysis.do computes suppression on the initial</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># regimen, the proportion of days covered and regimen change over all of a</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># patient's days to the end of 2013, because its `by studyid: egen` lines have</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># no first-year restriction; the 2015 version of the same code restricted the</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># data to year one first. See the "Which file does what" page.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>patient_outcomes <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(first_year) <span class="sc">|&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">vl_suppressed_year_one =</span> <span class="fu">any</span>(vl_suppressed),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">vl_suppressed_on_initial_regimen =</span> <span class="fu">any</span>(vl_suppressed <span class="sc">&amp;</span> on_initial_regimen),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">proportion_days_covered =</span> <span class="fu">mean</span>(day_covered),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">proportion_days_covered_initial =</span> <span class="fu">mean</span>(day_covered <span class="sc">&amp;</span> on_initial_regimen),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">changed_regimen =</span> <span class="fu">n_distinct</span>(regimen_number) <span class="sc">&gt;</span> <span class="dv">1</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(retention, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(patient_outcomes, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">retained_year_one =</span> <span class="fu">coalesce</span>(first_year_vl_tests <span class="sc">&gt;=</span> <span class="dv">2</span> <span class="sc">&amp;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                                   first_to_last_vl_days <span class="sc">&gt;</span> retention_min_gap_days, <span class="cn">FALSE</span>),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">adherent_pdc_80 =</span> proportion_days_covered <span class="sc">&gt;=</span> pdc_adherent,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">adherent_pdc_80_initial =</span> proportion_days_covered_initial <span class="sc">&gt;=</span> pdc_adherent</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="suppression-at-the-first-switch" class="level2">
 <h2 class="anchored" data-anchor-id="suppression-at-the-first-switch">Suppression at the first switch</h2>
-<p>Were patients who switched suppressed on the day they switched?</p>
+<p>Were patients who switched in the first year suppressed on the day they switched?</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Were patients suppressed on the day they switched to a second regimen?</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>suppression_at_switch <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(regimen_number <span class="sc">==</span> <span class="dv">2</span>, day_in_regimen <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(str, vl_suppressed)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Among patients who switched in year one, were they suppressed on the day</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># they switched to a second regimen?</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>suppression_at_switch <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(first_year, regimen_number <span class="sc">==</span> <span class="dv">2</span>, day_in_regimen <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(str, vl_suppressed)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1180,7 +1199,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>Each <span class="in">`by studyid: egen x = max(...)`</span> or <span class="in">`mean(...)`</span> in Stata becomes one line of a per-patient <span class="in">`summarise()`</span>. <span class="in">`any()`</span> is the R counterpart of <span class="in">`max()`</span> over a 0/1 variable.</span>
 <span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>**Current code:** the outcomes do not all use the same follow-up. Suppression in year one uses days 0-364 (through <span class="in">`quarter`</span>), but suppression on the initial regimen and the proportion of days covered are averaged over every day to the end of 2013, because the Stata <span class="in">`egen`</span> ran over all of a patient's rows. Patients who started in 2008 contribute up to six years; those who started late in 2011, two.</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>Every outcome uses the first year, days 0-364, as the paper describes: the data are filtered to <span class="in">`first_year`</span> before summarising. This is a deliberate departure from the saved Stata. Its <span class="in">`egen`</span> lines for suppression on the initial regimen, days covered and regimen change ran over every one of a patient's days to the end of 2013, so a patient who started in 2008 would contribute up to six years and one who started late in 2011 two, and every day after a patient stopped filling would count as uncovered. The 2015 version of the same code limited the data to the first year first; the saved file lacks that step (<span class="co">[</span><span class="ot">details</span><span class="co">](stata_overview.qmd#slips-in-the-code)</span>).</span>
 <span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: define-patient-outcomes</span></span>
@@ -1189,7 +1208,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Suppression at the first switch</span></span>
 <span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>Were patients who switched suppressed on the day they switched?</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>Were patients who switched in the first year suppressed on the day they switched?</span>
 <span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: suppression-at-switch</span></span>

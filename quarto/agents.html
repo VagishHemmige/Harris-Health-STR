@@ -378,9 +378,24 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-8-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Results</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/published_results.html" class="sidebar-item-text sidebar-link"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="menu-text">Published results and the code behind them</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../quarto/analysis-plan.html" class="sidebar-item-text sidebar-link"><i class="bi bi-file-earmark-ruled" role="img">
@@ -512,7 +527,7 @@ edit that file, not this page. Its first heading is the page title.
 <h2 class="anchored" data-anchor-id="the-project">The project</h2>
 <p>A teaching repository for a published study <a href="https://doi.org/10.1080/09540121.2018.1442554">Hemmige et al., <em>AIDS Care</em> 2018</a> comparing single-tablet with multi-tablet first-line antiretroviral regimens at Thomas Street Health Center (Harris Health System). The original Stata code is in <code>stata/</code> with patient-level details removed; <code>R/</code> is a translation into R, run only on synthetic data. The code and methods are explained on a Quarto website. The study is complete: the R is not used to rerun the published analysis.</p>
 <ul>
-<li><strong><code>analysis-plan.md</code> is the source of truth for design.</strong> It was reconstructed from the paper and the code, and marks where the code differs from the paper. The R translation follows the code; it does not “fix” those differences. If a translation needs to depart from the Stata, say so on the script’s page and in <code>stata_overview.qmd</code>.</li>
+<li><strong><code>analysis-plan.md</code> is the source of truth for design.</strong> It was reconstructed from the paper and the code. The code is the record of what was done; the plan marks where it is more specific than the paper’s methods. The R translation follows the code, except where the saved Stata is evidently a slip against the published method (for example, outcomes the paper reports for year one that the saved file computes over all follow-up); there the R follows the paper. Every such departure is stated on the script’s page and in <code>stata_overview.qmd</code>.</li>
 <li><strong>Deciders.</strong> Scientific decisions are made by: Vagish Hemmige (all areas; to be confirmed). Anyone may open or contribute to an issue; only a decider settles it.</li>
 <li><strong>This is an analysis project, not an R package.</strong> Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.</li>
 <li><strong>Default branch:</strong> <code>main</code>, protected. Changes reach it only through pull requests.</li>
@@ -635,7 +650,7 @@ edit that file, not this page. Its first heading is the page title.
 <section id="coding-conventions" class="level2">
 <h2 class="anchored" data-anchor-id="coding-conventions">Coding conventions</h2>
 <ul>
-<li><strong>Faithful translation first.</strong> Each R step reproduces what the Stata did, including choices that differ from the paper. Where R must differ (for example, to use the weights the paper describes), the script comment and its page say so.</li>
+<li><strong>Faithful translation first.</strong> Each R step reproduces what the Stata did, including choices the paper does not mention. Where the saved Stata is a slip against the published method (the psychiatry weights, the year-one window), the R follows the paper, and the script comment and its page say so.</li>
 <li><strong>Cohort flow:</strong> exclusions go through <code>count_patients()</code> in <code>R/06_cohort.R</code> in the plan’s order, so the flow counts and the cohort come from the same code.</li>
 <li><strong>Joins</strong> state a <code>relationship</code> where rows could multiply.</li>
 <li><strong>Style:</strong> readable for a clinician-analyst who learned R from online guides: pipes and dplyr/tidyr verbs, <code>case_when()</code>, loops over names or named lists. Required base R (the day-by-day pill count) is in named functions in <code>R/functions.R</code>.</li>

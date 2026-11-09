@@ -400,9 +400,24 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
- <span class="menu-text" id="quarto-sidebar-section-8-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Results</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/published_results.html" class="sidebar-item-text sidebar-link"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="menu-text">Published results and the code behind them</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Project documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../quarto/analysis-plan.html" class="sidebar-item-text sidebar-link"><i class="bi bi-file-earmark-ruled" role="img">
@@ -453,7 +468,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   <li><a href="#how-the-pieces-fit" id="toc-how-the-pieces-fit" class="nav-link active" data-scroll-target="#how-the-pieces-fit">How the pieces fit</a></li>
   <li><a href="#file-by-file" id="toc-file-by-file" class="nav-link" data-scroll-target="#file-by-file">File by file</a></li>
   <li><a href="#final-analysis-and-the-paper" id="toc-final-analysis-and-the-paper" class="nav-link" data-scroll-target="#final-analysis-and-the-paper">Final Analysis and the paper</a></li>
-  <li><a href="#things-the-code-does-that-the-paper-does-not-say" id="toc-things-the-code-does-that-the-paper-does-not-say" class="nav-link" data-scroll-target="#things-the-code-does-that-the-paper-does-not-say">Things the code does that the paper does not say</a></li>
+  <li><a href="#where-the-code-is-more-specific-than-the-paper" id="toc-where-the-code-is-more-specific-than-the-paper" class="nav-link" data-scroll-target="#where-the-code-is-more-specific-than-the-paper">Where the code is more specific than the paper</a></li>
   <li><a href="#slips-in-the-code" id="toc-slips-in-the-code" class="nav-link" data-scroll-target="#slips-in-the-code">Slips in the code</a></li>
   <li><a href="#privacy" id="toc-privacy" class="nav-link" data-scroll-target="#privacy">Privacy</a></li>
   </ul>
@@ -604,21 +619,20 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <h2 class="anchored" data-anchor-id="final-analysis-and-the-paper">Final Analysis and the paper</h2>
 <p>Final Analysis.do matches the paper <span class="citation" data-cites="hemmige2018str">(<a href="#ref-hemmige2018str" role="doc-biblioref">Hemmige et al. 2018</a>)</span>: the three regimens compared (Atripla against darunavir or atazanavir boosted with ritonavir, each with Truvada), insurance in the propensity model, and psychiatry visits and a 50 copies/mL threshold as sensitivity analyses. Main does not call it: it was run by hand a section at a time, so it would not run straight through. A deliberate stop line sits partway down, and it creates <code>VirologicallySuppressed2</code> twice, which Stata refuses.</p>
 </section>
-<section id="things-the-code-does-that-the-paper-does-not-say" class="level2">
-<h2 class="anchored" data-anchor-id="things-the-code-does-that-the-paper-does-not-say">Things the code does that the paper does not say</h2>
-<p>Kept as they are in both the Stata and the R:</p>
+<section id="where-the-code-is-more-specific-than-the-paper" class="level2">
+<h2 class="anchored" data-anchor-id="where-the-code-is-more-specific-than-the-paper">Where the code is more specific than the paper</h2>
+<p>The code is the record of what was done, so these are kept as they are in both the Stata and the R:</p>
 <ul>
 <li>Patients with prior care elsewhere and patients with no insurance status are excluded.</li>
 <li>Viral suppression is 400 copies/mL <em>or less</em>, not less than 400.</li>
-<li>Suppression on the initial regimen and the proportion of days covered are calculated over all follow-up to the end of 2013, not the first year.</li>
-<li>The 50 copies/mL sensitivity analysis counts suppression at any time, not the first year.</li>
 </ul>
 </section>
 <section id="slips-in-the-code" class="level2">
 <h2 class="anchored" data-anchor-id="slips-in-the-code">Slips in the code</h2>
 <ul>
-<li>The models meant to use the psychiatry-adjusted weights (<code>IPW2</code>) use <code>IPW</code>. The R uses <code>IPW2</code> (<a href="../quarto/09_sensitivity.html">step 9</a>).</li>
-<li><code>(CurrentDrug4CurrentDispense)</code> is missing its <code>==30</code>. It does no harm, because the value is always 0 or 30.</li>
+<li><p><strong>Follow-up window.</strong> The saved file computes five outcomes over all of a patient’s days to the end of 2013, not the first year: regimen change (lines 63-64), suppression on the initial regimen (161-162), the proportion of days covered (167), days covered on the initial regimen (196-197), and the 50 copies/mL suppression (177). Each is a <code>by studyid: egen</code> with nothing limiting it to year one, unlike retention and year-one suppression, which go through <code>Quarter</code>. The 2015 version of the same calculations ran after <code>keep if DaysSinceARTInitiation&lt;365</code>, which is missing here; Final Analysis.do was run by hand, and the R assumes that step was run but not saved. The paper reports these as first-year outcomes, so the R computes them for year one (<a href="../quarto/08_outcomes.html#other-outcomes">step 8</a>).</p></li>
+<li><p>The models meant to use the psychiatry-adjusted weights (<code>IPW2</code>) use <code>IPW</code>. The R uses <code>IPW2</code> (<a href="../quarto/09_sensitivity.html">step 9</a>).</p></li>
+<li><p><code>(CurrentDrug4CurrentDispense)</code> is missing its <code>==30</code>. It does no harm, because the value is always 0 or 30.</p></li>
 </ul>
 </section>
 <section id="privacy" class="level2">
@@ -639,7 +653,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-hemmige2018str" class="csl-entry" role="listitem">
-Hemmige, Vagish, Charlene A Flash, Jacquelyn Carter, Thomas P Giordano, and Thomas Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Naive Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
+Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Na<span>ı̈</span>ve Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1231,16 +1245,16 @@ Hemmige, Vagish, Charlene A Flash, Jacquelyn Carter, Thomas P Giordano, and Thom
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Final Analysis.do matches the paper <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>: the three regimens compared (Atripla against darunavir or atazanavir boosted with ritonavir, each with Truvada), insurance in the propensity model, and psychiatry visits and a 50 copies/mL threshold as sensitivity analyses. Main does not call it: it was run by hand a section at a time, so it would not run straight through. A deliberate stop line sits partway down, and it creates <span class="in">`VirologicallySuppressed2`</span> twice, which Stata refuses.</span>
 <span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Things the code does that the paper does not say</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where the code is more specific than the paper</span></span>
 <span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Kept as they are in both the Stata and the R:</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>The code is the record of what was done, so these are kept as they are in both the Stata and the R:</span>
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Patients with prior care elsewhere and patients with no insurance status are excluded.</span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Viral suppression is 400 copies/mL *or less*, not less than 400.</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Suppression on the initial regimen and the proportion of days covered are calculated over all follow-up to the end of 2013, not the first year.</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The 50 copies/mL sensitivity analysis counts suppression at any time, not the first year.</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Slips in the code</span></span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Slips in the code</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Follow-up window.** The saved file computes five outcomes over all of a patient's days to the end of 2013, not the first year: regimen change (lines 63-64), suppression on the initial regimen (161-162), the proportion of days covered (167), days covered on the initial regimen (196-197), and the 50 copies/mL suppression (177). Each is a <span class="in">`by studyid: egen`</span> with nothing limiting it to year one, unlike retention and year-one suppression, which go through <span class="in">`Quarter`</span>. The 2015 version of the same calculations ran after <span class="in">`keep if DaysSinceARTInitiation&lt;365`</span>, which is missing here; Final Analysis.do was run by hand, and the R assumes that step was run but not saved. The paper reports these as first-year outcomes, so the R computes them for year one (<span class="co">[</span><span class="ot">step 8</span><span class="co">](08_outcomes.qmd#other-outcomes)</span>).</span>
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The models meant to use the psychiatry-adjusted weights (<span class="in">`IPW2`</span>) use <span class="in">`IPW`</span>. The R uses <span class="in">`IPW2`</span> (<span class="co">[</span><span class="ot">step 9</span><span class="co">](09_sensitivity.qmd)</span>).</span>
 <span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`(CurrentDrug4CurrentDispense)`</span> is missing its <span class="in">`==30`</span>. It does no harm, because the value is always 0 or 30.</span>
