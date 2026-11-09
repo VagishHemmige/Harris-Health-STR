@@ -85,7 +85,7 @@ predict PropensityScore, p
 generate IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)
 ```
 
-The formula picks 1/p for STR patients and 1/(1-p) for the others; `if_else()` says so directly. These are average-treatment-effect weights.
+The formula picks 1/p for STR patients and 1/(1-p) for the others; `if_else()` says so directly. These are average-treatment-effect weights. Why they work, what they estimate, and when they go wrong are explained on [Inverse probability weighting](ipw.qmd).
 
 ```{r}
 #| label: compute-weights

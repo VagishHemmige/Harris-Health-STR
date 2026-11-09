@@ -22,7 +22,7 @@ Retention in care is usually measured by contacts with care separated by enough 
 
 ## Propensity scores and inverse probability weights
 
-In an observational study the groups being compared differ in ways that also affect the outcome. A **propensity score** is each person's probability of receiving the treatment given their measured characteristics, estimated with a logistic regression. Weighting each person by the inverse of the probability of the treatment they actually received (**inverse probability of treatment weighting**, IPTW) creates a pseudo-population in which the measured characteristics are balanced between groups, and the weighted comparison estimates the average treatment effect. Because weights are estimated and some are large, standard errors need a robust (sandwich) estimator. Weighting balances only what was measured: unmeasured confounding remains.
+In an observational study the groups being compared differ in ways that also affect the outcome. A **propensity score** is each person's probability of receiving the treatment given their measured characteristics, estimated with a logistic regression. Weighting each person by the inverse of the probability of the treatment they actually received (**inverse probability of treatment weighting**, IPTW) creates a pseudo-population in which the measured characteristics are balanced between groups, and the weighted comparison estimates the average treatment effect. Because weights are estimated and some are large, standard errors need a robust (sandwich) estimator. Weighting balances only what was measured: unmeasured confounding remains. [Inverse probability weighting](ipw.qmd) works through all of this with a small example.
 
 ## Reporting
 
