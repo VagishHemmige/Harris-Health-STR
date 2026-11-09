@@ -1,0 +1,72 @@
+---
+title: "Study design and methods"
+format: html
+---
+
+This page explains, in plain language and without code, what this study chose and why. The general background is on [Methodological background](methodological_background.qmd). The formal specification is the [analysis plan](analysis-plan.qmd); each section links the part of the plan that governs it. Two kinds of note mark where the description stands:
+
+- **Specified in:** the section of the analysis plan that defines the method.
+- **Current code:** where the original code does something other than what the paper describes, what the code does. Both the Stata and the R translation do the same thing here; the R does not silently "fix" the original.
+
+## The question and the design in brief
+
+A retrospective cohort of treatment-naive patients who started ART at Thomas Street Health Center between 2008 and 2011, comparing those who started the single-tablet regimen Atripla with those who started a boosted protease inhibitor with Truvada. Outcomes are measured in the first year after the first fill; the comparison is reported as odds ratios, unadjusted and weighted by the inverse probability of treatment.
+
+**Specified in:** [§1 Objective](analysis-plan.qmd#1-objective) and [§2 Design](analysis-plan.qmd#2-design).
+
+## Working out each patient's regimen
+
+The pharmacy record lists every drug dispensed. The drugs filled on the same day are joined into a regimen name (for example `Norvir/Prezista/Truvada`), and a new regimen starts whenever that name changes. This simple rule fails when a patient picks up only part of a regimen on a given day, so the original analyst reviewed the patients whose sequences looked wrong and wrote 576 manual corrections. Those corrections name individual patients and dates, so they are not published; the R code shows how such corrections are applied using a made-up example.
+
+A regimen is classed as twice daily if any drug in it was dispensed as a twice-daily product (for example raltegravir or lopinavir/ritonavir). Early Complera fills recorded as Truvada were recoded.
+
+**Specified in:** [§5 Exposure and time zero](analysis-plan.qmd#5-exposure-and-time-zero).
+
+## The person-day data set
+
+Every patient gets one row per day from 1 January 2008 to 31 December 2013. Each day carries the current regimen, the CD4 and viral load measured that day if any, the last values carried forward, and the days since the last and until the next test.
+
+## Medication on hand
+
+Every fill is assumed to be 30 pills. For each drug, pills on hand go up by 30 on a fill day and down by one each day; early refills add to what is left, and pills of a drug carried into a new regimen that contains it count. A day is **covered** when every drug in the current regimen is on hand.
+
+**Specified in:** [§7 Outcomes](analysis-plan.qmd#7-outcomes).
+
+## Who is included
+
+Patients are included if their first regimen in the window is one of the three compared regimens and is taken once daily. Time zero is the first day of the first regimen.
+
+**Specified in:** [§4 Study population](analysis-plan.qmd#4-study-population).
+
+**Current code:** the code also excludes patients recorded as having had prior care elsewhere, and patients with no insurance status; the paper's methods do not mention either exclusion.
+
+## Outcomes
+
+- **Retention in care in year one:** at least two viral loads in days 0-364 after the first fill, more than 90 days apart.
+- **Viral suppression in year one:** at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.
+- **Suppression on the initial regimen:** suppressed on a day while still on the first regimen.
+- **Adherence:** proportion of days covered of 80% or more.
+
+**Specified in:** [§7 Outcomes](analysis-plan.qmd#7-outcomes).
+
+**Current code:** suppression is defined as 400 copies/mL *or less*; the paper says *less than* 400.
+
+**Current code:** suppression on the initial regimen and the proportion of days covered are computed over all follow-up to the end of 2013, not only the first year as the paper's table implies.
+
+## Comparing the groups
+
+A logistic regression gives each patient's probability of starting the STR from hepatitis C, sex, Black race, Hispanic ethnicity, injection drug use, men who have sex with men, age group, baseline viral load group, baseline CD4 group and insurance. Each patient is weighted by the inverse of the probability of the regimen they started. Each outcome is compared with logistic regression, without weights and with them (robust standard errors).
+
+**Specified in:** [§8 Statistical analysis](analysis-plan.qmd#8-statistical-analysis).
+
+## Sensitivity analyses
+
+- A viral load threshold of 50 copies/mL for patients starting after 2008.
+- A propensity model that also includes any psychiatry visit.
+- Excluding patients who had a suppressed viral load 90 or more days after their last fill, which suggests they were filling elsewhere.
+
+**Specified in:** [§9 Sensitivity analyses](analysis-plan.qmd#9-sensitivity-analyses).
+
+**Current code:** in the Stata, the models meant to use the weights from the psychiatry propensity model use the main weights instead. The R uses the new weights, as the paper describes.
+
+**Current code:** the 50 copies/mL analysis counts suppression at any time in follow-up, not only year one.

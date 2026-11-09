@@ -1,0 +1,81 @@
+---
+title: "5. Pills on hand and daily outcomes"
+format: html
+---
+
+This script counts the pills of each drug a patient has each day, decides whether the day is covered by the full regimen, and defines the daily "still in care" and "virologically suppressed" measures. It produces `analytic_days`, the R counterpart of Stata's "Data Analytic file", for [6. Cohort](06_cohort.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/05_adherence.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/05_adherence.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from [`stata/Do Step 8 Data Preparation.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%208%20Data%20Preparation.do).
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/05_adherence.R")
+```
+
+## Number the days of each regimen
+
+Stata's variable `M` counts the days within a regimen: `bysort studyid CurrentRegimenNumber (CurrentDate): generate M=_n`. Day 1 of regimen 1 is the patient's first observation, which becomes time zero later.
+
+```{r}
+#| label: number-days-within-regimen
+#| eval: false
+```
+
+## Count pills on hand
+
+For each drug, pills on hand follow [`count_pills_on_hand()`](functions.qmd#counting-pills-on-hand): +30 on a fill day, -1 each day, never below zero. The first day of each regimen starts from that day's fill plus any pills of the same drug left the day before, from [`carry_over_pills()`](functions.qmd#carrying-pills-into-a-new-regimen).
+
+Regimens are processed in order because of that carry-over: regimen 2's first day needs regimen 1's last day. Stata did the same with nested loops over regimen number, drug position and previous drug position:
+
+```stata
+forvalues Regim=2(1)$MaxNumberRegimens{
+  forvalues counter=1(1)$SizeOfLargestRegimen {
+    replace CurrentDrug`counter'PillsLeft= CurrentDrug`counter'CurrentDispense if ((M==1)&(CurrentRegimenNumber==`Regim'))
+    forvalues j=1(1)$SizeOfLargestRegimen {
+      replace CurrentDrug`counter'PillsLeft=max(0,CurrentDrug`counter'PillsLeft+CurrentDrug`j'PillsLeft[_n-1]-1) ///
+        if ((M==1)&(CurrentRegimenNumber==`Regim')&(CurrentDrug`counter'Name==CurrentDrug`j'Name[_n-1])&(CurrentDrug`counter'Name~=""))
+    }
+    ...
+```
+
+In R, the loop is over regimen numbers only. Matching drugs between the last day of one regimen and the first day of the next is a join by drug name, and the day-by-day count runs within each patient, regimen and drug.
+
+```{r}
+#| label: count-pills-per-regimen
+#| eval: false
+```
+
+## Is the day covered?
+
+A day is covered when every drug in the regimen has pills on hand, partially covered when some do, and uncovered when none do. With one row per drug, these are `all()` and `any()` over the day's rows; Stata needed a loop over drug positions for each.
+
+```{r}
+#| label: summarise-coverage-per-day
+#| eval: false
+```
+
+## Still in care and virologically suppressed
+
+**Still in care (lab-based):** both a CD4 and a viral load are still to come. After a patient's last test of either kind, they count as out of care.
+
+**Virologically suppressed:** see [`vl_suppressed_on_day()`](functions.qmd#viral-suppression-on-a-day). A viral load of 400 or less counts for 90 days; a day just before a suppressed result also counts if that result is within 90 days.
+
+```{r}
+#| label: define-daily-outcomes
+#| eval: false
+```

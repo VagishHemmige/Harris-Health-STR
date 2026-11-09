@@ -1,0 +1,75 @@
+---
+title: "9. Sensitivity analyses"
+format: html
+---
+
+This script runs the sensitivity analyses the paper reports: a lower viral load threshold after 2008, a propensity model that adds psychiatry visits, and excluding patients who may have filled their prescriptions elsewhere.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/09_sensitivity.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/09_sensitivity.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 174-223.
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/09_sensitivity.R")
+```
+
+## A lower threshold after 2008
+
+The assay changed after 2008, so patients who started later are held to 50 copies/mL. The same daily rule is reused with a threshold that depends on the year ART started, and results are tabulated by start year, as the Stata did one `tab ... if YearofARTInitiation==2008` line at a time.
+
+**Current code:** this "ever suppressed" uses all follow-up, not only year one.
+
+```{r}
+#| label: suppression-threshold-by-year
+#| eval: false
+```
+
+## STR use by start year
+
+```{r}
+#| label: str-by-start-year
+#| eval: false
+```
+
+## Adding psychiatry visits to the propensity model
+
+`update()` refits the propensity model with one more term.
+
+**Current code:** Final Analysis.do computed the new weights (`IPW2`) but its next two models were written with `[pw=IPW]`, the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.
+
+```{r}
+#| label: add-psych-visits-to-propensity
+#| eval: false
+```
+
+## Possible outside pharmacy
+
+A suppressed viral load measured 90 or more days after the last fill of a drug in the current regimen suggests the patient was getting medication somewhere else. Stata counted days since the last fill with the same running-sum trick used for labs; here the last fill date is filled down and subtracted. A patient is flagged if this happens at any time in follow-up, and the flag is compared between the groups.
+
+```{r}
+#| label: flag-possible-outside-pharmacy
+#| eval: false
+```
+
+## Excluding them
+
+The paper reports that repeating the analysis without these patients gave similar results (data not shown). Final Analysis.do flags the patients but does not contain those models; they were run in a separate scratch file that is not part of this repository. Here the main models are refitted on the published cohort without the flagged patients, unweighted and with the original weights.
+
+```{r}
+#| label: exclude-possible-outside-pharmacy
+#| eval: false
+```

@@ -1,0 +1,72 @@
+---
+title: "Which file does what"
+format: html
+---
+
+The do-files here are the ones that produce the published analysis: the main do-file, the data-build steps it runs, and `Do Final Analysis.do`, which starts from the data set they make. Earlier versions, earlier analyses and scratch files are not included. The files themselves are in [`stata/`](https://github.com/VagishHemmige/Harris-Health-STR/tree/main/stata) and on the next two pages.
+
+## How the pieces fit
+
+```{mermaid}
+%%| eval: true
+flowchart TD
+  M["Do Main do file.do"]
+  subgraph build ["Building the person-day data set"]
+    S0B["0B Current regimen"] --> S7
+    S1A["1A Pharmacy fills"] --> S6["6 Split pharmacy file"] --> S7
+    S2["2 CD4"] --> S5
+    S3["3 Viral load"] --> S5
+    S4["4 Demographics"] --> S5
+    S4B["4B Insurance, prior care"] --> S5
+    S4C["4C Psychiatry visits"] --> S5
+    S5["5 Merge and expand to days"] --> S7["7 Merge pharmacy"] --> S8["8 Pills on hand, outcomes<br/>= Data Analytic file"]
+  end
+  M -. runs .-> build
+  S8 --> F["Final Analysis<br/>(published paper)"]
+  style build fill:#f8f9fa,stroke:#adb5bd,color:#212529
+```
+
+## File by file
+
+| File | Dated | What it does | R translation |
+|---|---|---|---|
+| Do Main do file | Nov 2015, analysis date Dec 2017 | Sets the analysis date and runs Steps 0B-8 with a log | [`R/main.R`](setup.qmd) |
+| Step 0B Current Regimen | Nov 2015 | Every regimen over time from fill dates, 576 manual corrections, Complera recode, twice-daily flags | [1. Regimens](01_regimens.qmd) |
+| Step 1A Pharmacy Part 1 | undated | Cleans drug names, flags twice-daily and single-tablet products, one row per patient | [1](01_regimens.qmd) and [4](04_daily_regimen.qmd) |
+| Step 2 CD4, Step 3 VL | Dec 2014 | Lab results, one row per patient | [2. Labs and baseline](02_labs_and_baseline.qmd) |
+| Step 4 Demographic | Dec 2014 | Demographics and risk indicators | [2](02_labs_and_baseline.qmd) |
+| Step 4B Insurance, 4C Psych | Dec 2017 | Insurance and prior care; psychiatry visit dates (added for the revision) | [2](02_labs_and_baseline.qmd) |
+| Step 5 Merge and Expand | Dec 2014 | One row per patient per day 2008-2013, labs carried forward and back | [3. Patient-days](03_person_days.qmd) |
+| Step 6 Tokenize Pharmacy | Dec 2014 | Splits the pharmacy file into about 147 files to get round Stata's memory limit | Not needed in R ([4](04_daily_regimen.qmd)) |
+| Step 7 Merge Pharmacy | undated | Current regimen and dispense days on each day | [4. Daily regimen](04_daily_regimen.qmd) |
+| Step 8 Data Preparation | Jun 2014 | Pills on hand, days covered, still in care, suppression: the "Data Analytic file" | [5. Pills on hand](05_adherence.qmd) |
+| Do Final Analysis | undated; uses the Dec 2017 data | **The published analysis.** Three regimens; exclusions; propensity score and weights; outcomes; sensitivity analyses | [6](06_cohort.qmd) to [9](09_sensitivity.qmd) |
+
+The main do-file still contains lines for files not kept here: two earlier regimen steps (0A and 1B, already commented out because 0B replaced them) and four earlier analysis steps (9-12, quarterly outcomes and survival models that are not in the paper). A stop line after Step 8 kept them from running.
+
+## Final Analysis and the paper
+
+Final Analysis.do matches the paper [@hemmige2018str]: the three regimens compared (Atripla against darunavir or atazanavir boosted with ritonavir, each with Truvada), insurance in the propensity model, and psychiatry visits and a 50 copies/mL threshold as sensitivity analyses. Main does not call it: it was run by hand a section at a time, so it would not run straight through. A deliberate stop line sits partway down, and it creates `VirologicallySuppressed2` twice, which Stata refuses.
+
+## Things the code does that the paper does not say
+
+Kept as they are in both the Stata and the R:
+
+- Patients with prior care elsewhere and patients with no insurance status are excluded.
+- Viral suppression is 400 copies/mL *or less*, not less than 400.
+- Suppression on the initial regimen and the proportion of days covered are calculated over all follow-up to the end of 2013, not the first year.
+- The 50 copies/mL sensitivity analysis counts suppression at any time, not the first year.
+
+## Slips in the code
+
+- The models meant to use the psychiatry-adjusted weights (`IPW2`) use `IPW`. The R uses `IPW2` ([step 9](09_sensitivity.qmd)).
+- `(CurrentDrug4CurrentDispense)` is missing its `==30`. It does no harm, because the value is always 0 or 30.
+
+## Privacy {#privacy}
+
+The do-files here are copies with patient-level details removed. Nothing else was changed.
+
+- **Manual corrections.** Step 0B had 576 lines correcting individual patients' regimens, 396 of them for a specific dispensing date or date range, and Step 1A five more. A study ID with an exact date is more than a de-identified data set may contain, so each block is replaced by a note saying how many lines were removed and what form they took.
+- **Notes about individual patients.** Comments naming a study ID are replaced by a one-line note.
+- **Paths and names.** A local folder path is replaced by `"<your analysis folder>"`, and a person's name in a comment by a description.
+- **Stop lines.** Lines that deliberately stopped a do-file partway are replaced by a comment.

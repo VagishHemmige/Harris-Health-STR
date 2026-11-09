@@ -1,0 +1,104 @@
+---
+title: "1. Regimens from pharmacy fills"
+format: html
+---
+
+This script turns the pharmacy dispensing record into each patient's sequence of regimens, with the date each one started and whether it is taken twice daily. It produces `fills` and `regimen_episodes` for [4. Daily regimen](04_daily_regimen.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/01_regimens.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/01_regimens.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from [`stata/Do Step 0B Current Regimen.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do), with the drug-name fixes also in [`Do Step 1A Pharmacy Part 1.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do).
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/01_regimens.R")
+```
+
+## Read the fills
+
+One row per drug dispensed: the patient (`studyid`), the date as text (`medtransdate`), the drug name, and the pharmacy's product code and description.
+
+```{r}
+#| label: read-fills
+#| eval: false
+```
+
+## Fix drug names and flag twice-daily products
+
+Some fills were recorded as "Experimental" or "Other" though the product description shows the drug. A join to the lookup table in `setup.R` replaces six Stata `replace` lines. Each fill is also flagged if its product is taken twice a day: for example, darunavir 600 mg is the twice-daily dose, while 800 mg (two 400 mg tablets) is the once-daily dose.
+
+```{r}
+#| label: fix-drug-names
+#| eval: false
+```
+
+## Name the regimen on each fill date
+
+The drugs filled on the same day, sorted alphabetically and joined with "/", make that day's regimen name. In Stata this took a `reshape wide` by drug, a loop to paste the names together, a string trick to trim trailing slashes, and a `reshape long` back:
+
+```stata
+bysort studyid DispenseNumber ( drugname) : generate M=_n
+reshape wide drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)
+generate CurrentRegimen=drugname1
+forvalue i=2(1)$SizeOfLargestRegimen {
+replace CurrentRegimen=CurrentRegimen+"/"+ drugname`i'
+}
+```
+
+In R it is a grouped summary.
+
+```{r}
+#| label: name-regimen-per-fill-date
+#| eval: false
+```
+
+## Apply manual corrections
+
+The rule above fails when a patient picks up part of a regimen on its own day: Norvir and Truvada on Monday and Reyataz on Wednesday gives two short-lived "regimens", `Norvir/Truvada` and `Reyataz`, and two spurious switches. The original analyst reviewed the patients whose sequences looked wrong and wrote 576 corrections, one `replace` line each, for the patient and date or date range. They name individual patients and dispensing dates, so they are left out of this repository ([why](stata_overview.qmd#privacy)). The code reads them from a file kept with the data; the synthetic example has three made-up rows.
+
+Note how much of the Stata code these corrections were. A rule that merges fills a few days apart, or one that ignores a lone fill of a drug already in the regimen, might replace many of them, but would also be a different definition from the one published.
+
+```{r}
+#| label: apply-manual-corrections
+#| eval: false
+```
+
+## Recode early Complera
+
+When Complera first came onto the formulary, some fills were recorded as Truvada. Once the corrections have set a fill date's regimen to Complera, a Truvada fill that day is recoded.
+
+```{r}
+#| label: recode-early-complera
+#| eval: false
+```
+
+## Check which drugs appear in each regimen
+
+Stata ran `bysort CurrentRegimen: tab drugname` and then a series of `tab studyid if CurrentRegimen=="..." && drugname=="..."` lines to find implausible combinations, such as a Sustiva fill during Atripla. This builds the same cross-tabulation as a table to inspect. Looking at the patients behind it is work for someone authorised to see the data.
+
+```{r}
+#| label: check-drugs-within-regimens
+#| eval: false
+```
+
+## Number the regimens
+
+A new regimen starts on the first fill date and on any fill date whose regimen name differs from the one before. A regimen is twice daily if any fill within it was a twice-daily product. One row per regimen remains, with its start date; Stata kept the same by `keep if NewRegimen` and reshaped it wide with one column per regimen.
+
+```{r}
+#| label: number-regimen-episodes
+#| eval: false
+```

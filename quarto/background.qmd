@@ -1,0 +1,26 @@
+---
+title: "Clinical background"
+format: html
+---
+
+## Why pill burden might matter
+
+Antiretroviral therapy works only if it is taken. Staying in care, collecting refills and taking pills every day are all harder for patients facing poverty, unstable housing, mental illness or substance use, which describes much of the population served by a county safety-net HIV clinic. One proposed help is to make the regimen simpler: a single tablet once a day rather than several.
+
+## The regimens compared
+
+At the time of the study (patients starting ART from 2008 to 2011), first-line regimens at the clinic were built on tenofovir and emtricitabine:
+
+| Regimen | Pills per day | Group in this study |
+|---|---|---|
+| Efavirenz/tenofovir/emtricitabine (Atripla) | 1 | Single-tablet regimen (STR) |
+| Darunavir + ritonavir + tenofovir/emtricitabine (Prezista + Norvir + Truvada) | 3 | Multi-tablet regimen (MTR) |
+| Atazanavir + ritonavir + tenofovir/emtricitabine (Reyataz + Norvir + Truvada) | 3 | Multi-tablet regimen (MTR) |
+
+Rilpivirine/tenofovir/emtricitabine (Complera) and elvitegravir/cobicistat/tenofovir/emtricitabine (Stribild) became available late in the period; earlier versions of the analysis included them, but the published comparison does not.
+
+The comparison is not only about pill count: the STR contains a non-nucleoside reverse transcriptase inhibitor (efavirenz) and the MTRs a boosted protease inhibitor. Clinicians may also have chosen protease inhibitors for patients they expected to adhere poorly, because protease inhibitors are less prone to resistance. The paper discusses both limitations [@hemmige2018str].
+
+## What the study found
+
+Patients who started the STR were more likely to be retained in care and to reach viral suppression in the first year, after propensity weighting; differences in pharmacy-based adherence were small and not statistically significant [@hemmige2018str]. The numbers are in the paper; this site does not reproduce them.

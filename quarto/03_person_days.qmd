@@ -1,0 +1,74 @@
+---
+title: "3. One row per patient-day"
+format: html
+---
+
+This script gives every patient one row for each day from 1 January 2008 to 31 December 2013 and attaches the lab results, with the last values carried forward and the days since the last and until the next test. It produces `person_days` for [4. Daily regimen](04_daily_regimen.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/03_person_days.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/03_person_days.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+
+Translated from [`stata/Do Step 5 Merge and Expand.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do).
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/03_person_days.R")
+```
+
+## Expand to days
+
+`cross_join()` pairs every patient with every day. Stata did the same with `expand 2192` and a counter.
+
+```{r}
+#| label: expand-to-days
+#| eval: false
+```
+
+## Attach lab results
+
+In Stata, with the labs in wide format, a loop checked every day against every test date:
+
+```stata
+generate CurrentCD4=.
+quietly forvalues counter=1(1)$MaxNumberCD4Measurements {
+replace CurrentCD4=CD4Result`counter' if CurrentDate==CD4Date`counter'
+}
+```
+
+A join by patient and date does it directly. If a patient had two results on one day, the later one in the file wins in both versions.
+
+```{r}
+#| label: attach-lab-results
+#| eval: false
+```
+
+## Carry values forward and back
+
+Stata counted days since the last test with a running sum (`replace x = 1 + x[_n-1] if x==.`), then sorted the data by *negative* date and repeated the trick to count days until the next test. `tidyr::fill()` carries a value down (or up) to the following missing rows, so the date of the last test and of the next test can be filled and subtracted from today's date. The same fill gives the last value carried forward (`LVCFCD4`, `LVCFViralLoad`) and the next value (`NextCD4`, `NextViralLoad`).
+
+Days before a patient's first test have no "last" value; days after the last test have no "next" one. That second fact defines "still in care" in [step 5](05_adherence.qmd).
+
+```{r}
+#| label: carry-lab-values
+#| eval: false
+```
+
+## Count days between tests
+
+The gap is the number of days between the tests either side of a day.
+
+```{r}
+#| label: count-days-between-tests
+#| eval: false
+```

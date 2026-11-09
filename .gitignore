@@ -1,0 +1,51 @@
+# R, RStudio and Positron
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.httr-oauth
+.DS_Store
+
+# Quarto. docs/ is the rendered site; the GitHub Actions workflow in
+# .github/workflows/publish.yml renders and publishes it to gh-pages.
+/.quarto/
+/docs/
+**/*.quarto_ipynb
+
+# Credentials
+.Renviron
+.env
+*.pem
+*.key
+
+# Data files. Data live outside the repository; this is a safety net, not access control.
+/data-raw/
+*.csv
+*.xlsx
+*.xls
+*.rds
+*.rda
+*.sas7bdat
+*.sas7bcat
+*.xpt
+*.dta
+*.sav
+*.parquet
+*.feather
+*.arrow
+*.fst
+
+# Outputs, ignored until cleared for public release.
+# Remove these lines when the governing review clears the outputs (for example
+# USRDS review before publication), or from the start if setup decided the outputs
+# need no review before release.
+# Removing them does not track tables saved as .csv or .rds: the data-format
+# patterns above still hide those, so cleared tables need their own exceptions.
+/figures/
+/tables/
+
+# Approved public files: add narrow exceptions here, never a whole format.
+# !tests/fixtures/synthetic.csv
+
+# Synthetic data written by R/synthetic/make_synthetic_data.R (regenerate rather than commit)
+/data-synthetic/

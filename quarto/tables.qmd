@@ -1,0 +1,34 @@
+---
+title: "Tables"
+format: html
+---
+
+This script writes the analysis tables to `tables/` as CSV files. The Stata wrote its results to log files.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/tables.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/tables.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/tables.R")
+```
+
+## Write the tables
+
+A named list holds every table, and a loop over its names writes each one. `tables/` is ignored by Git: tables made from real data would need clearing before release, and tables made from synthetic data mean nothing.
+
+```{r}
+#| label: write-tables
+#| eval: false
+```

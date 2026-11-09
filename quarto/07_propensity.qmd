@@ -1,0 +1,80 @@
+---
+title: "7. Propensity score and weights"
+format: html
+---
+
+This script compares the two groups at baseline, fits the propensity score model and computes the inverse probability of treatment weights. It adds `propensity_score` and `ipw` to `patients` for [8. Outcomes](08_outcomes.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/07_propensity.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/07_propensity.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 70-127.
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/07_propensity.R")
+```
+
+## Baseline differences
+
+Each Stata line such as `tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2` becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as `gtsummary`.
+
+```{r}
+#| label: test-baseline-differences
+#| eval: false
+```
+
+## Insurance and receiving an STR
+
+```{r}
+#| label: insurance-and-str
+#| eval: false
+```
+
+## Propensity model
+
+The covariates are those listed in the paper. In Stata, `Gender` was the numbered category made by `encode` (1 = F, 2 = M) entered as a number, which is the same model as a male indicator. Patients missing any covariate, for example with no viral load before ART, get no score and so no weight, and drop out of the weighted analyses, as they did in Stata.
+
+One difference to know about: if a category predicts the regimen perfectly (every patient in it started the STR, say), Stata's `logistic` drops that category and its patients with a note, while `glm()` keeps them and gives probabilities close to 0 or 1, and so very large weights. Check the fitted model for this before using the weights.
+
+```{r}
+#| label: fit-propensity-model
+#| eval: false
+```
+
+## Weights
+
+Stata:
+
+```stata
+predict PropensityScore, p
+generate IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)
+```
+
+The formula picks 1/p for STR patients and 1/(1-p) for the others; `if_else()` says so directly. These are average-treatment-effect weights.
+
+```{r}
+#| label: compute-weights
+#| eval: false
+```
+
+## Weighted balance
+
+Stata repeated the baseline tables with `[aw=IPW]`. Weighted means and proportions by group show whether weighting balanced the covariates; standardised differences are the usual summary.
+
+```{r}
+#| label: check-weighted-balance
+#| eval: false
+```

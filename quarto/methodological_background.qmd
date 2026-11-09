@@ -1,0 +1,29 @@
+---
+title: "Methodological background"
+format: html
+---
+
+General ideas this kind of analysis rests on. What this study chose is on [Study design and methods](study_methods.qmd).
+
+## Pharmacy fills as a record of treatment
+
+A clinic pharmacy records each dispensing: the patient, the date, the product and (usually) the quantity. Fills tell you what a patient collected, not what they swallowed, but they are recorded the same way for everyone and cover every day. Two things have to be worked out from them:
+
+- **Which regimen a patient is on.** A regimen is the set of drugs filled together. Patients sometimes pick up the drugs of one regimen on different days, refill one drug and not another, or keep collecting an old drug after a switch, so a rule such as "the drugs filled on the same day make the regimen" needs checking against the record.
+- **Whether a patient has medication on hand.** If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is *covered* when every drug in the regimen is on hand. The **proportion of days covered (PDC)** over a period is a standard adherence measure; 80% is the conventional cut-off. It is a lower bound when patients can also fill elsewhere.
+
+## One row per person per day
+
+Fills, labs and visits happen on irregular dates. Expanding each patient to one row per calendar day puts everything on the same time line: on any day you can ask what regimen the patient was on, how many pills they had, and what their most recent viral load was (the *last value carried forward*), and how long until the next test. Counting days, quarters or years from a start date then becomes simple filtering. The cost is size: a few thousand patients over six years is millions of rows, which mattered for Stata in 2014 and matters much less in R today.
+
+## Retention and viral suppression
+
+Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau's performance measures count medical visits at least 90 days apart; studies working from laboratory data often use viral load tests as the marker of a visit. Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect: older assays reported down to 400 copies/mL, newer ones to 50 or 20.
+
+## Propensity scores and inverse probability weights
+
+In an observational study the groups being compared differ in ways that also affect the outcome. A **propensity score** is each person's probability of receiving the treatment given their measured characteristics, estimated with a logistic regression. Weighting each person by the inverse of the probability of the treatment they actually received (**inverse probability of treatment weighting**, IPTW) creates a pseudo-population in which the measured characteristics are balanced between groups, and the weighted comparison estimates the average treatment effect. Because weights are estimated and some are large, standard errors need a robust (sandwich) estimator. Weighting balances only what was measured: unmeasured confounding remains.
+
+## Reporting
+
+Observational studies using routinely collected data are reported following STROBE and its extension RECORD [@vonelm2007strobe; @benchimol2015record].

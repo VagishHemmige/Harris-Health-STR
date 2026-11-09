@@ -1,0 +1,15 @@
+---
+title: "Final Analysis"
+format: html
+---
+
+The do-file behind the published paper. It starts from the "Data Analytic file" made by Step 8. It was run by hand a section at a time, so it has a stop line partway down (now a comment) and creates `VirologicallySuppressed2` twice; read it as a record, not a script that runs straight through. The R translation is in [steps 6 to 9](06_cohort.qmd).
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+# Reads the do-files as text; runs no analysis.
+source("_show_stata.R")
+show_do_file("Do Final Analysis.do", open = TRUE)
+```

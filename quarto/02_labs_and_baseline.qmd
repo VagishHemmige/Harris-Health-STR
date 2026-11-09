@@ -1,0 +1,80 @@
+---
+title: "2. Labs and baseline data"
+format: html
+---
+
+This script reads the CD4 and viral load results and the patient-level information: demographics, insurance, prior care and psychiatry visits. It produces `cd4`, `viral_load` and `baseline` for [3. One row per patient-day](03_person_days.qmd) and [6. Cohort](06_cohort.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/02_labs_and_baseline.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/02_labs_and_baseline.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from Stata Steps [2 (CD4)](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%202%20CD4.do), [3 (VL)](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%203%20VL.do), [4 (demographics)](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204%20Demographic.do), [4B (insurance)](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204B%20Insurance.do) and [4C (psychiatry)](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204C%20Psych.do), and the merges at the top of [Step 5](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do).
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/02_labs_and_baseline.R")
+```
+
+## CD4 counts
+
+Each Stata lab step read the file, converted the date, then reshaped to one row per patient with columns `CD4Result1`, `CD4Date1`, `CD4Result2` ... so that it could be merged one-to-one later. R keeps one row per test (long format) and joins by patient and date when needed, so no reshape is required.
+
+```{r}
+#| label: read-cd4
+#| eval: false
+```
+
+## Viral loads
+
+```{r}
+#| label: read-viral-load
+#| eval: false
+```
+
+## Demographics
+
+Lower-case codes (`f`, `m`, `b`, `h`) are corrected, then indicators are made for the propensity model. Injection drug use and MSM each include the combined `MSM&IDU` category. In Stata, `encode` then turned the text into numbered categories "to save space", which R does not need.
+
+```{r}
+#| label: read-demographics
+#| eval: false
+```
+
+## Insurance and prior care
+
+Added in December 2017, probably for the revision of the paper. The insurance categories are used in the propensity model; `prevcareelsewhere` is used as an exclusion in [6. Cohort](06_cohort.qmd).
+
+```{r}
+#| label: read-insurance
+#| eval: false
+```
+
+## Psychiatry visits
+
+Also added in December 2017, for a sensitivity analysis. The analysis only asks whether a patient had any psychiatry visit date on file, at any time.
+
+```{r}
+#| label: read-psych-visits
+#| eval: false
+```
+
+## Combine
+
+Stata's `merge 1:1` keeps patients found in either file and records which in `_merge`; the Step 5 code listed the unmatched patients and then kept them all. `full_join()` does the same. A patient in the lab files but not in the demographics file is kept, with missing demographics.
+
+```{r}
+#| label: combine-baseline
+#| eval: false
+```

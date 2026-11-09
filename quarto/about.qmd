@@ -1,0 +1,51 @@
+---
+title: "About"
+format: html
+---
+
+## The study
+
+Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.
+
+-   **Vagish Hemmige**, **Charlene A. Flash**, **Jacquelyn Carter**, **Thomas P. Giordano** and **Thomas Zerai** (authors of the paper)
+
+Scientific questions about the study go to Vagish Hemmige. Known issues are in [Issues](https://github.com/VagishHemmige/Harris-Health-STR/issues).
+
+## This repository
+
+`R/main.R` runs the R scripts in order: five that build a one-row-per-patient-per-day data set from pharmacy and laboratory extracts, and four that select the cohort, weight it and compare outcomes. `stata/` holds the original do-files. The real extracts are clinic records and are not in the repository; the code reads synthetic copies made by `R/synthetic/make_synthetic_data.R`.
+
+Contributions follow the rules in [`AGENTS.md`](agents.qmd).
+
+## How this website was created
+
+The site is built with [Quarto](https://quarto.org) from the scripts themselves. Each R code page imports the labelled sections of its script from `R/` and shows them with an explanation; the Stata pages print the do-files from `stata/`. The site never runs the analysis, so it is built without any data.
+
+The translation, the site and the documents were drafted with an AI assistant (Claude) using the R Analysis Workflow plugin, working from the do-files and the published paper and checked by running the R on synthetic data. The assistant had no access to the clinic data.
+
+Four documents describe the project:
+
+-   [**Analysis plan**](analysis-plan.qmd): *what the analysis did, and why,* reconstructed from the paper and the code, with the places they differ marked.
+-   [**Architecture**](architecture.qmd): *how the R code does it.* The scripts, their order, and the objects passed between them.
+-   [**AGENTS.md**](agents.qmd): *how people and AI assistants work on the project.*
+-   [**Repository blueprint**](repository-blueprint.qmd): *the layout every project of this kind starts from.*
+
+## Pages
+
+-   [**Clinical background**](background.qmd): pill burden, the regimens compared, and what the study found.
+-   [**Methodological background**](methodological_background.qmd): pharmacy fills, person-day data, retention and suppression measures, propensity weighting.
+-   [**Study design and methods**](study_methods.qmd): what this study chose, in plain language, and where the code differs from the paper.
+-   [**Setup**](setup.qmd): packages, file locations and constants.
+-   [**Functions**](functions.qmd): helper functions, including the pill count.
+-   [**1. Regimens from pharmacy fills**](01_regimens.qmd): regimen names, manual corrections, regimen numbering.
+-   [**2. Labs and baseline data**](02_labs_and_baseline.qmd): CD4, viral load, demographics, insurance, psychiatry visits.
+-   [**3. One row per patient-day**](03_person_days.qmd): expanding to days, carrying lab values forward and back.
+-   [**4. Daily regimen and fills**](04_daily_regimen.qmd): the current regimen and its drugs on each day.
+-   [**5. Pills on hand and daily outcomes**](05_adherence.qmd): pills on hand, coverage, still in care, suppression.
+-   [**6. Cohort**](06_cohort.qmd): exclusions, time zero, one row per patient.
+-   [**7. Propensity score and weights**](07_propensity.qmd): baseline comparisons, propensity model, weights.
+-   [**8. Outcomes**](08_outcomes.qmd): retention, suppression, adherence and the odds ratios.
+-   [**9. Sensitivity analyses**](09_sensitivity.qmd): lower threshold, psychiatry visits, outside pharmacy.
+-   [**Tables**](tables.qmd): writing the tables.
+-   [**Which file does what**](stata_overview.qmd): the do-files behind the paper, how they fit together, slips found, and what was removed for privacy.
+-   [**Data build (Steps 0-8)**](stata_data_build.qmd) and [**Final Analysis**](stata_final_analysis.qmd): the do-files themselves.

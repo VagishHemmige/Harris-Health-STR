@@ -1,0 +1,27 @@
+---
+title: "Overview"
+format: html
+---
+
+This site teaches the code behind a published study by translating the original Stata analysis into R, step by step. The paper is @hemmige2018str.
+
+## Clinical background
+
+Single-tablet regimens (STRs) combine a complete antiretroviral regimen in one pill taken once a day. When the study was done, the only first-line STR in wide use at the clinic was efavirenz/tenofovir/emtricitabine (Atripla); the usual alternatives were a ritonavir-boosted protease inhibitor (darunavir or atazanavir) taken with tenofovir/emtricitabine (Truvada), which is three pills once a day. The question was whether starting on one pill rather than three made a difference to staying in care and reaching an undetectable viral load in the first year. More on the [clinical background](quarto/background.qmd) page.
+
+## What this analysis does
+
+It uses pharmacy fills, CD4 counts and viral loads from Thomas Street Health Center, a Harris Health System HIV clinic in Houston, for patients starting antiretroviral therapy (ART) in 2008-2011. It compares patients who started Atripla with those who started a boosted protease inhibitor with Truvada, on retention in care, viral suppression and medication coverage.
+
+## Methods
+
+Every patient becomes one row per day from 2008 to 2013, and each day records the regimen, whether pills were on hand, and the most recent labs. Outcomes are then compared between the two groups with and without inverse probability of treatment weights from a propensity score. [Study design and methods](quarto/study_methods.qmd) explains each step in plain language, and the [analysis plan](quarto/analysis-plan.qmd) is the formal specification.
+
+## How to use this site
+
+- **Code** pages follow the R scripts in the order `R/main.R` runs them. Each one explains a step and shows the R code next to the Stata it replaces.
+- **Original Stata code** shows the do-files behind the paper as they were, with patient-level details removed, and how they fit together.
+
+## Status
+
+Teaching material for a completed, published study. The R code has been run only on synthetic data; it has not been used to reproduce the published numbers, and no real data or results from it are in this repository.

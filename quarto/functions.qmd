@@ -1,0 +1,128 @@
+---
+title: "Functions"
+format: html
+---
+
+Reusable helper functions. Most of them hold a rule from the Stata code that was written inline, sometimes more than once, so that the rule is stated and tested in one place.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/functions.R")
+```
+
+## Reading a source file
+
+Used by [1](01_regimens.qmd) and [2](02_labs_and_baseline.qmd).
+
+```{r}
+#| label: read-source-csv
+#| eval: false
+```
+
+## Reading the manual corrections
+
+Returns an empty table if the file is not there, so the code runs without any corrections. Used by [1. Regimens](01_regimens.qmd).
+
+```{r}
+#| label: read-regimen-corrections
+#| eval: false
+```
+
+## Naming a regimen
+
+Stata built the name by reshaping the day's fills wide, sorted by drug name, and gluing `drugname1 + "/" + drugname2 + ...`, then trimming trailing slashes. Sorting and pasting does the same in one line. `locale = "C"` sorts the way Stata does, by character code.
+
+```{r}
+#| label: make-regimen-name
+#| eval: false
+```
+
+## Applying manual corrections
+
+In Stata each correction was a line such as
+
+```stata
+replace CurrentRegimen="<regimen>" if ((studyid==<id>) & (ARTDate>=date("<m/d/y>","MDY")))
+```
+
+Here the corrections are rows of a table with a patient, an optional first and last date, and the regimen. A join finds the fill dates each correction covers. When two corrections cover the same date the later one wins, as the later `replace` did.
+
+```{r}
+#| label: apply-regimen-corrections
+#| eval: false
+```
+
+## Counting pills on hand
+
+The core of the adherence calculation (Stata Step 8):
+
+```stata
+replace CurrentDrug`counter'PillsLeft=cond((CurrentDrug`counter'CurrentDispense==30)&(CurrentDrug`counter'PillsLeft[_n-1]==0),30, ///
+    max(0,CurrentDrug`counter'CurrentDispense+CurrentDrug`counter'PillsLeft[_n-1]-1)) if ...
+```
+
+Stata's `replace` works down the rows in order, so `x[_n-1]` on the right is the value just computed for the row above: a running calculation. R's vectorised functions do not work that way, so this is one of the few places a loop is the clearest code. The value is the pills available *including* today's dose: a 30-pill fill covers that day and the next 29. A refill on a day with none left gives 30 rather than 29, because no pill from the old supply was used.
+
+```{r}
+#| label: count-pills-on-hand
+#| eval: false
+```
+
+## Carrying pills into a new regimen
+
+When a patient switches from, say, `Norvir/Reyataz/Truvada` to `Norvir/Prezista/Truvada`, the Truvada and Norvir they still have count towards the new regimen. Stata did this with a loop over every pair of drug positions; here the leftover pills of matching drugs are passed in.
+
+```{r}
+#| label: carry-over-pills
+#| eval: false
+```
+
+## Viral suppression on a day
+
+The daily definition used throughout. In Stata, a missing value is larger than any number, so `missing <= 400` is false; `coalesce(..., FALSE)` gives R the same answer where R would otherwise return `NA`.
+
+```{r}
+#| label: vl-suppressed-on-day
+#| eval: false
+```
+
+## Participant flow
+
+Records how many patients remain after each exclusion in [6. Cohort](06_cohort.qmd).
+
+```{r}
+#| label: count-patients
+#| eval: false
+```
+
+## Baseline comparisons
+
+The R counterparts of `tab ..., chi2`, `ttest` and `ranksum`, with the options that match Stata's defaults. Used by [7. Propensity score](07_propensity.qmd).
+
+```{r}
+#| label: compare-groups
+#| eval: false
+```
+
+## Odds ratios
+
+The R counterpart of `logistic outcome InitialRegimenSTR` and `logistic outcome InitialRegimenSTR [pw=IPW]`. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; `svyglm()` with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are. Used by [8](08_outcomes.qmd) and [9](09_sensitivity.qmd).
+
+```{r}
+#| label: odds-ratio-for-str
+#| eval: false
+```

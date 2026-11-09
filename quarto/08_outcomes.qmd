@@ -1,0 +1,82 @@
+---
+title: "8. Outcomes"
+format: html
+---
+
+This script defines each patient's outcomes and compares the STR and multi-tablet groups, unadjusted and weighted: the analyses behind the paper's Table 3. It adds outcome columns to `patients` and produces `outcome_summary` and `outcome_models`.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/08_outcomes.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/08_outcomes.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
+
+Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 56-68, 102-106 and 131-173 and 196-203.
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/08_outcomes.R")
+```
+
+## Retention in care
+
+At least two viral loads in days 0-364, more than 90 days apart. Stata needed eleven lines: mark viral load days, blank out the rest, count them, multiply the indicator by the date to get measurement dates, take the minimum and maximum, subtract, and drop the helper variables. Filtering to first-year test days and summarising per patient says it in one step.
+
+```{r}
+#| label: define-retention
+#| eval: false
+```
+
+## Other outcomes
+
+Each `by studyid: egen x = max(...)` or `mean(...)` in Stata becomes one line of a per-patient `summarise()`. `any()` is the R counterpart of `max()` over a 0/1 variable.
+
+**Current code:** the outcomes do not all use the same follow-up. Suppression in year one uses days 0-364 (through `quarter`), but suppression on the initial regimen and the proportion of days covered are averaged over every day to the end of 2013, because the Stata `egen` ran over all of a patient's rows. Patients who started in 2008 contribute up to six years; those who started late in 2011, two.
+
+```{r}
+#| label: define-patient-outcomes
+#| eval: false
+```
+
+## Suppression at the first switch
+
+Were patients who switched suppressed on the day they switched?
+
+```{r}
+#| label: suppression-at-switch
+#| eval: false
+```
+
+## Outcome summary
+
+Counts and percentages by group, as in the `tab outcome InitialRegimenSTR, row column chi2` lines.
+
+```{r}
+#| label: summarise-outcomes
+#| eval: false
+```
+
+## Odds ratios
+
+For each outcome, one unadjusted and one weighted logistic regression, collected in a table. In Stata each was a pair of lines repeated for every outcome:
+
+```stata
+logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject
+logistic RetainedInCareFirstYear InitialRegimenSTR if FirstObservationOfSubject [pw=IPW]
+```
+
+A loop over outcome names keeps every result in one table instead of in a log file.
+
+```{r}
+#| label: fit-outcome-models
+#| eval: false
+```

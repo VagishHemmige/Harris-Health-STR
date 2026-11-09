@@ -1,0 +1,63 @@
+---
+title: "4. Daily regimen and fills"
+format: html
+---
+
+This script puts each patient's current regimen on every day, lists the drugs in it, and marks the days each drug was dispensed. It produces `daily` and `daily_drugs` for [5. Pills on hand](05_adherence.qmd).
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/04_daily_regimen.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/04_daily_regimen.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+
+Translated from [`stata/Do Step 6 Tokenize Pharmacy.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%206%20Tokenize%20Pharmacy.do) and [`stata/Do Step 7 Merge Pharmacy.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%207%20Merge%20Pharmacy.do).
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/04_daily_regimen.R")
+```
+
+## Keep patients with fills
+
+Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata cut the wide pharmacy file into about 147 files, one per fill number, because merging it in one go ran out of memory; Step 7 then merged them one at a time in a loop. R joins long tables and needs neither step.
+
+```{r}
+#| label: keep-patients-with-fills
+#| eval: false
+```
+
+## Carry the regimen forward
+
+Each regimen is placed on the day it started and filled down until the next one starts. `new_regimen` marks the start days. A regimen that started before 1 January 2008 is not on the grid, so those days have no regimen until the next start: exactly what the Stata did, since it only matched start dates that fell inside the window.
+
+```{r}
+#| label: carry-regimen-forward
+#| eval: false
+```
+
+## List the drugs on each day
+
+Stata used `split CurrentRegimen, parse(/)` to make `CurrentDrug1Name`, `CurrentDrug2Name` and so on, and then every later calculation looped over the drug positions. Here each drug in the regimen is its own row, numbered by its position, so later steps can group by drug instead of looping.
+
+```{r}
+#| label: list-drugs-per-day
+#| eval: false
+```
+
+## Mark dispense days
+
+A drug in today's regimen that was dispensed today counts as a 30-pill fill. A drug dispensed that is not in the current regimen does not count, which is how the original handled stray fills of old drugs.
+
+```{r}
+#| label: mark-dispense-days
+#| eval: false
+```
