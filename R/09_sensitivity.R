@@ -10,9 +10,11 @@
 #   outside_pharmacy_models.
 
 ## ---- suppression-threshold-by-year
-# 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards.
-# As in the Stata code, "ever suppressed" here uses all follow-up, not year one.
+# 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards,
+# applied to the year-one suppression outcome as the paper describes. (The saved
+# Stata takes the maximum over all follow-up.)
 suppression_by_year_threshold <- cohort_days |>
+  filter(first_year) |>
   mutate(
     threshold = if_else(art_start_year == 2008, vl_suppression_main, vl_suppression_later),
     vl_suppressed_year_threshold = vl_suppressed_on_day(

@@ -77,10 +77,12 @@ Patient outcomes:
 
 - **Retention in care, year one:** at least two viral loads in days 0-364 after time zero, more than 90 days apart (HRSA-style definition using viral load tests).
 - **Viral suppression, year one:** suppressed on at least one day in days 0-364.
-- **Viral suppression on the initial regimen:** suppressed on at least one day while on the initial regimen. **Differs from paper:** uses all follow-up to 31 December 2013, not only year one.
-- **Adherence:** PDC ≥ 0.80, with PDC the proportion of days covered. **Differs from paper:** averaged over all follow-up to 31 December 2013, not only year one.
-- **Adherence on the initial regimen:** proportion of days that are both covered and on the initial regimen ≥ 0.80, over all follow-up.
-- **Regimen change:** any change of regimen during follow-up (descriptive).
+- **Viral suppression on the initial regimen:** suppressed on at least one day in days 0-364 while on the initial regimen.
+- **Adherence:** PDC ≥ 0.80, with PDC the proportion of days 0-364 covered.
+- **Adherence on the initial regimen:** proportion of days 0-364 that are both covered and on the initial regimen ≥ 0.80.
+- **Regimen change:** any change of regimen in days 0-364 (descriptive); suppression on the day of the first switch.
+
+All patient outcomes use days 0-364. The saved `Do Final Analysis.do` computes suppression on the initial regimen, both adherence measures and the 50 copies/mL sensitivity outcome over all follow-up to 31 December 2013; the 2015 version of the same calculations restricted the data to the first year, as the paper reports. This plan follows the paper.
 
 ## 8. Statistical analysis
 
@@ -94,7 +96,7 @@ Patient outcomes:
 
 ## 9. Sensitivity analyses
 
-1. **Assay threshold:** suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. **Differs from paper:** "ever suppressed" over all follow-up.
+1. **Assay threshold:** suppression defined with ≤50 copies/mL for patients starting ART after 2008 (≤400 for 2008), tabulated by year of ART start. Tests whether the 400 cut-off, set by the 2008 assay, hides differences. Suppression is counted in days 0-364, as in the main analysis.
 2. **Psychiatric history:** propensity model adding any psychiatry visit; retention and year-one suppression re-estimated with the new weights. Tests confounding by mental illness.
 3. **Outside pharmacy:** excluding patients with a viral load ≤400 measured 90 or more days after their last fill of a drug in the current regimen, at any time in follow-up; main models re-estimated, unweighted and with the original weights. Tests whether fills elsewhere bias the outcomes.
 

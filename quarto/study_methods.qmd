@@ -45,13 +45,13 @@ Patients are included if their first regimen in the window is one of the three c
 - **Retention in care in year one:** at least two viral loads in days 0-364 after the first fill, more than 90 days apart.
 - **Viral suppression in year one:** at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.
 - **Suppression on the initial regimen:** suppressed on a day while still on the first regimen.
-- **Adherence:** proportion of days covered of 80% or more.
+- **Adherence:** proportion of days covered of 80% or more in the first year.
+
+Every outcome is measured in the first year. The saved Stata file computed some of them over all follow-up; the R follows the paper ([details](stata_overview.qmd#slips-in-the-code)).
 
 **Specified in:** [§7 Outcomes](analysis-plan.qmd#7-outcomes).
 
 **Current code:** suppression is defined as 400 copies/mL *or less*; the paper says *less than* 400.
-
-**Current code:** suppression on the initial regimen and the proportion of days covered are computed over all follow-up to the end of 2013, not only the first year as the paper's table implies.
 
 ## Comparing the groups
 
@@ -68,5 +68,3 @@ A logistic regression gives each patient's probability of starting the STR from 
 **Specified in:** [§9 Sensitivity analyses](analysis-plan.qmd#9-sensitivity-analyses).
 
 **Current code:** in the Stata, the models meant to use the weights from the psychiatry propensity model use the main weights instead. The R uses the new weights, as the paper describes.
-
-**Current code:** the 50 copies/mL analysis counts suppression at any time in follow-up, not only year one.

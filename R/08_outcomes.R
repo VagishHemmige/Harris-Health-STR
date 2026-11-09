@@ -19,14 +19,17 @@ retention <- cohort_days |>
   )
 
 ## ---- define-patient-outcomes
-# Note the follow-up each outcome uses, which differs between outcomes in the
-# original code: suppression in year one uses days 0-364; suppression on the
-# initial regimen and proportion of days covered use all follow-up to the end
-# of 2013.
+# Every outcome uses the first year after ART start (days 0-364), as the paper
+# describes. The saved Final Analysis.do computes suppression on the initial
+# regimen, the proportion of days covered and regimen change over all of a
+# patient's days to the end of 2013, because its `by studyid: egen` lines have
+# no first-year restriction; the 2015 version of the same code restricted the
+# data to year one first. See the "Which file does what" page.
 patient_outcomes <- cohort_days |>
+  filter(first_year) |>
   group_by(studyid) |>
   summarise(
-    vl_suppressed_year_one = any(vl_suppressed[first_year]),
+    vl_suppressed_year_one = any(vl_suppressed),
     vl_suppressed_on_initial_regimen = any(vl_suppressed & on_initial_regimen),
     proportion_days_covered = mean(day_covered),
     proportion_days_covered_initial = mean(day_covered & on_initial_regimen),
@@ -45,9 +48,10 @@ patients <- patients |>
   )
 
 ## ---- suppression-at-switch
-# Were patients suppressed on the day they switched to a second regimen?
+# Among patients who switched in year one, were they suppressed on the day
+# they switched to a second regimen?
 suppression_at_switch <- cohort_days |>
-  filter(regimen_number == 2, day_in_regimen == 1) |>
+  filter(first_year, regimen_number == 2, day_in_regimen == 1) |>
   count(str, vl_suppressed)
 
 ## ---- summarise-outcomes
