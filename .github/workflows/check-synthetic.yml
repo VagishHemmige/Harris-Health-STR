@@ -39,6 +39,7 @@ jobs:
             any::purrr
             any::gtsummary
             any::cardx
+            any::broom.helpers
             any::gt
             any::flextable
 
