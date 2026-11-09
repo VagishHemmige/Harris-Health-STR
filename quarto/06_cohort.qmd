@@ -15,9 +15,9 @@ This R script file is itself reliant on the following helper files:
 -   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
 -   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
 
-Translated from the first part of [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do) (to line 57).
+Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 1-60 and 88-100.
 
-The code sections below are imported directly from that script when this page is rendered.
+The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.
 :::
 
 ```{r}
@@ -47,6 +47,30 @@ stata_for("start-at-first-regimen")
 ## Exclusions
 
 In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.
+
+```{mermaid}
+%%| eval: true
+%%| fig-cap: "Participant flow. The two totals and the group sizes are quoted from the paper; it does not report how many patients each step removed, so those boxes have no numbers. Nothing here comes from running the code."
+flowchart TD
+  accTitle: Participant flow from the paper
+  accDescr: 2,095 patients entered care in the study period. Four exclusions follow, in the order the code applies them, with no counts reported for each: a first regimen taken twice daily or started before 2008; a first regimen other than the three compared; prior HIV care elsewhere, or no record of it; no insurance status. 1,028 patients were included, 622 starting the single-tablet regimen and 406 the multi-tablet regimens. The paper's Results give 410 for the multi-tablet group.
+  A["2,095 patients entered care, 2008-2011"]
+  A --> B["Starting regimen taken once daily"]
+  B -.- X1["Excluded: twice-daily first regimen,<br/>or first regimen before 2008 (missing value)"]
+  B --> C["Started one of the three compared regimens"]
+  C -.- X2["Excluded: any other first regimen"]
+  C --> D["No prior HIV care elsewhere"]
+  D -.- X3["Excluded: prior care elsewhere,<br/>or no intake record"]
+  D --> E["Insurance status recorded"]
+  E -.- X4["Excluded: no insurance status"]
+  E --> F["1,028 included"]
+  F --> G["622 single-tablet regimen<br/>(Atripla)"]
+  F --> H["406 multi-tablet regimen*<br/>(atazanavir or darunavir,<br/>each with ritonavir and Truvada)"]
+  classDef excl fill:#f8f9fa,stroke:#adb5bd,color:#212529
+  class X1,X2,X3,X4 excl
+```
+
+\* The abstract gives 406 and the Results 410; 622 + 406 = 1,028. Patients with no propensity weight (a covariate missing) also drop out of the weighted analyses; the paper does not report how many.
 
 One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. This is how the code enforces the start of enrollment. It sets no upper limit on the start date; the 2008-2011 enrollment window is assumed to come from the data extract ([details](study_methods.qmd#who-is-included)). Likewise `drop if prevcareelsewhere` drops patients with that field missing. The R filters keep only an explicit "no" (`%in% FALSE`, `%in% 0`) to match.
 
@@ -82,7 +106,7 @@ stata_for("define-exposure-and-time")
 
 ## One row per patient
 
-Stata kept the daily data and picked out each patient's first day with `if FirstObservationOfSubject` on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before.
+Stata kept the daily data and picked out each patient's first day with `if FirstObservationOfSubject` on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before within the data. The day-by-day data start on 1 January 2008, so a test before then is never seen: a patient who started ART early in 2008 can have no baseline value when a later starter with a test at the same interval would have one. This matches the Stata.
 
 ```{r}
 #| label: build-patient-table

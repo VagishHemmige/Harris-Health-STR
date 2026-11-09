@@ -9,19 +9,22 @@ The do-files here are the ones that produce the published analysis: the main do-
 
 ```{mermaid}
 %%| eval: true
+%%| fig-cap: "How the do-files feed one another. Main runs Steps 0B to 8, which build the person-day file; Final Analysis was run by hand on that file."
 flowchart TD
-  M["Do Main do file.do"]
+  accTitle: How the Stata do-files fit together
+  accDescr: Do Main runs Steps 0B to 8. Step 0B (current regimen) and Step 1A (pharmacy fills, then split by Step 6) feed Step 7. Steps 2 to 4C (labs, demographics, insurance and prior care, psychiatry visits) feed Step 5, which expands to one row per patient per day and feeds Step 7. Step 7 merges the pharmacy data and feeds Step 8, which computes pills on hand and outcomes and saves the Data Analytic file. Final Analysis, the published analysis, reads that file.
+  M["Do Main do file.do<br/>runs Steps 0B-8"]
   subgraph build ["Building the person-day data set"]
-    S0B["0B Current regimen"] --> S7
-    S1A["1A Pharmacy fills"] --> S6["6 Split pharmacy file"] --> S7
-    S2["2 CD4"] --> S5
-    S3["3 Viral load"] --> S5
-    S4["4 Demographics"] --> S5
-    S4B["4B Insurance, prior care"] --> S5
-    S4C["4C Psychiatry visits"] --> S5
-    S5["5 Merge and expand to days"] --> S7["7 Merge pharmacy"] --> S8["8 Pills on hand, outcomes<br/>= Data Analytic file"]
+    direction TB
+    S0B["0B Current regimen"]
+    S1A["1A Pharmacy fills"] --> S6["6 Split pharmacy file"]
+    L["2-4C Labs, demographics,<br/>insurance, psychiatry"] --> S5["5 Merge and expand to days"]
+    S0B --> S7["7 Merge pharmacy"]
+    S6 --> S7
+    S5 --> S7
+    S7 --> S8["8 Pills on hand, outcomes<br/>= Data Analytic file"]
   end
-  M -. runs .-> build
+  M --> build
   S8 --> F["Final Analysis<br/>(published paper)"]
   style build fill:#f8f9fa,stroke:#adb5bd,color:#212529
 ```
@@ -37,7 +40,7 @@ flowchart TD
 | Step 4 Demographic | Dec 2014 | Demographics and risk indicators | [2](02_labs_and_baseline.qmd) |
 | Step 4B Insurance, 4C Psych | Dec 2017 | Insurance and prior care; psychiatry visit dates (added for the revision) | [2](02_labs_and_baseline.qmd) |
 | Step 5 Merge and Expand | Dec 2014 | One row per patient per day 2008-2013, labs carried forward and back | [3. Patient-days](03_person_days.qmd) |
-| Step 6 Tokenize Pharmacy | Dec 2014 | Splits the pharmacy file into about 147 files to get round Stata's memory limit | Not needed in R ([4](04_daily_regimen.qmd)) |
+| Step 6 Tokenize Pharmacy | Dec 2014 | Splits the pharmacy file into one file per fill number to get round Stata's memory limit | Not needed in R ([4](04_daily_regimen.qmd)) |
 | Step 7 Merge Pharmacy | undated | Current regimen and dispense days on each day | [4. Daily regimen](04_daily_regimen.qmd) |
 | Step 8 Data Preparation | Jun 2014 | Pills on hand, days covered, still in care, suppression: the "Data Analytic file" | [5. Pills on hand](05_adherence.qmd) |
 | Do Final Analysis | undated; uses the Dec 2017 data | **The published analysis.** Three regimens; exclusions; propensity score and weights; outcomes; sensitivity analyses | [6](06_cohort.qmd) to [9](09_sensitivity.qmd) |

@@ -15,9 +15,9 @@ This R script file is itself reliant on the following helper files:
 -   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
 -   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
 
-Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 56-68, 102-106 and 131-173 and 196-203.
+Translated from [`stata/Do Final Analysis.do`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do), lines 62-68, 102-106, 131-173 and 196-203.
 
-The code sections below are imported directly from that script when this page is rendered.
+The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.
 :::
 
 ```{r}

@@ -18,7 +18,7 @@ retention in care among treatment naive patients. *AIDS Care.*
 [doi:10.1080/09540121.2018.1442554](https://doi.org/10.1080/09540121.2018.1442554).
 
 The study compared patients starting a single-tablet regimen with those
-starting three pills once a day, using pharmacy fills and laboratory
+starting three or four pills once a day, using pharmacy fills and laboratory
 results from a Harris Health System HIV clinic. This repository holds
 the original Stata code, with patient-level details removed, and a
 step-by-step translation into R.

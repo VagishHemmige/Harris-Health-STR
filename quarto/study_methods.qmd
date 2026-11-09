@@ -31,6 +31,60 @@ Every patient gets one row per day from 1 January 2008 to 31 December 2013. Each
 
 Every fill is assumed to be 30 pills. For each drug, pills on hand go up by 30 on a fill day and down by one each day; early refills add to what is left, and pills of a drug carried into a new regimen that contains it count. A day is **covered** when every drug in the current regimen is on hand.
 
+```{r}
+#| label: fig-pills-on-hand
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 4.2
+#| fig-cap: "How fills become pills on hand and covered days, for one made-up patient on a two-drug regimen. Each fill adds 30 pills and each day uses one; an early refill adds to what is left. A day is covered only when both drugs are on hand."
+#| fig-alt: "Step chart of pills on hand over 120 days for a made-up patient taking two drugs, A and B, with a band underneath marking covered days. Drug A is filled on days 0, 25, 70 and 100; the early refill on day 25 adds to the 5 pills left, and drug A runs out only on days 60 to 69. Drug B is filled on days 0, 40 and 95 and runs out on days 30 to 39 and 70 to 94. Days are covered only when both drugs are on hand: 76 of 121 days, about 63%. Made-up example is printed on the chart."
+library(ggplot2)
+
+# A copy of the rule in count_pills_on_hand() (Functions page), applied to
+# made-up fills. Nothing here is study or synthetic data.
+pills_from_fills <- function(fill_days, n_days = 121, fill_size = 30) {
+  dispensed <- ifelse(0:(n_days - 1) %in% fill_days, fill_size, 0)
+  pills <- numeric(n_days)
+  pills[1] <- dispensed[1]
+  for (day in 2:n_days) {
+    if (dispensed[day] == fill_size && pills[day - 1] == 0) {
+      pills[day] <- fill_size
+    } else {
+      pills[day] <- max(0, dispensed[day] + pills[day - 1] - 1)
+    }
+  }
+  pills
+}
+
+fills <- list("Drug A" = c(0, 25, 70, 100), "Drug B" = c(0, 40, 95))
+on_hand <- do.call(rbind, lapply(names(fills), function(drug) {
+  data.frame(day = 0:120, drug = drug, pills = pills_from_fills(fills[[drug]]))
+}))
+fill_marks <- do.call(rbind, lapply(names(fills), function(drug) {
+  data.frame(day = fills[[drug]], drug = drug)
+}))
+covered <- aggregate(pills ~ day, data = on_hand, FUN = function(p) all(p > 0))
+covered$status <- ifelse(covered$pills, "Covered", "Not covered")
+covered$drug <- "Covered?"
+
+ggplot() +
+  geom_step(data = on_hand, aes(day, pills), linewidth = 0.8, colour = "#2780e3") +
+  geom_point(data = fill_marks, aes(day, 0), shape = 17, size = 2.6, colour = "#212529") +
+  geom_tile(data = covered, aes(day, 15, fill = status), height = 30, width = 1) +
+  facet_grid(factor(drug, c("Drug A", "Drug B", "Covered?")) ~ ., switch = "y") +
+  scale_fill_manual(values = c("Covered" = "#198754", "Not covered" = "#ced4da"), name = NULL) +
+  scale_x_continuous("Days since the first fill", breaks = seq(0, 120, 30), expand = c(0.01, 0)) +
+  scale_y_continuous("Pills on hand", breaks = c(0, 30, 60)) +
+  geom_label(data = data.frame(drug = "Drug A", day = 118, pills = 52),
+             aes(day, pills, label = "Made-up example"), hjust = 1, size = 3.4) +
+  labs(caption = "Triangles: fill days. Days covered here: share of days with every drug on hand (PDC).") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", strip.placement = "outside",
+        strip.text.y.left = element_text(angle = 0, face = "bold"),
+        panel.grid.minor = element_blank())
+```
+
 **Specified in:** [§7 Outcomes](analysis-plan.qmd#7-outcomes).
 
 ## Who is included
@@ -48,9 +102,61 @@ Enrollment and follow-up are different windows. Patients started ART in 2008-201
 ## Outcomes
 
 - **Retention in care in year one:** at least two viral loads in days 0-364 after the first fill, more than 90 days apart.
-- **Viral suppression in year one:** at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.
+- **Viral suppression at least once in year one:** at least one day in days 0-364 on which the patient counts as suppressed: the last viral load was 400 copies/mL or less, and either it was measured within the last 90 days or the next one, within 90 days, was also 400 or less.
 - **Suppression on the initial regimen:** suppressed on a day while still on the first regimen.
 - **Adherence:** proportion of days covered of 80% or more in the first year.
+
+```{r}
+#| label: fig-outcome-timeline
+#| echo: false
+#| eval: true
+#| fig-width: 8
+#| fig-height: 4.4
+#| fig-cap: "How the year-one outcomes are read from one made-up patient's viral load tests. The shaded window is days 0-364 after the first fill. A day counts as suppressed when the last result was 400 copies/mL or less and was measured within 90 days, or when the next result, within 90 days, is also 400 or less (the look-ahead). Retention needs two tests in the window more than 90 days apart."
+#| fig-alt: "Timeline from 60 days before to 450 days after the first fill for a made-up patient. Viral load tests: 48,000 copies/mL on day minus 20 (the baseline), 2,100 on day 45, 350 on day 140, 150 on day 300 and 40 on day 420. A band marks suppressed days: days 140 to 230 because the last result was 350 within 90 days; days 231 to 299 only through the look-ahead to the result of 150 on day 300; and from day 300 onward. A bracket from day 45 to day 300 shows two tests in the window 255 days apart, so the patient is retained. The patient counts as suppressed in year one. Notes say that a test on day 0 would also count, and that the look-ahead can use a test after day 364. 'Made-up example' is printed on the chart."
+library(ggplot2)
+
+# Made-up tests; the rule is the one in vl_suppressed_on_day() (Functions page).
+tests <- data.frame(day = c(-20, 45, 140, 300, 420),
+                    vl = c(48000, 2100, 350, 150, 40))
+days <- -60:450
+last_i <- findInterval(days, tests$day)
+next_i <- last_i + 1
+last_vl <- ifelse(last_i > 0, tests$vl[pmax(last_i, 1)], NA)
+last_day <- ifelse(last_i > 0, tests$day[pmax(last_i, 1)], NA)
+next_vl <- ifelse(next_i <= nrow(tests), tests$vl[pmin(next_i, nrow(tests))], NA)
+next_day <- ifelse(next_i <= nrow(tests), tests$day[pmin(next_i, nrow(tests))], NA)
+recent <- !is.na(last_vl) & last_vl <= 400 & days - last_day <= 90
+bridge <- !is.na(last_vl) & last_vl <= 400 & !recent &
+  !is.na(next_vl) & next_vl <= 400 & next_day - days <= 90
+status <- data.frame(day = days,
+                     how = ifelse(recent, "Last result ≤400, within 90 days",
+                           ifelse(bridge, "Counted through the look-ahead", NA)))
+status <- status[!is.na(status$how), ]
+
+ggplot() +
+  annotate("rect", xmin = 0, xmax = 364, ymin = -Inf, ymax = Inf, fill = "#e7f1fc") +
+  annotate("text", x = 182, y = 3.35, label = "Year one: days 0-364", size = 3.6, colour = "#1c5fa8") +
+  geom_vline(xintercept = c(0, 364), colour = "#1c5fa8", linetype = "dashed") +
+  geom_tile(data = status, aes(day, 1, fill = how), height = 0.45, width = 1) +
+  geom_point(data = tests, aes(day, 2.2), shape = 21, size = 3.2, fill = "#212529") +
+  geom_text(data = tests, aes(day, 2.6, label = format(vl, big.mark = ",")), size = 3.4) +
+  annotate("segment", x = 45, xend = 300, y = 1.75, yend = 1.75,
+           arrow = arrow(ends = "both", length = unit(2, "mm")), colour = "#e8590c") +
+  annotate("text", x = 172, y = 1.55, size = 3.3, colour = "#a5410a",
+           label = "Retained: tests 255 days apart (more than 90)") +
+  annotate("label", x = 445, y = 3.35, label = "Made-up example", hjust = 1, size = 3.4) +
+  scale_fill_manual(values = c("Last result ≤400, within 90 days" = "#198754",
+                               "Counted through the look-ahead" = "#8fd19e"),
+                    name = "Suppressed days") +
+  scale_y_continuous(NULL, breaks = c(1, 2.2), labels = c("Suppressed?", "Viral load\n(copies/mL)"),
+                     limits = c(0.6, 3.5)) +
+  scale_x_continuous("Days since the first fill (day 0)", breaks = c(-60, 0, 90, 180, 270, 364, 450)) +
+  labs(caption = "A test on day 0 is in the window, so a patient already suppressed when ART starts counts as suppressed.\nThe look-ahead can use a test after day 364.") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank(), plot.caption = element_text(hjust = 0))
+```
 
 **R departs from the Stata:** every outcome is measured in the first year. The saved Stata file computed some of them over all follow-up, a step assumed run but not saved ([details](stata_overview.qmd#slips-in-the-code)).
 
@@ -61,6 +167,10 @@ Enrollment and follow-up are different windows. Patients started ART in 2008-201
 ## Comparing the groups
 
 A logistic regression gives each patient's probability of starting the STR from hepatitis C, sex, Black race, Hispanic ethnicity, injection drug use, men who have sex with men, age group, baseline viral load group, baseline CD4 group and insurance. Each patient is weighted by the inverse of the probability of the regimen they started. Each outcome is compared with logistic regression, without weights and with them (robust standard errors).
+
+Patients stay in the group of the regimen they started for the whole year, even if they switch (an intention-to-treat comparison). The paper reports that 9 MTR patients switched to an STR during the year; they are still counted as MTR [@hemmige2018str].
+
+The results are odds ratios. With outcomes as common as these (70-85%), an odds ratio is further from 1 than the corresponding ratio of percentages, so it should not be read as "1.5 times as likely". The percentages in each group are on [Published results](published_results.qmd).
 
 **Specified in:** [§8 Statistical analysis](analysis-plan.qmd#8-statistical-analysis).
 
@@ -73,3 +183,8 @@ A logistic regression gives each patient's probability of starting the STR from 
 **Specified in:** [§9 Sensitivity analyses](analysis-plan.qmd#9-sensitivity-analyses).
 
 **R departs from the Stata:** in the saved Stata, the models meant to use the weights from the psychiatry propensity model use the main weights instead. The R uses the new weights, as the paper describes.
+
+## References
+
+::: {#refs}
+:::

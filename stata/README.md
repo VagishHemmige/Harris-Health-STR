@@ -9,10 +9,11 @@ These are copies of the originals with patient-level details removed. Nothing el
 | File | Removed |
 |---|---|
 | Do Step 0B Current Regimen.do | 576 manual regimen corrections, each naming a study ID (396 also with a dispensing date or date range); 43 comment lines about individual patients among the corrections and 24 more in the checking section that follows; a person's name in a comment |
-| Do Step 1A Pharmacy Part 1.do | 5 corrections naming a study ID and dates, and a comment listing the IDs |
+| Do Step 1A Pharmacy Part 1.do | 5 corrections naming a study ID and dates, and a comment listing the IDs; the largest number of drugs dispensed to one patient, from a comment |
+| Do Step 6 Tokenize Pharmacy.do, Do Step 7 Merge Pharmacy.do | The same number, from a comment each |
 | Do Main do file.do | A local folder path; a deliberate stop line |
 | Do Final Analysis.do | A deliberate stop line |
 
-Each block of removed corrections is replaced by a comment giving the number of lines and their form; each removed note by a one-line comment; the path by `"<your analysis folder>"`; and stop lines by a comment. Aggregate counts typed into the code are kept.
+Each block of removed corrections is replaced by a comment giving the number of lines and their form; each removed note by a one-line comment; the path by `"<your analysis folder>"`; and stop lines by a comment. Aggregate counts typed into the code are kept, except one that described a single patient, which was removed from the comments without replacement.
 
 The do-files read de-identified CSV extracts that are not in this repository.

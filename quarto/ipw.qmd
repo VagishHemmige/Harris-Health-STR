@@ -11,15 +11,17 @@ In a trial, a coin decides the regimen, so the two groups are alike in everythin
 
 Take 100 made-up patients of two kinds:
 
-- **60 with few barriers to care.** Clinicians gave 48 of them the single tablet (80%) and 12 the three-pill regimen. 90% of them reach suppression, *whichever regimen they get*.
-- **40 with many barriers.** Clinicians gave 12 of them the single tablet (30%) and 28 the three-pill regimen. 60% reach suppression, *whichever regimen they get*.
+- **60 with few barriers to care.** Clinicians gave 48 of them the single tablet (80%) and 12 the multi-tablet regimen. 90% of them reach suppression, *whichever regimen they get*.
+- **40 with many barriers.** Clinicians gave 12 of them the single tablet (30%) and 28 the multi-tablet regimen. 60% reach suppression, *whichever regimen they get*.
 
 The regimen makes no difference here, by construction. But compare the groups directly:
 
-| | Patients | Few barriers | Suppressed |
-|---|---|---|---|
-| Single tablet | 60 | 48 (80%) | 48 × 0.9 + 12 × 0.6 = 50.4 (84%) |
-| Three pills | 40 | 12 (30%) | 12 × 0.9 + 28 × 0.6 = 27.6 (69%) |
+| Regimen | Patients | With few barriers | Expected suppressed | Suppressed (%) |
+|---|---|---|---|---|
+| Single tablet | 60 | 48 (80%) | 50.4 | 84% |
+| Multi-tablet | 40 | 12 (30%) | 27.6 | 69% |
+
+: Table 1. Before weighting, the single tablet went mostly to patients with few barriers. Expected suppressed: 48 × 0.9 + 12 × 0.6 = 50.4 for the single tablet; 12 × 0.9 + 28 × 0.6 = 27.6 for multi-tablet.
 
 The single tablet "wins" by 15 points, entirely because it went mostly to patients who were going to do well anyway.
 
@@ -32,29 +34,33 @@ A patient's **propensity score** is the probability that a patient like them rec
 Each patient is weighted by one over the probability of the regimen they actually received:
 
 - Single tablet: weight = 1 / propensity score.
-- Three pills: weight = 1 / (1 − propensity score).
+- Multi-tablet: weight = 1 / (1 − propensity score).
 
 A patient who received a regimen that was unlikely for someone like them gets a large weight, because they stand in for the similar patients who went the other way.
 
-| | Received | Probability of what they received | Weight | Patients | Weighted count |
+| Barriers | Received | P(regimen received) | Weight | Patients | Weighted count |
 |---|---|---|---|---|---|
-| Few barriers | Single tablet | 0.8 | 1.25 | 48 | 60 |
-| Few barriers | Three pills | 0.2 | 5 | 12 | 60 |
-| Many barriers | Single tablet | 0.3 | 3.33 | 12 | 40 |
-| Many barriers | Three pills | 0.7 | 1.43 | 28 | 40 |
+| Few | Single tablet | 0.8 | 1.25 | 48 | 60 |
+| Few | Multi-tablet | 0.2 | 5 | 12 | 60 |
+| Many | Single tablet | 0.3 | 3.33 | 12 | 40 |
+| Many | Multi-tablet | 0.7 | 1.43 | 28 | 40 |
+
+: Table 2. Each weight is 1 / P(regimen received); weight × patients gives each group the cohort's 60:40 mix.
 
 After weighting, each regimen group looks like the whole cohort: 60 with few barriers and 40 with many. That is the **pseudo-population**, a version of the cohort in which the regimen no longer depends on barriers to care. Now compare:
 
-| | Weighted patients | Few barriers | Suppressed |
-|---|---|---|---|
-| Single tablet | 100 | 60 (60%) | 60 × 0.9 + 40 × 0.6 = 78 (78%) |
-| Three pills | 100 | 60 (60%) | 60 × 0.9 + 40 × 0.6 = 78 (78%) |
+| Regimen | Weighted patients | With few barriers | Expected suppressed | Suppressed (%) |
+|---|---|---|---|---|
+| Single tablet | 100 | 60 (60%) | 78 | 78% |
+| Multi-tablet | 100 | 60 (60%) | 78 | 78% |
+
+: Table 3. After weighting, both groups have the same mix and the same suppression. Expected suppressed: 60 × 0.9 + 40 × 0.6 = 78 in each group.
 
 The false 15-point difference is gone. With real data, what remains after weighting is the estimated effect of the regimen, provided the propensity model has captured everything that drove both the choice and the outcome.
 
 ## What the weighted result estimates
 
-These weights make *both* groups look like the whole cohort. The comparison therefore answers: what would happen if *everyone* in the cohort started the single tablet, compared with everyone starting three pills? This is the **average treatment effect (ATE)**, and it is what this study estimated.
+These weights make *both* groups look like the whole cohort. The comparison therefore answers: what would happen if *everyone* in the cohort started the single tablet, compared with everyone starting the multi-tablet regimen? This is the **average treatment effect (ATE)**, and it is what this study estimated.
 
 The weighted odds ratio compares those two whole-cohort scenarios. It is a *marginal* odds ratio, so it need not equal the odds ratio from a regression that adjusts for the same covariates. That is a property of odds ratios, not an error.
 
@@ -71,26 +77,28 @@ Weights become extreme when some patients had almost no chance of one regimen. S
 What analysts do about it:
 
 - **Look first.** Compare the distribution of propensity scores in the two groups and list the largest weights.
-- **Stabilized weights.** Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for three pills). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.
+- **Stabilized weights.** Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for multi-tablet). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.
 - **Trimming.** Cap weights at a percentile, or drop patients with scores near 0 or 1. This reduces noise but changes the population the answer applies to.
-- **A different question.** Weights of 1 for the single tablet and p / (1 − p) for three pills make the three-pill group look like the single-tablet group. This estimates the **average treatment effect in the treated (ATT)**: the effect among the kind of patients clinicians actually gave the single tablet.
+- **A different question.** Weights of 1 for the single tablet and p / (1 − p) for multi-tablet make the multi-tablet group look like the single-tablet group. This estimates the **average treatment effect in the treated (ATT)**: the effect among the kind of patients clinicians actually gave the single tablet.
 
 This study used unstabilized, untrimmed ATE weights and did not report the weight distribution.
 
 ## Standard errors, and Stata's `aw` and `pw`
 
-A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use **robust (sandwich) standard errors**. These also ignore the fact that the propensity scores were estimated; for the ATE that usually makes them somewhat conservative (too wide) rather than too narrow [@lunceford2004stratification].
+A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use **robust (sandwich) standard errors**. These also ignore the fact that the propensity scores were estimated. Theory for ATE weights shows that ignoring this tends to make the standard errors somewhat too wide (conservative) rather than too narrow [@lunceford2004stratification], and a simulation study of stabilized weights for relative risks found the same [@xu2010stabilized]. Neither guarantees it for every data set, and neither studied odds ratios with unstabilized weights as used here.
 
-Stata offers several kinds of weight. Two appear in Final Analysis.do, and they give the **same estimates but different standard errors**:
+Stata offers several kinds of weight. Two appear in Final Analysis.do. They give the **same weighted percentages and means**, but they mean different things, and only one of them can be used for the models:
 
 | | `[aw=IPW]` (analytic weights) | `[pw=IPW]` (probability weights) |
 |---|---|---|
-| Meant for | Rows that are averages of different numbers of people, so a larger weight means a more precise row | Each row stands in for 1/p people, as in survey sampling and inverse probability weighting |
-| Weighted percentages, means, odds ratios | Same | Same |
-| Standard errors | Treated as if the weights described precision; rescaled to the sample size | Robust (sandwich) standard errors, always |
+| What a weight means | The row is an average of several people, so a larger weight means a more precise row | The row stands in for 1/p people, as in survey sampling and inverse probability weighting |
+| Weighted percentages and means | The same under both | The same under both |
+| `logistic` | Not allowed: `logistic` accepts only `fw`, `iw` and `pw` | Allowed; always gives robust (sandwich) standard errors |
 | Used in Final Analysis.do for | The balance tables (`tab`, `summarize`): weighted percentages and means, with no tests | Every model (`logistic ... [pw=IPW]`) |
 
-That split is the right one: `aw` where only the weighted numbers matter, `pw` wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance ([7](07_propensity.qmd#weighted-balance)), and `survey::svyglm()`, which gives robust standard errors, for the models ([`odds_ratio_for_str()`](functions.qmd#odds-ratios)). Stata has two more kinds of weight that are not used here: `fw`, where a row really is several identical people, and `iw`, for special cases.
+: Table 4. Stata's two kinds of weight in Final Analysis.do.
+
+That split is the right one: `aw` where only the weighted numbers matter, `pw` wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance ([7](07_propensity.qmd#weighted-balance)), and `survey::svyglm()`, which gives robust standard errors, for the models ([`odds_ratio_for_str()`](functions.qmd#odds-ratios)). Stata has two more kinds of weight that are not used here: `fw`, where a row really is several identical people, and `iw`, for special cases. For commands that accept both `aw` and `pw`, such as `regress`, the estimates are the same and only the standard errors differ.
 
 ## What weighting cannot do
 

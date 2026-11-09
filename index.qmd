@@ -7,11 +7,11 @@ This site teaches the code behind a published study by translating the original 
 
 ## Clinical background
 
-Single-tablet regimens (STRs) combine a complete antiretroviral regimen in one pill taken once a day. When the study was done, the only first-line STR in wide use at the clinic was efavirenz/tenofovir/emtricitabine (Atripla); the usual alternatives were a ritonavir-boosted protease inhibitor (darunavir or atazanavir) taken with tenofovir/emtricitabine (Truvada), which is three pills once a day. The question was whether starting on one pill rather than three made a difference to staying in care and reaching an undetectable viral load in the first year. More on the [clinical background](quarto/background.qmd) page.
+Single-tablet regimens (STRs) combine a complete antiretroviral regimen in one pill taken once a day. When the study was done, the only first-line STR in wide use at the clinic was efavirenz/tenofovir/emtricitabine (Atripla); the usual alternatives were a ritonavir-boosted protease inhibitor (darunavir or atazanavir) taken with tenofovir/emtricitabine (Truvada), which was three or four pills once a day. The question was whether starting on one pill rather than three or four went with staying in care and reaching viral suppression in the first year. More on the [clinical background](quarto/background.qmd) page.
 
 ## What this analysis does
 
-It uses pharmacy fills, CD4 counts and viral loads from Thomas Street Health Center, a Harris Health System HIV clinic in Houston, for patients starting antiretroviral therapy (ART) in 2008-2011. It compares patients who started Atripla with those who started a boosted protease inhibitor with Truvada, on retention in care, viral suppression and medication coverage.
+It uses pharmacy fills, CD4 counts and viral loads from Thomas Street Health Center, a Harris Health System safety-net HIV clinic in Houston, for patients starting antiretroviral therapy (ART) in 2008-2011. It compares patients who started Atripla with those who started a boosted protease inhibitor with Truvada, on retention in care, viral suppression at least once in the first year, and medication coverage. It is an observational study: the comparison is weighted for measured differences between the groups, not randomized.
 
 ## Methods
 
@@ -21,6 +21,19 @@ Every patient becomes one row per day from 2008 to 2013, and each day records th
 
 - **Code** pages follow the R scripts in the order `R/main.R` runs them. Each one explains a step and shows the R code next to the Stata it replaces.
 - **Original Stata code** shows the do-files behind the paper as they were, with patient-level details removed, and how they fit together.
+
+## Terms used on this site
+
+- **ART:** antiretroviral therapy.
+- **STR / MTR:** single-tablet regimen / multi-tablet regimen.
+- **Viral suppression:** a viral load at or below the threshold, here 400 copies/mL. "Suppressed in year one" means at least once in the first year, not throughout it.
+- **Retention in care:** at least two viral load tests in the first year, more than 90 days apart; an adaptation of the HRSA (Health Resources and Services Administration) HIV/AIDS Bureau measure ("HRSA-style").
+- **PDC:** proportion of days covered: the share of days on which a patient had every drug of the regimen on hand, by the pharmacy record.
+- **Propensity score:** the estimated probability that a patient like this one started the STR.
+- **IPW / IPTW:** inverse probability (of treatment) weighting; see [Inverse probability weighting](quarto/ipw.qmd).
+- **ATE:** average treatment effect: the comparison of everyone in the cohort starting one regimen against everyone starting the other.
+- **Intention to treat:** patients stay in the group of the regimen they started, even if they switch.
+- **LVCF:** last value carried forward: each day takes the most recent test result.
 
 ## Status
 

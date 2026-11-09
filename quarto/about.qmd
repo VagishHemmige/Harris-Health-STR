@@ -5,7 +5,7 @@ format: html
 
 ## The study
 
-Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.
+Did starting HIV treatment on a single-tablet regimen, rather than three or four pills once a day, go with better retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.
 
 -   **Vagish Hemmige**, **Charlene A. Flash**, **Josephinel Carter**, **Thomas P. Giordano** and **Teddy Zerai** (authors of the paper)
 

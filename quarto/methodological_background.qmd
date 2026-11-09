@@ -10,7 +10,7 @@ General ideas this kind of analysis rests on. What this study chose is on [Study
 A clinic pharmacy records each dispensing: the patient, the date, the product and (usually) the quantity. Fills tell you what a patient collected, not what they swallowed, but they are recorded the same way for everyone and cover every day. Two things have to be worked out from them:
 
 - **Which regimen a patient is on.** A regimen is the set of drugs filled together. Patients sometimes pick up the drugs of one regimen on different days, refill one drug and not another, or keep collecting an old drug after a switch, so a rule such as "the drugs filled on the same day make the regimen" needs checking against the record.
-- **Whether a patient has medication on hand.** If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is *covered* when every drug in the regimen is on hand. The **proportion of days covered (PDC)** over a period is a standard adherence measure; 80% is the conventional cut-off. It is a lower bound when patients can also fill elsewhere.
+- **Whether a patient has medication on hand.** If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is *covered* when every drug in the regimen is on hand. The **proportion of days covered (PDC)** over a period is a common adherence measure, and 80% is a common cut-off. For ART the evidence on how much adherence is enough is mixed and depends on the regimen: the older 95% figure came from unboosted protease inhibitors, and viral suppression is common at lower adherence to non-nucleoside regimens [@bangsberg2006adherence]. PDC is a lower bound when patients can also fill elsewhere, and it is too low when a fill lasts longer than the assumed number of days.
 
 ## One row per person per day
 
@@ -18,7 +18,9 @@ Fills, labs and visits happen on irregular dates. Expanding each patient to one 
 
 ## Retention and viral suppression
 
-Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau's performance measures count medical visits at least 90 days apart; studies working from laboratory data often use viral load tests as the marker of a visit. Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect: older assays reported down to 400 copies/mL, newer ones to 50 or 20.
+Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau's measure counts medical visits at least 90 days apart in a calendar year; studies working from laboratory data often use viral load tests as the marker of a visit. There is no gold-standard retention measure, and the common ones agree only moderately with one another [@mugavero2012retention]. This study adapted the idea to the first 365 days after starting ART ("HRSA-style").
+
+Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect. This study used 400 copies/mL, the limit of the clinic's assay in 2008, and 50 copies/mL in a sensitivity analysis for later years [@hemmige2018str].
 
 ## Propensity scores and inverse probability weights
 
@@ -27,3 +29,8 @@ In an observational study the groups being compared differ in ways that also aff
 ## Reporting
 
 Observational studies using routinely collected data are reported following STROBE and its extension RECORD [@vonelm2007strobe; @benchimol2015record].
+
+## References
+
+::: {#refs}
+:::

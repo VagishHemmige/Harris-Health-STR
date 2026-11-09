@@ -2,7 +2,7 @@
 
 How the R translation is built: the scripts, the order they run in, and the objects they pass. What the analysis is meant to do is in `analysis-plan.md`; how to work here is in `AGENTS.md`.
 
-Revision: November 2026, covering `R/` and `quarto/` at the first commit.
+Revision: November 2026, covering `R/` and `quarto/` as of commit fb51d8e (main after PR #11).
 
 ## Running it
 
@@ -17,6 +17,8 @@ Rscript R/main.R                            # the translation, about 30 seconds 
 
 ```mermaid
 flowchart TD
+  accTitle: Data flow between the R scripts
+  accDescr: The dispensing file and the corrections file feed 01_regimens, which passes fills and regimen episodes to 04. The CD4, viral load, demographics, insurance and psychiatry files feed 02, which passes labs and baseline to 03 and baseline and insurance categories to 06. 03 passes person-days to 04; 04 passes daily data to 05; 05 passes analytic days to 06. 06 passes cohort days, patients and the cohort flow to 07, and cohort days to 08 and 09. 07 passes patients with weights to 08 and the propensity model to 09. 08 passes patients with outcomes to 09. tables.R collects the tables from 08 and 09 and writes CSV files.
   subgraph inputs ["Inputs (data_dir)"]
     D[Dispensing CSV]
     C[CD4 CSV]
@@ -42,6 +44,7 @@ flowchart TD
   R6 -->|cohort_days, patients, cohort_flow| R7[07_propensity.R]
   R7 -->|patients + ipw| R8[08_outcomes.R]
   R6 -->|cohort_days| R8
+  R6 -->|cohort_days| R9
   R8 -->|patients + outcomes| R9[09_sensitivity.R]
   R7 -->|propensity_model| R9
   R9 --> T[tables.R]

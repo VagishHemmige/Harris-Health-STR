@@ -69,7 +69,8 @@ The site documents the code. It does not run the analysis.
 - **Provisional content.** `quarto/_pending.lua` highlights in yellow every paragraph that starts with **Decision pending:** or, in the plan, **Open:**, and any `[text]{.pending}`.
 - **Project documents.** `analysis-plan.md`, `ARCHITECTURE.md`, `AGENTS.md` and `REPOSITORY-BLUEPRINT.md` are shown by pages in `quarto/` that only include the root file: edit the root file, not the page.
 - Each script page loads its script with `knitr::read_chunk("../R/<script>.R")` and shows each labelled section with `#| eval: false`, with prose explaining what it does, why, and the Stata it replaces.
-- **Chunks that run:** the `read_chunk()` imports, the Architecture page's chunk that reads `ARCHITECTURE.md`, and the chunks that show the do-files through `quarto/_stata_links.R`, which read `stata/` and `quarto/stata_map.csv` as text. Nothing else is evaluated.
+- **Chunks that run:** the `read_chunk()` imports, the Architecture page's chunk that reads `ARCHITECTURE.md`, the chunks that show the do-files through `quarto/_stata_links.R`, which read `stata/` and `quarto/stata_map.csv` as text, and teaching figures. Nothing else is evaluated.
+- **Teaching figures** are drawn from made-up numbers typed into the page, or from numbers quoted from the published paper with a citation. They never read data, synthetic or real, and never source the analysis scripts. Made-up examples say "Made-up example" inside the image, not only in the caption, and every figure has `fig-alt` text.
 - The site renders to `docs/`, which is not committed: the GitHub Actions workflow `.github/workflows/publish.yml` renders it and publishes it to the `gh-pages` branch on every push to `main`. When you add a script, add its page and sidebar entry in the same pull request, and render locally to check it.
 - **Prose must match the code.** If a change alters what a section does, update its explanation in the same pull request.
 
@@ -81,7 +82,7 @@ The site documents the code. It does not run the analysis.
 
 ## Outputs
 
-- `R/tables.R` writes to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. There are no figures.
+- `R/tables.R` writes to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site's teaching figures are described under Quarto website.
 - `README.Rmd` is the source of `README.md`; edit the `.Rmd` and re-knit.
 
 ## Restricted data (applies to everyone)

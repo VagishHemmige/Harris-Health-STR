@@ -57,3 +57,44 @@
 .quarto-title-tools-only h1:empty {
   display: none;
 }
+
+/* Tables scroll inside their own box on narrow screens, instead of pushing
+   the whole page sideways (site-scripts.html adds the box). Long code names
+   in table cells may break. */
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+.table-caption {
+  color: #6c757d;
+  margin: .5rem 0 .25rem;
+}
+.table-scroll > table {
+  margin-bottom: 0;
+}
+td code, th code,
+#refs a, .csl-entry {
+  overflow-wrap: anywhere;
+}
+
+/* Diagrams keep a readable size: below about 640 px the box scrolls
+   sideways rather than shrinking the labels. Edge labels are darkened for
+   contrast. */
+.cell-output-display:has(> .mermaid),
+div:has(> pre.mermaid),
+.quarto-figure:has(svg[id^="mermaid"]) {
+  overflow-x: auto;
+}
+pre.mermaid svg,
+svg[id^="mermaid"] {
+  min-width: 640px;
+}
+.edgeLabel, .edgeLabel p, .edgeLabel span {
+  color: #212529 !important;
+  fill: #212529 !important;
+}
+
+/* Printing shows folded code (site-scripts.html opens the folds) */
+@media print {
+  details > summary { list-style: none; }
+}

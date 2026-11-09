@@ -7,7 +7,7 @@
 
 ## ---- keep-patients-with-fills
 # Patients who were never dispensed antiretrovirals are dropped. Stata Step 6
-# split the pharmacy file into about 147 pieces only because the merge ran out
+# split the pharmacy file into many pieces only because the merge ran out
 # of memory; a join does not need that.
 daily <- person_days |>
   semi_join(regimen_episodes, by = "studyid")

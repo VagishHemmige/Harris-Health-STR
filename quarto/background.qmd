@@ -5,22 +5,59 @@ format: html
 
 ## Why pill burden might matter
 
-Antiretroviral therapy works only if it is taken. Staying in care, collecting refills and taking pills every day are all harder for patients facing poverty, unstable housing, mental illness or substance use, which describes much of the population served by a county safety-net HIV clinic. One proposed help is to make the regimen simpler: a single tablet once a day rather than several.
+Antiretroviral therapy (ART) works only if it is taken. Staying in care, collecting refills and taking pills every day are all harder for patients facing poverty, unstable housing, mental illness or substance use, which describes much of the population served by a county safety-net HIV clinic. One proposed help is to make the regimen simpler: a single tablet once a day rather than several.
 
 ## The regimens compared
 
-At the time of the study (patients starting ART from 2008 to 2011), first-line regimens at the clinic were built on tenofovir and emtricitabine:
+The study included patients starting ART from 2008 to 2011. At that time, first-line regimens at the clinic were built on tenofovir and emtricitabine:
 
-| Regimen | Pills per day | Group in this study |
+| Regimen | Pills per day, 2008-2011 | Group in this study |
 |---|---|---|
 | Efavirenz/tenofovir/emtricitabine (Atripla) | 1 | Single-tablet regimen (STR) |
-| Darunavir + ritonavir + tenofovir/emtricitabine (Prezista + Norvir + Truvada) | 3 | Multi-tablet regimen (MTR) |
+| Darunavir + ritonavir + tenofovir/emtricitabine (Prezista + Norvir + Truvada) | 4 (two 400 mg darunavir tablets) | Multi-tablet regimen (MTR) |
 | Atazanavir + ritonavir + tenofovir/emtricitabine (Reyataz + Norvir + Truvada) | 3 | Multi-tablet regimen (MTR) |
 
-Rilpivirine/tenofovir/emtricitabine (Complera) and elvitegravir/cobicistat/tenofovir/emtricitabine (Stribild) became available late in the period; earlier versions of the analysis included them, but the published comparison does not.
+: The three starting regimens in the published comparison {.striped}
 
-The comparison is not only about pill count: the STR contains a non-nucleoside reverse transcriptase inhibitor (efavirenz) and the MTRs a boosted protease inhibitor. Clinicians may also have chosen protease inhibitors for patients they expected to adhere poorly, because protease inhibitors are less prone to resistance. The paper discusses both limitations [@hemmige2018str].
+So the comparison is one pill against three or four. A single 800 mg darunavir tablet was approved only in November 2012, after enrollment closed.
+
+Rilpivirine/tenofovir/emtricitabine (Complera), a second STR, was approved in August 2011, at the very end of enrollment. Elvitegravir/cobicistat/tenofovir/emtricitabine (Stribild) came in August 2012, after it. Earlier versions of the analysis included other regimens, but the published comparison is limited to these three.
+
+The comparison is not only about pill count. The STR contains a non-nucleoside reverse transcriptase inhibitor (efavirenz) and the MTRs a boosted protease inhibitor. Clinicians may also have chosen protease inhibitors for patients they expected to adhere poorly, because protease inhibitors are less prone to resistance. The paper discusses both limitations [@hemmige2018str].
 
 ## What the study found
 
-Patients who started the STR were more likely to be retained in care and to reach viral suppression in the first year, after propensity weighting; differences in pharmacy-based adherence were small and not statistically significant [@hemmige2018str]. The numbers are in the paper; this site does not reproduce them.
+All the numbers below are quoted from the paper [@hemmige2018str]. The code in this repository has not been run on the study data, so it has not reproduced them. [Published results and the code behind them](published_results.qmd) gives every number with the step of the code that computes it.
+
+Patients who started the STR were more likely to be **retained in care** in their first year: 80.7% against 72.7%, with an odds ratio of 1.49 (95% CI 1.10-2.02) after propensity weighting.
+
+They were also more likely to be **suppressed at least once in the first year** (84.4% against 77.6%; weighted odds ratio 1.41, 1.02-1.96). This counts a patient as suppressed if any viral load in the year met the definition. It does not mean they stayed suppressed.
+
+Two results did not differ clearly between the groups after weighting:
+
+- **Suppressed while still on the starting regimen:** odds ratio 1.28 (0.95-1.73).
+- **Adherence** measured from pharmacy fills (at least 80% of days covered): odds ratio 1.04 (0.79-1.38).
+
+These are associations from one clinic's records, weighted for measured differences between the groups. They are not the result of a trial: patients the clinicians judged likely to struggle may have been steered to one regimen for reasons the data do not record.
+
+## How far the findings apply
+
+- **One clinic.** Thomas Street Health Center is a county safety-net clinic in Houston serving mainly low-income patients. Patients elsewhere, with different support, may differ.
+- **Older regimens.** Efavirenz-based regimens are no longer recommended first-line treatment in the United States, and today's single tablets are mostly integrase-inhibitor based. The study speaks to the value of a simpler regimen, not to which drugs to start today.
+- **Drug class as well as pill count.** In a randomized trial, atazanavir/ritonavir and efavirenz had similar antiviral activity when each was given with tenofovir/emtricitabine [@daar2011a5202]. A difference in an observational study is therefore not simply the effect of the drugs themselves. It may come from fewer pills, from tolerability, or from who was given which regimen.
+- **Starting regimen, not the regimen taken.** Patients stay in the group of the regimen they started, even if they switched. Nine MTR patients switched to an STR during the year and are still counted as MTR, which would tend to shrink any difference between the groups.
+
+## Other evidence
+
+Other studies of pill burden point in the same direction, but not uniformly:
+
+- A meta-analysis of randomized trials found that fewer pills a day went with both better adherence and more viral suppression [@nachega2014pillburden].
+- Among homeless and marginally housed people in San Francisco, the efavirenz-based STR was associated with higher adherence and more suppression. The suppression difference disappeared once adherence was taken into account [@bangsberg2010str].
+- In a cohort of women in the United States, STR use was associated with modestly better adherence and suppression [@hanna2014women].
+- In South Carolina Medicaid, STRs were associated with better adherence and fewer hospital stays, but not with more suppression after adjustment [@sutton2016pillburden].
+- In a large French cohort, STRs lasted longer before being stopped, but outcomes were similar once switches made only to simplify treatment were not counted as failures [@cotte2017str].
+
+## References
+
+::: {#refs}
+:::

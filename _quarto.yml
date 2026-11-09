@@ -186,7 +186,10 @@ format:
     code-fold: true
     code-tools: true
     page-layout: full
-    code-summary: "Click to show/hide R Code"
+    code-summary: "R code"
+    # Names each R fold after its step, wraps tables so they scroll on
+    # phones, and opens folded code for printing.
+    include-after-body: site-scripts.html
 
 # The site shows code; it never runs the analysis. Only these chunks set
 # eval: true: the read_chunk() imports, the Architecture page's chunk that
