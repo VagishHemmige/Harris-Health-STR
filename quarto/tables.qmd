@@ -48,7 +48,7 @@ stata_for("prepare-table-data")
 
 ## Table 1: patients by starting regimen
 
-`tbl_summary()` makes the usual Table 1: counts and percentages for categories, mean (SD) for age, one column per group and one for everyone (`add_overall()`). `add_p()` adds the tests Final Analysis.do ran: Pearson chi-squared without continuity correction, the default of Stata's `tab ..., chi2`, and an equal-variance t-test, the default of `ttest`.
+`tbl_summary()` makes the usual Table 1: counts and percentages for categories, mean (SD) for age, the number missing for every variable, one column per group and one for everyone (`add_overall()`). `add_p()` adds the tests Final Analysis.do ran: Pearson chi-squared without continuity correction, the default of Stata's `tab ..., chi2`, and an equal-variance t-test, the default of `ttest`.
 
 The weighted half of the table comes from `tbl_svysummary()`, which takes a survey design. The design holds the inverse probability weights, so the percentages are the weighted ones Stata's `tab ... [aw=IPW]` showed. `tbl_merge()` puts the two side by side, so a reader can see the groups differ before weighting and match after it. How weighting does that is explained on [Inverse probability weighting](ipw.qmd).
 
@@ -66,7 +66,13 @@ stata_for("table-1-baseline")
 
 ## Table 2: outcomes and odds ratios
 
-`tbl_summary()` gives each outcome as n (%) in each group. `add_stat()` then adds two columns from a small function that calls [`odds_ratio_for_str()`](functions.qmd#odds-ratios) for each outcome, once without weights and once with them, so the odds ratios in the table are the ones the models in [8. Outcomes](08_outcomes.qmd) estimate. Writing the odds ratios through the same helper function means the table and the models cannot disagree.
+Table 2 is three gtsummary tables merged side by side with `tbl_merge()`:
+
+- `tbl_summary()` gives each outcome as n (%) in each group.
+- `tbl_uvregression()` with `x = str` fits one logistic regression per outcome, each with the regimen as the only predictor, and shows the odds ratio with its 95% CI and p-value. These are the unadjusted models in [8. Outcomes](08_outcomes.qmd).
+- The same function given the survey design instead of the data fits the weighted models: `svyglm()` with the inverse probability weights, Stata's `logistic ... [pw=IPW]`.
+
+`tidy_fun = tidy_wald_z` makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports ([Functions](functions.qmd#statas-confidence-intervals-in-gtsummary-tables)). Each model table has an N column: the weighted models use only patients with a weight, so their N can be smaller than the group totals, which a reader of the published table could not see.
 
 ```{r}
 #| label: table-2-outcomes
@@ -82,7 +88,9 @@ stata_for("table-2-outcomes")
 
 ## Saving the tables
 
-`as_flex_table()` turns each table into a Word table, and `save_as_docx()` saves it: the file opens in Word with the layout, bold labels and column headers already set. `as_gt()` and `gtsave()` save an HTML copy for checking in a browser.
+`as_flex_table()` turns each table into a Word table, and `save_as_docx()` saves it: the file opens in Word with the layout, bold labels and column headers already set. `as_gt()` and `gtsave()` save an HTML copy for checking in a browser, and `as_tibble()` a plain CSV copy that the automatic check prints.
+
+No journal theme is set. gtsummary's `theme_gtsummary_journal()` can format a table to a journal's style (for example, `"jama"` or `"lancet"`); which journal to use is a choice for the authors.
 
 ```{r}
 #| label: save-publication-tables

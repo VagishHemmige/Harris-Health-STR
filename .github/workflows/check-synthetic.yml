@@ -47,6 +47,10 @@ jobs:
           Rscript R/synthetic/make_synthetic_data.R
           Rscript R/main.R
 
+      - name: Print the publication tables (synthetic numbers)
+        run: |
+          for f in tables/*_formatted.csv; do echo "== $f"; cat "$f"; echo; done
+
       - name: Keep the synthetic tables
         uses: actions/upload-artifact@v4
         with:

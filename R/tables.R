@@ -4,7 +4,7 @@
 #   result to a CSV file.
 # Translates: no Stata. The Stata wrote results to log files, and the tables in
 #   the paper were typed from them.
-# Needs: tables_dir (setup.R); odds_ratio_for_str() (functions.R);
+# Needs: tables_dir (setup.R); tidy_wald_z() (functions.R);
 #   cohort_flow (06_cohort.R); patients with ipw, baseline_tests,
 #   insurance_model, weighted_balance, weighted_categories (07_propensity.R);
 #   outcome_names, outcome_summary, outcome_models, suppression_at_switch
@@ -12,11 +12,13 @@
 #   psych_models, outside_pharmacy_summary, outside_pharmacy_test,
 #   outside_pharmacy_models (09_sensitivity.R).
 # Produces: in tables/ (ignored by Git): table_1_baseline and table_2_outcomes
-#   as .docx and .html, and one CSV file per result.
+#   as .docx and .html (and as CSV, for the automatic check), and one CSV
+#   file per result.
 
 ## ---- prepare-table-data
 # The label each variable should have in the paper, and the regimen group as a
-# labelled factor so the single tablet comes first.
+# labelled factor so the single tablet comes first. Every call names its
+# package, as the reporting guidance asks.
 baseline_variables <- c("age", "male", "ethnicity", "primaryriskfactor", "hepc",
                         "insurance_status", "baseline_vl_group", "baseline_cd4_group")
 
@@ -41,92 +43,118 @@ outcome_labels <- list(
 )
 
 table_data <- patients |>
-  mutate(regimen = factor(if_else(str, "Single tablet", "Multi-tablet"),
-                          levels = c("Single tablet", "Multi-tablet")))
+  dplyr::mutate(regimen = factor(dplyr::if_else(str, "Single tablet", "Multi-tablet"),
+                                 levels = c("Single tablet", "Multi-tablet")))
+
+weighted_design <- survey::svydesign(ids = ~1, weights = ~ipw,
+                                     data = dplyr::filter(table_data, !is.na(ipw)))
 
 ## ---- table-1-baseline
-# Before weighting: counts and percentages, mean (SD) for age, and the tests
-# Final Analysis.do ran (Pearson chi-squared without continuity correction;
-# t-test with equal variances).
+# Before weighting: n (%) for categories, mean (SD) for age, the number missing
+# for every variable, and the tests Final Analysis.do ran (Pearson
+# chi-squared without continuity correction; t-test with equal variances).
 table_1_unweighted <- table_data |>
-  tbl_summary(
+  gtsummary::tbl_summary(
     by = regimen,
-    include = all_of(baseline_variables),
+    include = tidyselect::all_of(baseline_variables),
     label = baseline_labels,
-    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    statistic = list(gtsummary::all_continuous() ~ "{mean} ({sd})",
+                     gtsummary::all_categorical() ~ "{n} ({p}%)"),
+    missing = "always",
+    missing_stat = "{N_miss}",
     missing_text = "Missing"
   ) |>
-  add_overall() |>
-  add_p(
-    test = list(all_categorical() ~ "chisq.test.no.correct", age ~ "t.test"),
+  gtsummary::add_overall() |>
+  gtsummary::add_p(
+    test = list(gtsummary::all_categorical() ~ "chisq.test.no.correct", age ~ "t.test"),
     test.args = list(age ~ list(var.equal = TRUE))
   )
 
 # After weighting: weighted percentages and means among patients with a
 # weight, as Stata's [aw=IPW] tables gave; no tests, as in Stata.
-weighted_design <- svydesign(ids = ~1, weights = ~ipw,
-                             data = filter(table_data, !is.na(ipw)))
-
 table_1_weighted <- weighted_design |>
-  tbl_svysummary(
+  gtsummary::tbl_svysummary(
     by = regimen,
-    include = all_of(baseline_variables),
+    include = tidyselect::all_of(baseline_variables),
     label = baseline_labels,
-    statistic = list(all_continuous() ~ "{mean} ({sd})",
-                     all_categorical() ~ "{p}%"),
+    statistic = list(gtsummary::all_continuous() ~ "{mean} ({sd})",
+                     gtsummary::all_categorical() ~ "{p}%"),
     missing = "no"
   )
 
-table_1 <- tbl_merge(
+table_1 <- gtsummary::tbl_merge(
   list(table_1_unweighted, table_1_weighted),
   tab_spanner = c("**Before weighting**", "**After weighting**")
 ) |>
-  bold_labels() |>
-  modify_caption("**Table 1. Patient characteristics by starting regimen**")
+  gtsummary::bold_labels() |>
+  gtsummary::modify_caption("**Table 1. Patient characteristics by starting regimen**")
 
 ## ---- table-2-outcomes
-# Each outcome by group, with the odds ratios from odds_ratio_for_str() added
-# as two more columns: unadjusted and inverse probability weighted.
-format_odds_ratio <- function(result) {
-  sprintf("%.2f (%.2f-%.2f)", result$odds_ratio, result$conf_low, result$conf_high)
-}
-
-odds_ratio_columns <- function(data, variable, ...) {
-  tibble(
-    unadjusted_or = format_odds_ratio(odds_ratio_for_str(data, variable)),
-    weighted_or = format_odds_ratio(odds_ratio_for_str(data, variable, weight = "ipw"))
-  )
-}
-
-table_2 <- table_data |>
-  tbl_summary(
+# Three tables merged side by side: each outcome by group; the unadjusted odds
+# ratio (logistic regression); and the weighted odds ratio (survey-weighted
+# logistic regression, Stata's [pw=IPW]). tbl_uvregression() with x = str fits
+# one model per outcome. tidy_wald_z() gives Stata's Wald intervals. The N
+# column shows how many patients each model used: the weighted models use only
+# patients with a weight.
+outcome_counts <- table_data |>
+  gtsummary::tbl_summary(
     by = regimen,
-    include = all_of(outcome_names),
+    include = tidyselect::all_of(outcome_names),
     label = outcome_labels,
-    statistic = list(all_dichotomous() ~ "{n} ({p}%)"),
-    missing = "no"
-  ) |>
-  add_stat(fns = everything() ~ odds_ratio_columns) |>
-  modify_header(
-    unadjusted_or = "**Odds ratio (95% CI)**",
-    weighted_or = "**Weighted odds ratio (95% CI)**"
-  ) |>
-  bold_labels() |>
-  modify_caption("**Table 2. Outcomes in the first year by starting regimen**")
+    statistic = list(gtsummary::all_dichotomous() ~ "{n} ({p}%)"),
+    missing = "always",
+    missing_stat = "{N_miss}",
+    missing_text = "Missing"
+  )
+
+unadjusted_models <- table_data |>
+  dplyr::select(str, tidyselect::all_of(outcome_names)) |>
+  gtsummary::tbl_uvregression(
+    method = stats::glm,
+    method.args = list(family = stats::binomial()),
+    x = str,
+    exponentiate = TRUE,
+    tidy_fun = tidy_wald_z,
+    label = outcome_labels,
+    show_single_row = str
+  )
+
+weighted_models <- weighted_design |>
+  gtsummary::tbl_uvregression(
+    method = survey::svyglm,
+    method.args = list(family = stats::quasibinomial()),
+    x = str,
+    include = tidyselect::all_of(outcome_names),
+    exponentiate = TRUE,
+    tidy_fun = tidy_wald_z,
+    label = outcome_labels,
+    show_single_row = str
+  )
+
+table_2 <- gtsummary::tbl_merge(
+  list(outcome_counts, unadjusted_models, weighted_models),
+  tab_spanner = c("**Patients**", "**Unadjusted**", "**Weighted**")
+) |>
+  gtsummary::bold_labels() |>
+  gtsummary::modify_caption("**Table 2. Outcomes in the first year by starting regimen**")
 
 ## ---- save-publication-tables
-# Word files go straight into a manuscript; HTML files are for checking.
+# Word files go straight into a manuscript; HTML files are for checking; a CSV
+# of each formatted table lets the automatic check print it.
 dir.create(tables_dir, showWarnings = FALSE)
 
 publication_tables <- list(table_1_baseline = table_1, table_2_outcomes = table_2)
 
 for (table_name in names(publication_tables)) {
   publication_tables[[table_name]] |>
-    as_flex_table() |>
-    flextable::save_as_docx(path = file.path(tables_dir, str_c(table_name, ".docx")))
+    gtsummary::as_flex_table() |>
+    flextable::save_as_docx(path = file.path(tables_dir, stringr::str_c(table_name, ".docx")))
   publication_tables[[table_name]] |>
-    as_gt() |>
-    gt::gtsave(file.path(tables_dir, str_c(table_name, ".html")))
+    gtsummary::as_gt() |>
+    gt::gtsave(file.path(tables_dir, stringr::str_c(table_name, ".html")))
+  publication_tables[[table_name]] |>
+    gtsummary::as_tibble(col_labels = TRUE) |>
+    readr::write_csv(file.path(tables_dir, stringr::str_c(table_name, "_formatted.csv")))
 }
 
 ## ---- write-tables
