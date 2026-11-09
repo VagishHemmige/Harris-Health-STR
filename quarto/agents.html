@@ -626,7 +626,8 @@ edit that file, not this page. Its first heading is the page title.
 <li><strong>Provisional content.</strong> <code>quarto/_pending.lua</code> highlights in yellow every paragraph that starts with <strong>Decision pending:</strong> or, in the plan, <strong>Open:</strong>, and any <code>[text]{.pending}</code>.</li>
 <li><strong>Project documents.</strong> <code>analysis-plan.md</code>, <code>ARCHITECTURE.md</code>, <code>AGENTS.md</code> and <code>REPOSITORY-BLUEPRINT.md</code> are shown by pages in <code>quarto/</code> that only include the root file: edit the root file, not the page.</li>
 <li>Each script page loads its script with <code>knitr::read_chunk("../R/&lt;script&gt;.R")</code> and shows each labelled section with <code>#| eval: false</code>, with prose explaining what it does, why, and the Stata it replaces.</li>
-<li><strong>Chunks that run:</strong> the <code>read_chunk()</code> imports, the Architecture page’s chunk that reads <code>ARCHITECTURE.md</code>, and the chunks that show the do-files through <code>quarto/_stata_links.R</code>, which read <code>stata/</code> and <code>quarto/stata_map.csv</code> as text. Nothing else is evaluated.</li>
+<li><strong>Chunks that run:</strong> the <code>read_chunk()</code> imports, the Architecture page’s chunk that reads <code>ARCHITECTURE.md</code>, the chunks that show the do-files through <code>quarto/_stata_links.R</code>, which read <code>stata/</code> and <code>quarto/stata_map.csv</code> as text and, through <code>quarto/_function_links.R</code>, read the R scripts as text to link each helper function to the steps that call it, and teaching figures. Nothing else is evaluated.</li>
+<li><strong>Teaching figures</strong> are drawn from made-up numbers typed into the page, or from numbers quoted from the published paper with a citation. They never read data, synthetic or real, and never source the analysis scripts. Made-up examples say “Made-up example” inside the image, not only in the caption, and every figure has <code>fig-alt</code> text.</li>
 <li>The site renders to <code>docs/</code>, which is not committed: the GitHub Actions workflow <code>.github/workflows/publish.yml</code> renders it and publishes it to the <code>gh-pages</code> branch on every push to <code>main</code>. When you add a script, add its page and sidebar entry in the same pull request, and render locally to check it.</li>
 <li><strong>Prose must match the code.</strong> If a change alters what a section does, update its explanation in the same pull request.</li>
 </ul>
@@ -642,7 +643,7 @@ edit that file, not this page. Its first heading is the page title.
 <section id="outputs" class="level2">
 <h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
 <ul>
-<li><code>R/tables.R</code> writes to <code>tables/</code>, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. There are no figures.</li>
+<li><code>R/tables.R</code> builds the publication tables with gtsummary (Word and HTML) and writes every result as CSV to <code>tables/</code>, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site’s teaching figures are described under Quarto website.</li>
 <li><code>README.Rmd</code> is the source of <code>README.md</code>; edit the <code>.Rmd</code> and re-knit.</li>
 </ul>
 </section>
@@ -670,7 +671,7 @@ edit that file, not this page. Its first heading is the page title.
 <li><strong>Fidelity:</strong> does the R still do what the Stata does, and is every departure documented?</li>
 <li><strong>Structure:</strong> is <code>ARCHITECTURE.md</code> current; are chunk labels unique and found by their pages; does every definitive script have a page and sidebar entry?</li>
 <li><strong>Disclosure:</strong> search every changed file, commit message and pull-request text for study IDs, dates, names and paths.</li>
-<li><strong>Execution:</strong> do <code>R/synthetic/make_synthetic_data.R</code> and <code>R/main.R</code> run in a fresh session; does the site render?</li>
+<li><strong>Execution:</strong> do <code>R/synthetic/make_synthetic_data.R</code> and <code>R/main.R</code> run in a fresh session; does the site render? The workflow <code>.github/workflows/check-synthetic.yml</code> runs both on every branch push and pull request, and keeps the synthetic tables as a download.</li>
 </ul>
 </section>
 <section id="working-with-agents" class="level2">
@@ -688,6 +689,78 @@ edit that file, not this page. Its first heading is the page title.
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

@@ -506,7 +506,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R"><code>R/functions.R</code></a></li>
 </ul>
 <p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%208%20Data%20Preparation.do"><code>stata/Do Step 8 Data Preparation.do</code></a>.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="number-the-days-of-each-regimen" class="level2">
@@ -514,7 +514,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>Stata’s variable <code>M</code> counts the days within a regimen: <code>bysort studyid CurrentRegimenNumber (CurrentDate): generate M=_n</code>. Day 1 of regimen 1 is the patient’s first observation, which becomes time zero later.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's M: day 1, 2, 3 ... of each regimen for each patient.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>daily_drugs <span class="ot">&lt;-</span> daily_drugs <span class="sc">|&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(studyid, drug_position, date) <span class="sc">|&gt;</span></span>
@@ -559,7 +559,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 1-12 (Number the days o
 <p>In R, the loop is over regimen numbers only. Matching drugs between the last day of one regimen and the first day of the next is a join by drug name, and the day-by-day count runs within each patient, regimen and drug.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regimens are processed in order, because the first day of a regimen can take</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># over pills of the same drug left from the day before, the last day of the</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># previous regimen.</span></span>
@@ -602,6 +602,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 1-12 (Number the days o
 </details>
 </div>
 <div id="r-count-pills-per-regimen" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#counting-pills-on-hand"><code>count_pills_on_hand()</code></a>, <a href="../quarto/functions.html#carrying-pills-into-a-new-regimen"><code>carry_over_pills()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 8 Data Preparation.do</code>, lines 14-18 (Pills on hand in the first regimen)
@@ -639,7 +640,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in
 <p>A day is covered when every drug in the regimen has pills on hand, partially covered when some do, and uncovered when none do. With one row per drug, these are <code>all()</code> and <code>any()</code> over the day’s rows; Stata needed a loop over drug positions for each.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A day is covered when every drug in the regimen is on hand, partially covered</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># when some but not all are, and uncovered when none are.</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>day_coverage <span class="ot">&lt;-</span> daily_drugs <span class="sc">|&gt;</span></span>
@@ -701,7 +702,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 44-61 (Covered, partial
 <p><strong>Virologically suppressed:</strong> see <a href="../quarto/functions.html#viral-suppression-on-a-day"><code>vl_suppressed_on_day()</code></a>. A day counts only if the most recent viral load is 400 or less. That result then counts for 90 days. A later day also counts if the next viral load comes within 90 days and is 400 or less too, which bridges a gap between two suppressed results. A suppressed result never reaches back to the days before it.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Still in care: a CD4 and a viral load are both still to come. Virologically</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># suppressed: see vl_suppressed_on_day() in functions.R.</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>analytic_days <span class="ot">&lt;-</span> daily <span class="sc">|&gt;</span></span>
@@ -715,6 +716,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 44-61 (Covered, partial
 </details>
 </div>
 <div id="r-define-daily-outcomes" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#viral-suppression-on-a-day"><code>vl_suppressed_on_day()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care and virologically suppressed)
@@ -742,6 +744,78 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care an
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1300,7 +1374,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care an
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 8 Data Preparation.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%208%20Data%20Preparation.do)</span>.</span>
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>

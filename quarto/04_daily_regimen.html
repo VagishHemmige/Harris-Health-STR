@@ -505,17 +505,17 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R"><code>R/setup.R</code></a></li>
 </ul>
 <p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%206%20Tokenize%20Pharmacy.do"><code>stata/Do Step 6 Tokenize Pharmacy.do</code></a> and <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%207%20Merge%20Pharmacy.do"><code>stata/Do Step 7 Merge Pharmacy.do</code></a>.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="keep-patients-with-fills" class="level2">
 <h2 class="anchored" data-anchor-id="keep-patients-with-fills">Keep patients with fills</h2>
-<p>Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata cut the wide pharmacy file into about 147 files, one per fill number, because merging it in one go ran out of memory; Step 7 then merged them one at a time in a loop. R joins long tables and needs neither step.</p>
+<p>Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata cut the wide pharmacy file into one file per fill number because merging it in one go ran out of memory; Step 7 then merged them one at a time in a loop. R joins long tables and needs neither step.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Patients who were never dispensed antiretrovirals are dropped. Stata Step 6</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># split the pharmacy file into about 147 pieces only because the merge ran out</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># split the pharmacy file into many pieces only because the merge ran out</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># of memory; a join does not need that.</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>daily <span class="ot">&lt;-</span> person_days <span class="sc">|&gt;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(regimen_episodes, <span class="at">by =</span> <span class="st">"studyid"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -528,7 +528,7 @@ Stata: <code>Do Step 6 Tokenize Pharmacy.do</code>, lines 1-11 (Split the pharma
 </summary>
 <p><a href="../quarto/stata_data_build.html#s6-split">See it in context</a></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co">//Flash-Zerai data set</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co">//This snippet of code breaks up the single pharmacy file, which is too large to merge, into ~147 bite size chunks</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co">//This snippet of code breaks up the single pharmacy file, which is too large to merge, into bite size chunks</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co">//12-16-2014</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-label="4"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-label="5"></a><span class="kw">forvalues</span> counter=1(1)<span class="ot">$MaxNumDrugs</span> {</span>
@@ -563,7 +563,7 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 1-11 (Keep patients with 
 <p>Each regimen is placed on the day it started and filled down until the next one starts. <code>new_regimen</code> marks the start days. A regimen that started before 1 January 2008 is not on the grid, so those days have no regimen until the next start: exactly what the Stata did, since it only matched start dates that fell inside the window.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each regimen is placed on its start date and carried forward until the next</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># one starts. Days before the first regimen in the study window have none.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>daily <span class="ot">&lt;-</span> daily <span class="sc">|&gt;</span></span>
@@ -608,7 +608,7 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 13-30 (Carry the current 
 <p>Stata used <code>split CurrentRegimen, parse(/)</code> to make <code>CurrentDrug1Name</code>, <code>CurrentDrug2Name</code> and so on, and then every later calculation looped over the drug positions. Here each drug in the regimen is its own row, numbered by its position, so later steps can group by drug instead of looping.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata split the regimen name at "/" into CurrentDrug1Name, CurrentDrug2Name ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Here each drug is a row, numbered by its position in the regimen name.</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>daily_drugs <span class="ot">&lt;-</span> daily <span class="sc">|&gt;</span></span>
@@ -642,7 +642,7 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 32-38 (List the drugs in 
 <p>A drug in today’s regimen that was dispensed today counts as a 30-pill fill. A drug dispensed that is not in the current regimen does not count, which is how the original handled stray fills of old drugs.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A drug in the current regimen that was filled that day counts as 30 pills.</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dispensed_drugs <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(studyid, <span class="at">date =</span> dispense_date, <span class="at">drug_name =</span> drugname) <span class="sc">|&gt;</span></span>
@@ -668,7 +668,7 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 41-57 (Encode and resha
 <span id="cb9-46"><a href="#cb9-46" aria-label="46"></a><span class="kw">encode</span> drugconstituents, <span class="kw">generate</span>(DrugConstituents)</span>
 <span id="cb9-47"><a href="#cb9-47" aria-label="47"></a><span class="kw">drop</span> drugconstituents</span>
 <span id="cb9-48"><a href="#cb9-48" aria-label="48"></a></span>
-<span id="cb9-49"><a href="#cb9-49" aria-label="49"></a><span class="co">//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject (~147):</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-label="49"></a><span class="co">//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject:</span></span>
 <span id="cb9-50"><a href="#cb9-50" aria-label="50"></a><span class="kw">quietly</span> <span class="kw">summarize</span> <span class="kw">N</span></span>
 <span id="cb9-51"><a href="#cb9-51" aria-label="51"></a><span class="kw">global</span> MaxNumDrugs <span class="ot">`r(max)'</span></span>
 <span id="cb9-52"><a href="#cb9-52" aria-label="52"></a><span class="kw">display</span> <span class="st">"Maximum number of drugs is: "</span> <span class="ot">$MaxNumDrugs</span></span>
@@ -683,7 +683,7 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 41-57 (Encode and resha
 Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 40-53 (Mark the days each drug was dispensed)
 </summary>
 <p><a href="../quarto/stata_data_build.html#s7-dispense">See it in context</a></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-startfrom="40"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 39;"><span id="cb10-40"><a href="#cb10-40" aria-label="40"></a><span class="co">//This code merges the ~147 Pharmacy fill files with the active database</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-startfrom="40"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 39;"><span id="cb10-40"><a href="#cb10-40" aria-label="40"></a><span class="co">//This code merges the Pharmacy fill files with the active database</span></span>
 <span id="cb10-41"><a href="#cb10-41" aria-label="41"></a><span class="kw">forvalues</span> counter=1(1)<span class="ot">$MaxNumDrugs</span> {</span>
 <span id="cb10-42"><a href="#cb10-42" aria-label="42"></a><span class="kw">display</span> <span class="st">"Currently on loop iteration "</span> <span class="ot">`counter'</span> <span class="st">"..."</span></span>
 <span id="cb10-43"><a href="#cb10-43" aria-label="43"></a><span class="kw">merge</span> <span class="fu">m</span>:1 studyid <span class="kw">using</span> Pharmacy<span class="ot">`counter'</span>.dta</span>
@@ -706,6 +706,78 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 40-53 (Mark the days each
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1263,7 +1335,7 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 40-53 (Mark the days each
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 6 Tokenize Pharmacy.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%206%20Tokenize%20Pharmacy.do)</span> and <span class="co">[</span><span class="ot">`stata/Do Step 7 Merge Pharmacy.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%207%20Merge%20Pharmacy.do)</span>.</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
@@ -1276,7 +1348,7 @@ Stata: <code>Do Step 7 Merge Pharmacy.do</code>, lines 40-53 (Mark the days each
 <span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Keep patients with fills</span></span>
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata cut the wide pharmacy file into about 147 files, one per fill number, because merging it in one go ran out of memory; Step 7 then merged them one at a time in a loop. R joins long tables and needs neither step.</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>Patients never dispensed antiretrovirals cannot be in the study. Step 6 in Stata cut the wide pharmacy file into one file per fill number because merging it in one go ran out of memory; Step 7 then merged them one at a time in a loop. R joins long tables and needs neither step.</span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: keep-patients-with-fills</span></span>

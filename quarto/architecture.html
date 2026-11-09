@@ -504,12 +504,12 @@ It reads only ARCHITECTURE.md, never data, and runs no analysis code.
 <section id="architecture" class="level1">
 <h1>Architecture</h1>
 <p>How the R translation is built: the scripts, the order they run in, and the objects they pass. What the analysis is meant to do is in <code>analysis-plan.md</code>; how to work here is in <code>AGENTS.md</code>.</p>
-<p>Revision: November 2026, covering <code>R/</code> and <code>quarto/</code> at the first commit.</p>
+<p>Revision: November 2026, covering <code>R/</code> and <code>quarto/</code> as of commit fb51d8e (main after PR #11).</p>
 <section id="running-it" class="level2">
 <h2 class="anchored" data-anchor-id="running-it">Running it</h2>
 <pre class="text"><code>Rscript R/synthetic/make_synthetic_data.R   # fake input files in data-synthetic/
 Rscript R/main.R                            # the translation, about 30 seconds on 400 synthetic patients</code></pre>
-<p><code>R/main.R</code> sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables.</p>
+<p><code>R/main.R</code> sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables. <code>.github/workflows/check-synthetic.yml</code> runs both commands on GitHub for every branch push.</p>
 </section>
 <section id="data-flow" class="level2">
 <h2 class="anchored" data-anchor-id="data-flow">Data flow</h2>
@@ -520,6 +520,8 @@ Rscript R/main.R                            # the translation, about 30 seconds 
 <div>
 
 <pre class="mermaid mermaid-js">flowchart TD
+  accTitle: Data flow between the R scripts
+  accDescr: The dispensing file and the corrections file feed 01_regimens, which passes fills and regimen episodes to 04. The CD4, viral load, demographics, insurance and psychiatry files feed 02, which passes labs and baseline to 03 and baseline and insurance categories to 06. 03 passes person-days to 04; 04 passes daily data to 05; 05 passes analytic days to 06. 06 passes cohort days, patients and the cohort flow to 07, and cohort days to 08 and 09. 07 passes patients with weights to 08 and the propensity model to 09. 08 passes patients with outcomes to 09. tables.R collects the tables from 08 and 09 and writes CSV files.
   subgraph inputs ["Inputs (data_dir)"]
     D[Dispensing CSV]
     C[CD4 CSV]
@@ -545,6 +547,7 @@ Rscript R/main.R                            # the translation, about 30 seconds 
   R6 --&gt;|cohort_days, patients, cohort_flow| R7[07_propensity.R]
   R7 --&gt;|patients + ipw| R8[08_outcomes.R]
   R6 --&gt;|cohort_days| R8
+  R6 --&gt;|cohort_days| R9
   R8 --&gt;|patients + outcomes| R9[09_sensitivity.R]
   R7 --&gt;|propensity_model| R9
   R9 --&gt; T[tables.R]
@@ -645,8 +648,8 @@ Rscript R/main.R                            # the translation, about 30 seconds 
 <tr class="even">
 <td><code>tables.R</code></td>
 <td>(the Stata wrote results to logs)</td>
-<td>the tables above</td>
-<td>CSV files in <code>tables/</code></td>
+<td><code>patients</code> and the results above</td>
+<td><code>table_1_baseline</code> and <code>table_2_outcomes</code> (gtsummary) as .docx and .html, and every result as CSV, in <code>tables/</code></td>
 </tr>
 </tbody>
 </table>
@@ -672,6 +675,7 @@ quarto/
   published_results.qmd  # each published number and the code step behind it
   stata_map.csv          # do-file sections (line ranges) and the R chunk labels that replace them
   _stata_links.R         # builds the sectioned Stata pages and the Stata blocks under each R step from stata_map.csv
+  _function_links.R      # links each helper function to the R steps that call it, and back, by reading R/ as text
   analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd
 stata/                   # the do-files behind the paper, patient-level details removed
 docs/                    # rendered site (not committed)
@@ -684,6 +688,78 @@ docs/                    # rendered site (not committed)
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

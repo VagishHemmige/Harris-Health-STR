@@ -515,17 +515,26 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>In a trial, a coin decides the regimen, so the two groups are alike in everything except the regimen. In clinic, a clinician decides, and the decision depends on the patient. If the same things that guide the choice also affect the outcome, a simple comparison mixes the effect of the regimen with the effect of who received it. This is <strong>confounding by indication</strong>.</p>
 <p>Take 100 made-up patients of two kinds:</p>
 <ul>
-<li><strong>60 with few barriers to care.</strong> Clinicians gave 48 of them the single tablet (80%) and 12 the three-pill regimen. 90% of them reach suppression, <em>whichever regimen they get</em>.</li>
-<li><strong>40 with many barriers.</strong> Clinicians gave 12 of them the single tablet (30%) and 28 the three-pill regimen. 60% reach suppression, <em>whichever regimen they get</em>.</li>
+<li><strong>60 with few barriers to care.</strong> Clinicians gave 48 of them the single tablet (80%) and 12 the multi-tablet regimen. 90% of them reach suppression, <em>whichever regimen they get</em>.</li>
+<li><strong>40 with many barriers.</strong> Clinicians gave 12 of them the single tablet (30%) and 28 the multi-tablet regimen. 60% reach suppression, <em>whichever regimen they get</em>.</li>
 </ul>
 <p>The regimen makes no difference here, by construction. But compare the groups directly:</p>
 <table class="caption-top table">
+<caption>Table 1. Before weighting, the single tablet went mostly to patients with few barriers. Expected suppressed: 48 × 0.9 + 12 × 0.6 = 50.4 for the single tablet; 12 × 0.9 + 28 × 0.6 = 27.6 for multi-tablet.</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
 <thead>
 <tr class="header">
-<th></th>
+<th>Regimen</th>
 <th>Patients</th>
-<th>Few barriers</th>
-<th>Suppressed</th>
+<th>With few barriers</th>
+<th>Expected suppressed</th>
+<th>Suppressed (%)</th>
 </tr>
 </thead>
 <tbody>
@@ -533,13 +542,15 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <td>Single tablet</td>
 <td>60</td>
 <td>48 (80%)</td>
-<td>48 × 0.9 + 12 × 0.6 = 50.4 (84%)</td>
+<td>50.4</td>
+<td>84%</td>
 </tr>
 <tr class="even">
-<td>Three pills</td>
+<td>Multi-tablet</td>
 <td>40</td>
 <td>12 (30%)</td>
-<td>12 × 0.9 + 28 × 0.6 = 27.6 (69%)</td>
+<td>27.6</td>
+<td>69%</td>
 </tr>
 </tbody>
 </table>
@@ -554,10 +565,11 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>Each patient is weighted by one over the probability of the regimen they actually received:</p>
 <ul>
 <li>Single tablet: weight = 1 / propensity score.</li>
-<li>Three pills: weight = 1 / (1 − propensity score).</li>
+<li>Multi-tablet: weight = 1 / (1 − propensity score).</li>
 </ul>
 <p>A patient who received a regimen that was unlikely for someone like them gets a large weight, because they stand in for the similar patients who went the other way.</p>
 <table class="caption-top table">
+<caption>Table 2. Each weight is 1 / P(regimen received); weight × patients gives each group the cohort’s 60:40 mix.</caption>
 <colgroup>
 <col style="width: 16%">
 <col style="width: 16%">
@@ -568,9 +580,9 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </colgroup>
 <thead>
 <tr class="header">
-<th></th>
+<th>Barriers</th>
 <th>Received</th>
-<th>Probability of what they received</th>
+<th>P(regimen received)</th>
 <th>Weight</th>
 <th>Patients</th>
 <th>Weighted count</th>
@@ -578,7 +590,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </thead>
 <tbody>
 <tr class="odd">
-<td>Few barriers</td>
+<td>Few</td>
 <td>Single tablet</td>
 <td>0.8</td>
 <td>1.25</td>
@@ -586,15 +598,15 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <td>60</td>
 </tr>
 <tr class="even">
-<td>Few barriers</td>
-<td>Three pills</td>
+<td>Few</td>
+<td>Multi-tablet</td>
 <td>0.2</td>
 <td>5</td>
 <td>12</td>
 <td>60</td>
 </tr>
 <tr class="odd">
-<td>Many barriers</td>
+<td>Many</td>
 <td>Single tablet</td>
 <td>0.3</td>
 <td>3.33</td>
@@ -602,8 +614,8 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <td>40</td>
 </tr>
 <tr class="even">
-<td>Many barriers</td>
-<td>Three pills</td>
+<td>Many</td>
+<td>Multi-tablet</td>
 <td>0.7</td>
 <td>1.43</td>
 <td>28</td>
@@ -613,12 +625,21 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </table>
 <p>After weighting, each regimen group looks like the whole cohort: 60 with few barriers and 40 with many. That is the <strong>pseudo-population</strong>, a version of the cohort in which the regimen no longer depends on barriers to care. Now compare:</p>
 <table class="caption-top table">
+<caption>Table 3. After weighting, both groups have the same mix and the same suppression. Expected suppressed: 60 × 0.9 + 40 × 0.6 = 78 in each group.</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
 <thead>
 <tr class="header">
-<th></th>
+<th>Regimen</th>
 <th>Weighted patients</th>
-<th>Few barriers</th>
-<th>Suppressed</th>
+<th>With few barriers</th>
+<th>Expected suppressed</th>
+<th>Suppressed (%)</th>
 </tr>
 </thead>
 <tbody>
@@ -626,13 +647,15 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <td>Single tablet</td>
 <td>100</td>
 <td>60 (60%)</td>
-<td>60 × 0.9 + 40 × 0.6 = 78 (78%)</td>
+<td>78</td>
+<td>78%</td>
 </tr>
 <tr class="even">
-<td>Three pills</td>
+<td>Multi-tablet</td>
 <td>100</td>
 <td>60 (60%)</td>
-<td>60 × 0.9 + 40 × 0.6 = 78 (78%)</td>
+<td>78</td>
+<td>78%</td>
 </tr>
 </tbody>
 </table>
@@ -640,7 +663,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="what-the-weighted-result-estimates" class="level2">
 <h2 class="anchored" data-anchor-id="what-the-weighted-result-estimates">What the weighted result estimates</h2>
-<p>These weights make <em>both</em> groups look like the whole cohort. The comparison therefore answers: what would happen if <em>everyone</em> in the cohort started the single tablet, compared with everyone starting three pills? This is the <strong>average treatment effect (ATE)</strong>, and it is what this study estimated.</p>
+<p>These weights make <em>both</em> groups look like the whole cohort. The comparison therefore answers: what would happen if <em>everyone</em> in the cohort started the single tablet, compared with everyone starting the multi-tablet regimen? This is the <strong>average treatment effect (ATE)</strong>, and it is what this study estimated.</p>
 <p>The weighted odds ratio compares those two whole-cohort scenarios. It is a <em>marginal</em> odds ratio, so it need not equal the odds ratio from a regression that adjusts for the same covariates. That is a property of odds ratios, not an error.</p>
 </section>
 <section id="checking-that-it-worked" class="level2">
@@ -654,17 +677,18 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>What analysts do about it:</p>
 <ul>
 <li><strong>Look first.</strong> Compare the distribution of propensity scores in the two groups and list the largest weights.</li>
-<li><strong>Stabilized weights.</strong> Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for three pills). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.</li>
+<li><strong>Stabilized weights.</strong> Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for multi-tablet). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.</li>
 <li><strong>Trimming.</strong> Cap weights at a percentile, or drop patients with scores near 0 or 1. This reduces noise but changes the population the answer applies to.</li>
-<li><strong>A different question.</strong> Weights of 1 for the single tablet and p / (1 − p) for three pills make the three-pill group look like the single-tablet group. This estimates the <strong>average treatment effect in the treated (ATT)</strong>: the effect among the kind of patients clinicians actually gave the single tablet.</li>
+<li><strong>A different question.</strong> Weights of 1 for the single tablet and p / (1 − p) for multi-tablet make the multi-tablet group look like the single-tablet group. This estimates the <strong>average treatment effect in the treated (ATT)</strong>: the effect among the kind of patients clinicians actually gave the single tablet.</li>
 </ul>
 <p>This study used unstabilized, untrimmed ATE weights and did not report the weight distribution.</p>
 </section>
 <section id="standard-errors-and-statas-aw-and-pw" class="level2">
 <h2 class="anchored" data-anchor-id="standard-errors-and-statas-aw-and-pw">Standard errors, and Stata’s <code>aw</code> and <code>pw</code></h2>
-<p>A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use <strong>robust (sandwich) standard errors</strong>. These also ignore the fact that the propensity scores were estimated; for the ATE that usually makes them somewhat conservative (too wide) rather than too narrow <span class="citation" data-cites="lunceford2004stratification">(<a href="#ref-lunceford2004stratification" role="doc-biblioref">Lunceford and Davidian 2004</a>)</span>.</p>
-<p>Stata offers several kinds of weight. Two appear in Final Analysis.do, and they give the <strong>same estimates but different standard errors</strong>:</p>
+<p>A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use <strong>robust (sandwich) standard errors</strong>. These also ignore the fact that the propensity scores were estimated. Theory for ATE weights shows that ignoring this tends to make the standard errors somewhat too wide (conservative) rather than too narrow <span class="citation" data-cites="lunceford2004stratification">(<a href="#ref-lunceford2004stratification" role="doc-biblioref">Lunceford and Davidian 2004</a>)</span>, and a simulation study of stabilized weights for relative risks found the same <span class="citation" data-cites="xu2010stabilized">(<a href="#ref-xu2010stabilized" role="doc-biblioref">Xu et al. 2010</a>)</span>. Neither guarantees it for every data set, and neither studied odds ratios with unstabilized weights as used here.</p>
+<p>Stata offers several kinds of weight. Two appear in Final Analysis.do. They give the <strong>same weighted percentages and means</strong>, but they mean different things, and only one of them can be used for the models:</p>
 <table class="caption-top table">
+<caption>Table 4. Stata’s two kinds of weight in Final Analysis.do.</caption>
 <colgroup>
 <col style="width: 33%">
 <col style="width: 33%">
@@ -679,19 +703,19 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </thead>
 <tbody>
 <tr class="odd">
-<td>Meant for</td>
-<td>Rows that are averages of different numbers of people, so a larger weight means a more precise row</td>
-<td>Each row stands in for 1/p people, as in survey sampling and inverse probability weighting</td>
+<td>What a weight means</td>
+<td>The row is an average of several people, so a larger weight means a more precise row</td>
+<td>The row stands in for 1/p people, as in survey sampling and inverse probability weighting</td>
 </tr>
 <tr class="even">
-<td>Weighted percentages, means, odds ratios</td>
-<td>Same</td>
-<td>Same</td>
+<td>Weighted percentages and means</td>
+<td>The same under both</td>
+<td>The same under both</td>
 </tr>
 <tr class="odd">
-<td>Standard errors</td>
-<td>Treated as if the weights described precision; rescaled to the sample size</td>
-<td>Robust (sandwich) standard errors, always</td>
+<td><code>logistic</code></td>
+<td>Not allowed: <code>logistic</code> accepts only <code>fw</code>, <code>iw</code> and <code>pw</code></td>
+<td>Allowed; always gives robust (sandwich) standard errors</td>
 </tr>
 <tr class="even">
 <td>Used in Final Analysis.do for</td>
@@ -700,7 +724,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </tr>
 </tbody>
 </table>
-<p>That split is the right one: <code>aw</code> where only the weighted numbers matter, <code>pw</code> wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance (<a href="../quarto/07_propensity.html#weighted-balance">7</a>), and <code>survey::svyglm()</code>, which gives robust standard errors, for the models (<a href="../quarto/functions.html#odds-ratios"><code>odds_ratio_for_str()</code></a>). Stata has two more kinds of weight that are not used here: <code>fw</code>, where a row really is several identical people, and <code>iw</code>, for special cases.</p>
+<p>That split is the right one: <code>aw</code> where only the weighted numbers matter, <code>pw</code> wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance (<a href="../quarto/07_propensity.html#weighted-balance">7</a>), and <code>survey::svyglm()</code>, which gives robust standard errors, for the models (<a href="../quarto/functions.html#odds-ratios"><code>odds_ratio_for_str()</code></a>). Stata has two more kinds of weight that are not used here: <code>fw</code>, where a row really is several identical people, and <code>iw</code>, for special cases. For commands that accept both <code>aw</code> and <code>pw</code>, such as <code>regress</code>, the estimates are the same and only the standard errors differ.</p>
 </section>
 <section id="what-weighting-cannot-do" class="level2">
 <h2 class="anchored" data-anchor-id="what-weighting-cannot-do">What weighting cannot do</h2>
@@ -721,6 +745,9 @@ Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Ted
 <div id="ref-lunceford2004stratification" class="csl-entry" role="listitem">
 Lunceford, Jared K, and Marie Davidian. 2004. <span>“Stratification and Weighting via the Propensity Score in Estimation of Causal Treatment Effects: A Comparative Study.”</span> <em>Statistics in Medicine</em> 23 (19): 2937–60. <a href="https://doi.org/10.1002/sim.1903">https://doi.org/10.1002/sim.1903</a>.
 </div>
+<div id="ref-xu2010stabilized" class="csl-entry" role="listitem">
+Xu, Stanley, Colleen Ross, Marsha A Raebel, Susan Shetterly, Christopher Blanchette, and David Smith. 2010. <span>“Use of Stabilized Inverse Propensity Scores as Weights to Directly Estimate Relative Risk and Its Confidence Intervals.”</span> <em>Value in Health</em> 13 (2): 273–77. <a href="https://doi.org/10.1111/j.1524-4733.2009.00671.x">https://doi.org/10.1111/j.1524-4733.2009.00671.x</a>.
+</div>
 </div>
 
 
@@ -729,6 +756,78 @@ Lunceford, Jared K, and Marie Davidian. 2004. <span>“Stratification and Weight
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1281,95 +1380,103 @@ Lunceford, Jared K, and Marie Davidian. 2004. <span>“Stratification and Weight
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Take 100 made-up patients of two kinds:</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**60 with few barriers to care.** Clinicians gave 48 of them the single tablet (80%) and 12 the three-pill regimen. 90% of them reach suppression, *whichever regimen they get*.</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**40 with many barriers.** Clinicians gave 12 of them the single tablet (30%) and 28 the three-pill regimen. 60% reach suppression, *whichever regimen they get*.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**60 with few barriers to care.** Clinicians gave 48 of them the single tablet (80%) and 12 the multi-tablet regimen. 90% of them reach suppression, *whichever regimen they get*.</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**40 with many barriers.** Clinicians gave 12 of them the single tablet (30%) and 28 the multi-tablet regimen. 60% reach suppression, *whichever regimen they get*.</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>The regimen makes no difference here, by construction. But compare the groups directly:</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Patients <span class="pp">|</span> Few barriers <span class="pp">|</span> Suppressed <span class="pp">|</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single tablet <span class="pp">|</span> 60 <span class="pp">|</span> 48 (80%) <span class="pp">|</span> 48 × 0.9 + 12 × 0.6 = 50.4 (84%) <span class="pp">|</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Three pills <span class="pp">|</span> 40 <span class="pp">|</span> 12 (30%) <span class="pp">|</span> 12 × 0.9 + 28 × 0.6 = 27.6 (69%) <span class="pp">|</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Regimen <span class="pp">|</span> Patients <span class="pp">|</span> With few barriers <span class="pp">|</span> Expected suppressed <span class="pp">|</span> Suppressed (%) <span class="pp">|</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single tablet <span class="pp">|</span> 60 <span class="pp">|</span> 48 (80%) <span class="pp">|</span> 50.4 <span class="pp">|</span> 84% <span class="pp">|</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-tablet <span class="pp">|</span> 40 <span class="pp">|</span> 12 (30%) <span class="pp">|</span> 27.6 <span class="pp">|</span> 69% <span class="pp">|</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>The single tablet "wins" by 15 points, entirely because it went mostly to patients who were going to do well anyway.</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>: Table 1. Before weighting, the single tablet went mostly to patients with few barriers. Expected suppressed: 48 × 0.9 + 12 × 0.6 = 50.4 for the single tablet; 12 × 0.9 + 28 × 0.6 = 27.6 for multi-tablet.</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## The propensity score</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>The single tablet "wins" by 15 points, entirely because it went mostly to patients who were going to do well anyway.</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>A patient's **propensity score** is the probability that a patient like them received the single tablet. In the example it is 0.8 for a patient with few barriers and 0.3 for one with many. In real data nobody knows these probabilities, so they are estimated with a logistic regression of "received the single tablet" on the patient's characteristics. In this study those were age, sex, race, ethnicity, injection drug use, sex between men, hepatitis C, insurance, and baseline viral load and CD4 (<span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd#propensity-model)</span>).</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## The propensity score</span></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## The weights</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>A patient's **propensity score** is the probability that a patient like them received the single tablet. In the example it is 0.8 for a patient with few barriers and 0.3 for one with many. In real data nobody knows these probabilities, so they are estimated with a logistic regression of "received the single tablet" on the patient's characteristics. In this study those were age, sex, race, ethnicity, injection drug use, sex between men, hepatitis C, insurance, and baseline viral load and CD4 (<span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd#propensity-model)</span>).</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>Each patient is weighted by one over the probability of the regimen they actually received:</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## The weights</span></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Single tablet: weight = 1 / propensity score.</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Three pills: weight = 1 / (1 − propensity score).</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>A patient who received a regimen that was unlikely for someone like them gets a large weight, because they stand in for the similar patients who went the other way.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>Each patient is weighted by one over the probability of the regimen they actually received:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Single tablet: weight = 1 / propensity score.</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Multi-tablet: weight = 1 / (1 − propensity score).</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Received <span class="pp">|</span> Probability of what they received <span class="pp">|</span> Weight <span class="pp">|</span> Patients <span class="pp">|</span> Weighted count <span class="pp">|</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|---|</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Few barriers <span class="pp">|</span> Single tablet <span class="pp">|</span> 0.8 <span class="pp">|</span> 1.25 <span class="pp">|</span> 48 <span class="pp">|</span> 60 <span class="pp">|</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Few barriers <span class="pp">|</span> Three pills <span class="pp">|</span> 0.2 <span class="pp">|</span> 5 <span class="pp">|</span> 12 <span class="pp">|</span> 60 <span class="pp">|</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Many barriers <span class="pp">|</span> Single tablet <span class="pp">|</span> 0.3 <span class="pp">|</span> 3.33 <span class="pp">|</span> 12 <span class="pp">|</span> 40 <span class="pp">|</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Many barriers <span class="pp">|</span> Three pills <span class="pp">|</span> 0.7 <span class="pp">|</span> 1.43 <span class="pp">|</span> 28 <span class="pp">|</span> 40 <span class="pp">|</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>After weighting, each regimen group looks like the whole cohort: 60 with few barriers and 40 with many. That is the **pseudo-population**, a version of the cohort in which the regimen no longer depends on barriers to care. Now compare:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>A patient who received a regimen that was unlikely for someone like them gets a large weight, because they stand in for the similar patients who went the other way.</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Barriers <span class="pp">|</span> Received <span class="pp">|</span> P(regimen received) <span class="pp">|</span> Weight <span class="pp">|</span> Patients <span class="pp">|</span> Weighted count <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|---|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Few <span class="pp">|</span> Single tablet <span class="pp">|</span> 0.8 <span class="pp">|</span> 1.25 <span class="pp">|</span> 48 <span class="pp">|</span> 60 <span class="pp">|</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Few <span class="pp">|</span> Multi-tablet <span class="pp">|</span> 0.2 <span class="pp">|</span> 5 <span class="pp">|</span> 12 <span class="pp">|</span> 60 <span class="pp">|</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Many <span class="pp">|</span> Single tablet <span class="pp">|</span> 0.3 <span class="pp">|</span> 3.33 <span class="pp">|</span> 12 <span class="pp">|</span> 40 <span class="pp">|</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Many <span class="pp">|</span> Multi-tablet <span class="pp">|</span> 0.7 <span class="pp">|</span> 1.43 <span class="pp">|</span> 28 <span class="pp">|</span> 40 <span class="pp">|</span></span>
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Weighted patients <span class="pp">|</span> Few barriers <span class="pp">|</span> Suppressed <span class="pp">|</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single tablet <span class="pp">|</span> 100 <span class="pp">|</span> 60 (60%) <span class="pp">|</span> 60 × 0.9 + 40 × 0.6 = 78 (78%) <span class="pp">|</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Three pills <span class="pp">|</span> 100 <span class="pp">|</span> 60 (60%) <span class="pp">|</span> 60 × 0.9 + 40 × 0.6 = 78 (78%) <span class="pp">|</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>The false 15-point difference is gone. With real data, what remains after weighting is the estimated effect of the regimen, provided the propensity model has captured everything that drove both the choice and the outcome.</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the weighted result estimates</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>: Table 2. Each weight is 1 / P(regimen received); weight × patients gives each group the cohort's 60:40 mix.</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>After weighting, each regimen group looks like the whole cohort: 60 with few barriers and 40 with many. That is the **pseudo-population**, a version of the cohort in which the regimen no longer depends on barriers to care. Now compare:</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Regimen <span class="pp">|</span> Weighted patients <span class="pp">|</span> With few barriers <span class="pp">|</span> Expected suppressed <span class="pp">|</span> Suppressed (%) <span class="pp">|</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single tablet <span class="pp">|</span> 100 <span class="pp">|</span> 60 (60%) <span class="pp">|</span> 78 <span class="pp">|</span> 78% <span class="pp">|</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-tablet <span class="pp">|</span> 100 <span class="pp">|</span> 60 (60%) <span class="pp">|</span> 78 <span class="pp">|</span> 78% <span class="pp">|</span></span>
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>These weights make *both* groups look like the whole cohort. The comparison therefore answers: what would happen if *everyone* in the cohort started the single tablet, compared with everyone starting three pills? This is the **average treatment effect (ATE)**, and it is what this study estimated.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>: Table 3. After weighting, both groups have the same mix and the same suppression. Expected suppressed: 60 × 0.9 + 40 × 0.6 = 78 in each group.</span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>The weighted odds ratio compares those two whole-cohort scenarios. It is a *marginal* odds ratio, so it need not equal the odds ratio from a regression that adjusts for the same covariates. That is a property of odds ratios, not an error.</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>The false 15-point difference is gone. With real data, what remains after weighting is the estimated effect of the regimen, provided the propensity model has captured everything that drove both the choice and the outcome.</span>
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checking that it worked</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the weighted result estimates</span></span>
 <span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>The weights are only as good as the propensity model, so the check is whether the weighted groups really look alike on every covariate <span class="co">[</span><span class="ot">@austin2015iptw</span><span class="co">]</span>. In the example, the share with few barriers goes from 80% vs 30% to 60% vs 60%.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>These weights make *both* groups look like the whole cohort. The comparison therefore answers: what would happen if *everyone* in the cohort started the single tablet, compared with everyone starting the multi-tablet regimen? This is the **average treatment effect (ATE)**, and it is what this study estimated.</span>
 <span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>The usual summary is the **standardized difference**: the difference between groups divided by a pooled standard deviation. For a proportion, that is (p₁ − p₂) / √<span class="co">[</span><span class="ot">(p₁(1 − p₁) + p₂(1 − p₂)) / 2</span><span class="co">]</span>. In the example it is 1.16 before weighting and 0 after. Below about 0.1 is commonly taken as balanced. This study's code compares weighted percentages and means (<span class="co">[</span><span class="ot">weighted balance</span><span class="co">](07_propensity.qmd#weighted-balance)</span> and <span class="co">[</span><span class="ot">by category</span><span class="co">](07_propensity.qmd#weighted-balance-by-category)</span>) but does not compute standardized differences.</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>The weighted odds ratio compares those two whole-cohort scenarios. It is a *marginal* odds ratio, so it need not equal the odds ratio from a regression that adjusts for the same covariates. That is a property of odds ratios, not an error.</span>
 <span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="fu">## When weights get large</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checking that it worked</span></span>
 <span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>Weights become extreme when some patients had almost no chance of one regimen. Suppose only 1 of the 40 patients with many barriers had received the single tablet. That patient's propensity score would be 0.025 and their weight 40: one person would stand in for all 40 patients with many barriers in the single-tablet group, and their outcome alone would drive the estimate. This is a failure of **positivity** (overlap): every kind of patient needs a real chance of either regimen.</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>The weights are only as good as the propensity model, so the check is whether the weighted groups really look alike on every covariate <span class="co">[</span><span class="ot">@austin2015iptw</span><span class="co">]</span>. In the example, the share with few barriers goes from 80% vs 30% to 60% vs 60%.</span>
 <span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>What analysts do about it:</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>The usual summary is the **standardized difference**: the difference between groups divided by a pooled standard deviation. For a proportion, that is (p₁ − p₂) / √<span class="co">[</span><span class="ot">(p₁(1 − p₁) + p₂(1 − p₂)) / 2</span><span class="co">]</span>. In the example it is 1.16 before weighting and 0 after. Below about 0.1 is commonly taken as balanced. This study's code compares weighted percentages and means (<span class="co">[</span><span class="ot">weighted balance</span><span class="co">](07_propensity.qmd#weighted-balance)</span> and <span class="co">[</span><span class="ot">by category</span><span class="co">](07_propensity.qmd#weighted-balance-by-category)</span>) but does not compute standardized differences.</span>
 <span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Look first.** Compare the distribution of propensity scores in the two groups and list the largest weights.</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Stabilized weights.** Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for three pills). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.</span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trimming.** Cap weights at a percentile, or drop patients with scores near 0 or 1. This reduces noise but changes the population the answer applies to.</span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**A different question.** Weights of 1 for the single tablet and p / (1 − p) for three pills make the three-pill group look like the single-tablet group. This estimates the **average treatment effect in the treated (ATT)**: the effect among the kind of patients clinicians actually gave the single tablet.</span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>This study used unstabilized, untrimmed ATE weights and did not report the weight distribution.</span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="fu">## Standard errors, and Stata's `aw` and `pw`</span></span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use **robust (sandwich) standard errors**. These also ignore the fact that the propensity scores were estimated; for the ATE that usually makes them somewhat conservative (too wide) rather than too narrow <span class="co">[</span><span class="ot">@lunceford2004stratification</span><span class="co">]</span>.</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## When weights get large</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>Weights become extreme when some patients had almost no chance of one regimen. Suppose only 1 of the 40 patients with many barriers had received the single tablet. That patient's propensity score would be 0.025 and their weight 40: one person would stand in for all 40 patients with many barriers in the single-tablet group, and their outcome alone would drive the estimate. This is a failure of **positivity** (overlap): every kind of patient needs a real chance of either regimen.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>What analysts do about it:</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Look first.** Compare the distribution of propensity scores in the two groups and list the largest weights.</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Stabilized weights.** Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for multi-tablet). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trimming.** Cap weights at a percentile, or drop patients with scores near 0 or 1. This reduces noise but changes the population the answer applies to.</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**A different question.** Weights of 1 for the single tablet and p / (1 − p) for multi-tablet make the multi-tablet group look like the single-tablet group. This estimates the **average treatment effect in the treated (ATT)**: the effect among the kind of patients clinicians actually gave the single tablet.</span>
 <span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>Stata offers several kinds of weight. Two appear in Final Analysis.do, and they give the **same estimates but different standard errors**:</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>This study used unstabilized, untrimmed ATE weights and did not report the weight distribution.</span>
 <span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> <span class="in">`[aw=IPW]`</span> (analytic weights) <span class="pp">|</span> <span class="in">`[pw=IPW]`</span> (probability weights) <span class="pp">|</span></span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Meant for <span class="pp">|</span> Rows that are averages of different numbers of people, so a larger weight means a more precise row <span class="pp">|</span> Each row stands in for 1/p people, as in survey sampling and inverse probability weighting <span class="pp">|</span></span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Weighted percentages, means, odds ratios <span class="pp">|</span> Same <span class="pp">|</span> Same <span class="pp">|</span></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Standard errors <span class="pp">|</span> Treated as if the weights described precision; rescaled to the sample size <span class="pp">|</span> Robust (sandwich) standard errors, always <span class="pp">|</span></span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Used in Final Analysis.do for <span class="pp">|</span> The balance tables (<span class="in">`tab`</span>, <span class="in">`summarize`</span>): weighted percentages and means, with no tests <span class="pp">|</span> Every model (<span class="in">`logistic ... [pw=IPW]`</span>) <span class="pp">|</span></span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>That split is the right one: <span class="in">`aw`</span> where only the weighted numbers matter, <span class="in">`pw`</span> wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance (<span class="co">[</span><span class="ot">7</span><span class="co">](07_propensity.qmd#weighted-balance)</span>), and <span class="in">`survey::svyglm()`</span>, which gives robust standard errors, for the models (<span class="co">[</span><span class="ot">`odds_ratio_for_str()`</span><span class="co">](functions.qmd#odds-ratios)</span>). Stata has two more kinds of weight that are not used here: <span class="in">`fw`</span>, where a row really is several identical people, and <span class="in">`iw`</span>, for special cases.</span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## What weighting cannot do</span></span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>Weighting balances only what is in the propensity model. The paper points out the obvious gap: clinicians may have chosen boosted protease inhibitors for patients they expected to adhere poorly, because those drugs are less prone to resistance, and nothing in the data measures that expectation <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>. No weighting can remove a difference that was never measured.</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Standard errors, and Stata's `aw` and `pw`</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use **robust (sandwich) standard errors**. These also ignore the fact that the propensity scores were estimated. Theory for ATE weights shows that ignoring this tends to make the standard errors somewhat too wide (conservative) rather than too narrow <span class="co">[</span><span class="ot">@lunceford2004stratification</span><span class="co">]</span>, and a simulation study of stabilized weights for relative risks found the same <span class="co">[</span><span class="ot">@xu2010stabilized</span><span class="co">]</span>. Neither guarantees it for every data set, and neither studied odds ratios with unstabilized weights as used here.</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>Stata offers several kinds of weight. Two appear in Final Analysis.do. They give the **same weighted percentages and means**, but they mean different things, and only one of them can be used for the models:</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> <span class="in">`[aw=IPW]`</span> (analytic weights) <span class="pp">|</span> <span class="in">`[pw=IPW]`</span> (probability weights) <span class="pp">|</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> What a weight means <span class="pp">|</span> The row is an average of several people, so a larger weight means a more precise row <span class="pp">|</span> The row stands in for 1/p people, as in survey sampling and inverse probability weighting <span class="pp">|</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Weighted percentages and means <span class="pp">|</span> The same under both <span class="pp">|</span> The same under both <span class="pp">|</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`logistic`</span> <span class="pp">|</span> Not allowed: <span class="in">`logistic`</span> accepts only <span class="in">`fw`</span>, <span class="in">`iw`</span> and <span class="in">`pw`</span> <span class="pp">|</span> Allowed; always gives robust (sandwich) standard errors <span class="pp">|</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Used in Final Analysis.do for <span class="pp">|</span> The balance tables (<span class="in">`tab`</span>, <span class="in">`summarize`</span>): weighted percentages and means, with no tests <span class="pp">|</span> Every model (<span class="in">`logistic ... [pw=IPW]`</span>) <span class="pp">|</span></span>
 <span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>: Table 4. Stata's two kinds of weight in Final Analysis.do.</span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>That split is the right one: <span class="in">`aw`</span> where only the weighted numbers matter, <span class="in">`pw`</span> wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance (<span class="co">[</span><span class="ot">7</span><span class="co">](07_propensity.qmd#weighted-balance)</span>), and <span class="in">`survey::svyglm()`</span>, which gives robust standard errors, for the models (<span class="co">[</span><span class="ot">`odds_ratio_for_str()`</span><span class="co">](functions.qmd#odds-ratios)</span>). Stata has two more kinds of weight that are not used here: <span class="in">`fw`</span>, where a row really is several identical people, and <span class="in">`iw`</span>, for special cases. For commands that accept both <span class="in">`aw`</span> and <span class="in">`pw`</span>, such as <span class="in">`regress`</span>, the estimates are the same and only the standard errors differ.</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="fu">## What weighting cannot do</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>Weighting balances only what is in the propensity model. The paper points out the obvious gap: clinicians may have chosen boosted protease inhibitors for patients they expected to adhere poorly, because those drugs are less prone to resistance, and nothing in the data measures that expectation <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>. No weighting can remove a difference that was never measured.</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

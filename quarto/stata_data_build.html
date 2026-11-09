@@ -908,7 +908,7 @@ Show these 52 lines
 <span id="cb20-46"><a href="#cb20-46" aria-label="46"></a><span class="kw">encode</span> drugconstituents, <span class="kw">generate</span>(DrugConstituents)</span>
 <span id="cb20-47"><a href="#cb20-47" aria-label="47"></a><span class="kw">drop</span> drugconstituents</span>
 <span id="cb20-48"><a href="#cb20-48" aria-label="48"></a></span>
-<span id="cb20-49"><a href="#cb20-49" aria-label="49"></a><span class="co">//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject (~147):</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-label="49"></a><span class="co">//We create a global $MaxNumDrugs which saves the maximum number of drugs dispensed for a single subject:</span></span>
 <span id="cb20-50"><a href="#cb20-50" aria-label="50"></a><span class="kw">quietly</span> <span class="kw">summarize</span> <span class="kw">N</span></span>
 <span id="cb20-51"><a href="#cb20-51" aria-label="51"></a><span class="kw">global</span> MaxNumDrugs <span class="ot">`r(max)'</span></span>
 <span id="cb20-52"><a href="#cb20-52" aria-label="52"></a><span class="kw">display</span> <span class="st">"Maximum number of drugs is: "</span> <span class="ot">$MaxNumDrugs</span></span>
@@ -1212,7 +1212,7 @@ Show these 26 lines
 <h3 class="anchored" data-anchor-id="s6-split">Lines 1-11: Split the pharmacy file to save memory</h3>
 <p><strong>In R:</strong> <a href="../quarto/04_daily_regimen.html#r-keep-patients-with-fills"><code>keep-patients-with-fills</code></a></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="co">//Flash-Zerai data set</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="co">//This snippet of code breaks up the single pharmacy file, which is too large to merge, into ~147 bite size chunks</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="co">//This snippet of code breaks up the single pharmacy file, which is too large to merge, into bite size chunks</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-label="3"></a><span class="co">//12-16-2014</span></span>
 <span id="cb32-4"><a href="#cb32-4" aria-label="4"></a></span>
 <span id="cb32-5"><a href="#cb32-5" aria-label="5"></a><span class="kw">forvalues</span> counter=1(1)<span class="ot">$MaxNumDrugs</span> {</span>
@@ -1278,7 +1278,7 @@ Show these 26 lines
 <section id="s7-dispense" class="level3">
 <h3 class="anchored" data-anchor-id="s7-dispense">Lines 40-53: Mark the days each drug was dispensed</h3>
 <p><strong>In R:</strong> <a href="../quarto/04_daily_regimen.html#r-mark-dispense-days"><code>mark-dispense-days</code></a></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36" data-startfrom="40"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 39;"><span id="cb36-40"><a href="#cb36-40" aria-label="40"></a><span class="co">//This code merges the ~147 Pharmacy fill files with the active database</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36" data-startfrom="40"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 39;"><span id="cb36-40"><a href="#cb36-40" aria-label="40"></a><span class="co">//This code merges the Pharmacy fill files with the active database</span></span>
 <span id="cb36-41"><a href="#cb36-41" aria-label="41"></a><span class="kw">forvalues</span> counter=1(1)<span class="ot">$MaxNumDrugs</span> {</span>
 <span id="cb36-42"><a href="#cb36-42" aria-label="42"></a><span class="kw">display</span> <span class="st">"Currently on loop iteration "</span> <span class="ot">`counter'</span> <span class="st">"..."</span></span>
 <span id="cb36-43"><a href="#cb36-43" aria-label="43"></a><span class="kw">merge</span> <span class="fu">m</span>:1 studyid <span class="kw">using</span> Pharmacy<span class="ot">`counter'</span>.dta</span>
@@ -1396,6 +1396,78 @@ Show these 26 lines
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

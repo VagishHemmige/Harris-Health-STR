@@ -508,7 +508,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R"><code>R/functions.R</code></a></li>
 </ul>
 <p>Translated from Stata Steps <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%202%20CD4.do">2 (CD4)</a>, <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%203%20VL.do">3 (VL)</a>, <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204%20Demographic.do">4 (demographics)</a>, <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204B%20Insurance.do">4B (insurance)</a> and <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204C%20Psych.do">4C (psychiatry)</a>, and the merges at the top of <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do">Step 5</a>.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="cd4-counts" class="level2">
@@ -516,12 +516,13 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>Each Stata lab step read the file, converted the date, then reshaped to one row per patient with columns <code>CD4Result1</code>, <code>CD4Date1</code>, <code>CD4Result2</code> … so that it could be merged one-to-one later. R keeps one row per test (long format) and joins by patient and date when needed, so no reshape is required.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cd4 <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"cd4"</span>]]) <span class="sc">|&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">lab_date =</span> <span class="fu">mdy</span>(testdate), <span class="at">cd4 =</span> resultnumeric)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-read-cd4" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 2 CD4.do</code>, lines 1-24 (Read CD4 results and reshape)
@@ -558,12 +559,13 @@ Stata: <code>Do Step 2 CD4.do</code>, lines 1-24 (Read CD4 results and reshape)
 <h2 class="anchored" data-anchor-id="viral-loads">Viral loads</h2>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>viral_load <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"viral_load"</span>]]) <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">lab_date =</span> <span class="fu">mdy</span>(testdate), <span class="at">vl =</span> resultnumeric)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-read-viral-load" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 3 VL.do</code>, lines 1-24 (Read viral loads and reshape)
@@ -602,7 +604,7 @@ Stata: <code>Do Step 3 VL.do</code>, lines 1-24 (Read viral loads and reshape)
 <p>A blank ethnicity needs care. In Stata, <code>generate Black=(ethnicity=="B")</code> compares the blank text with “B” and gets 0, so the patient counts as not Black and keeps a propensity score. R reads a blank as missing, and <code>ethnicity == "B"</code> would give a missing value, which would drop the patient from the weighted analyses. <code>ethnicity %in% "B"</code> gives <code>FALSE</code> for a missing value, which matches Stata. In Stata, <code>encode</code> then turned the text into numbered categories “to save space”, which R does not need.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lower-case codes are corrected, and indicators are made for Black and Hispanic</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ethnicity, injection drug use and men who have sex with men. As in Stata,</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># where `generate Black=(ethnicity=="B")` gives 0 for a blank, a missing</span></span>
@@ -623,6 +625,7 @@ Stata: <code>Do Step 3 VL.do</code>, lines 1-24 (Read viral loads and reshape)
 </details>
 </div>
 <div id="r-read-demographics" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 4 Demographic.do</code>, lines 1-44 (Read and clean demographics)
@@ -680,7 +683,7 @@ Stata: <code>Do Step 4 Demographic.do</code>, lines 1-44 (Read and clean demogra
 <p>Added in December 2017, probably for the revision of the paper. The insurance categories are used in the propensity model; <code>prevcareelsewhere</code> is used as an exclusion in <a href="../quarto/06_cohort.html">6. Cohort</a>.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>insurance <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"insurance"</span>]]) <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">insurance_status =</span> insurancestatus,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">prior_care_elsewhere =</span> prevcareelsewhere)</span>
@@ -691,6 +694,7 @@ Stata: <code>Do Step 4 Demographic.do</code>, lines 1-44 (Read and clean demogra
 </details>
 </div>
 <div id="r-read-insurance" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 4B Insurance.do</code>, lines 1-11 (Read insurance and prior care)
@@ -715,7 +719,7 @@ Stata: <code>Do Step 4B Insurance.do</code>, lines 1-11 (Read insurance and prio
 <p>Also added in December 2017, for a sensitivity analysis. The analysis only asks whether a patient had any psychiatry visit date on file, at any time.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The analysis uses only whether a patient ever had a psychiatry visit date.</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>psych_visits <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"psych_visits"</span>]]) <span class="sc">|&gt;</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psych_date =</span> <span class="fu">mdy</span>(psychvisitdate)) <span class="sc">|&gt;</span></span>
@@ -724,6 +728,7 @@ Stata: <code>Do Step 4B Insurance.do</code>, lines 1-11 (Read insurance and prio
 </details>
 </div>
 <div id="r-read-psych-visits" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 4C Psych.do</code>, lines 1-21 (Read psychiatry visits)
@@ -758,7 +763,7 @@ Stata: <code>Do Step 4C Psych.do</code>, lines 1-21 (Read psychiatry visits)
 <p><code>merge 1:1</code> also stops if a patient appears twice in either file. <a href="../quarto/functions.html#checking-one-row-per-patient"><code>check_unique_patients()</code></a> does that check first, and <code>relationship = "one-to-one"</code> makes each join stop rather than duplicate a patient.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata merged these files one to one and kept patients found in any of them,</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># including patients with lab results but no demographic record. `merge 1:1`</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># stops if a patient appears twice, so the same check comes first here.</span></span>
@@ -774,6 +779,7 @@ Stata: <code>Do Step 4C Psych.do</code>, lines 1-21 (Read psychiatry visits)
 </details>
 </div>
 <div id="r-combine-baseline" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#checking-one-row-per-patient"><code>check_unique_patients()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient-level files)
@@ -814,6 +820,78 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1372,7 +1450,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>Translated from Stata Steps <span class="co">[</span><span class="ot">2 (CD4)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%202%20CD4.do)</span>, <span class="co">[</span><span class="ot">3 (VL)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%203%20VL.do)</span>, <span class="co">[</span><span class="ot">4 (demographics)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204%20Demographic.do)</span>, <span class="co">[</span><span class="ot">4B (insurance)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204B%20Insurance.do)</span> and <span class="co">[</span><span class="ot">4C (psychiatry)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204C%20Psych.do)</span>, and the merges at the top of <span class="co">[</span><span class="ot">Step 5</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do)</span>.</span>
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>

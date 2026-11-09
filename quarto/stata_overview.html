@@ -519,23 +519,25 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div>
 
 <pre class="mermaid mermaid-js">flowchart TD
-  M["Do Main do file.do"]
+  accTitle: How the Stata do-files fit together
+  accDescr: Do Main runs Steps 0B to 8. Step 0B (current regimen) and Step 1A (pharmacy fills, then split by Step 6) feed Step 7. Steps 2 to 4C (labs, demographics, insurance and prior care, psychiatry visits) feed Step 5, which expands to one row per patient per day and feeds Step 7. Step 7 merges the pharmacy data and feeds Step 8, which computes pills on hand and outcomes and saves the Data Analytic file. Final Analysis, the published analysis, reads that file.
+  M["Do Main do file.do&lt;br/&gt;runs Steps 0B-8"]
   subgraph build ["Building the person-day data set"]
-    S0B["0B Current regimen"] --&gt; S7
-    S1A["1A Pharmacy fills"] --&gt; S6["6 Split pharmacy file"] --&gt; S7
-    S2["2 CD4"] --&gt; S5
-    S3["3 Viral load"] --&gt; S5
-    S4["4 Demographics"] --&gt; S5
-    S4B["4B Insurance, prior care"] --&gt; S5
-    S4C["4C Psychiatry visits"] --&gt; S5
-    S5["5 Merge and expand to days"] --&gt; S7["7 Merge pharmacy"] --&gt; S8["8 Pills on hand, outcomes&lt;br/&gt;= Data Analytic file"]
+    direction TB
+    S0B["0B Current regimen"]
+    S1A["1A Pharmacy fills"] --&gt; S6["6 Split pharmacy file"]
+    L["2-4C Labs, demographics,&lt;br/&gt;insurance, psychiatry"] --&gt; S5["5 Merge and expand to days"]
+    S0B --&gt; S7["7 Merge pharmacy"]
+    S6 --&gt; S7
+    S5 --&gt; S7
+    S7 --&gt; S8["8 Pills on hand, outcomes&lt;br/&gt;= Data Analytic file"]
   end
-  M -. runs .-&gt; build
+  M --&gt; build
   S8 --&gt; F["Final Analysis&lt;br/&gt;(published paper)"]
   style build fill:#f8f9fa,stroke:#adb5bd,color:#212529
 </pre>
 </div>
-<p></p></figure><p></p>
+<p></p><figcaption> How the do-files feed one another. Main runs Steps 0B to 8, which build the person-day file; Final Analysis was run by hand on that file.</figcaption> </figure><p></p>
 </div>
 </div>
 </div>
@@ -597,7 +599,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <tr class="even">
 <td>Step 6 Tokenize Pharmacy</td>
 <td>Dec 2014</td>
-<td>Splits the pharmacy file into about 147 files to get round Stata’s memory limit</td>
+<td>Splits the pharmacy file into one file per fill number to get round Stata’s memory limit</td>
 <td>Not needed in R (<a href="../quarto/04_daily_regimen.html">4</a>)</td>
 </tr>
 <tr class="odd">
@@ -663,6 +665,78 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Na<span>ı̈</span>ve Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
 </div>
 </div></section></div></main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1213,67 +1287,70 @@ Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Ted
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>%%| <span class="fu">eval</span>: true</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  M[<span class="ot">"</span><span class="st">Do Main do file.do</span><span class="ot">"</span>]</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  subgraph build [<span class="ot">"</span><span class="st">Building the person-day data set</span><span class="ot">"</span>]</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    S0B[<span class="ot">"</span><span class="st">0B Current regimen</span><span class="ot">"</span>] --&gt; S7</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    S1A[<span class="ot">"</span><span class="st">1A Pharmacy fills</span><span class="ot">"</span>] --&gt; S6[<span class="ot">"</span><span class="st">6 Split pharmacy file</span><span class="ot">"</span>] --&gt; S7</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    S2[<span class="ot">"</span><span class="st">2 CD4</span><span class="ot">"</span>] --&gt; S5</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    S3[<span class="ot">"</span><span class="st">3 Viral load</span><span class="ot">"</span>] --&gt; S5</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    S4[<span class="ot">"</span><span class="st">4 Demographics</span><span class="ot">"</span>] --&gt; S5</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    S4B[<span class="ot">"</span><span class="st">4B Insurance, prior care</span><span class="ot">"</span>] --&gt; S5</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    S4C[<span class="ot">"</span><span class="st">4C Psychiatry visits</span><span class="ot">"</span>] --&gt; S5</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    S5[<span class="ot">"</span><span class="st">5 Merge and expand to days</span><span class="ot">"</span>] --&gt; S7[<span class="ot">"</span><span class="st">7 Merge pharmacy</span><span class="ot">"</span>] --&gt; S8[<span class="ot">"</span><span class="st">8 Pills on hand, outcomes&lt;br/&gt;= Data Analytic file</span><span class="ot">"</span>]</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  end</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  M -. runs .-&gt; build</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  S8 --&gt; F[<span class="ot">"</span><span class="st">Final Analysis&lt;br/&gt;(published paper)</span><span class="ot">"</span>]</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  style build fill:<span class="co">#f8f9fa,stroke:#adb5bd,color:#212529</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## File by file</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Dated <span class="pp">|</span> What it does <span class="pp">|</span> R translation <span class="pp">|</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Do Main do file <span class="pp">|</span> Nov 2015, analysis date Dec 2017 <span class="pp">|</span> Sets the analysis date and runs Steps 0B-8 with a log <span class="pp">|</span> <span class="co">[</span><span class="ot">`R/main.R`</span><span class="co">](setup.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 0B Current Regimen <span class="pp">|</span> Nov 2015 <span class="pp">|</span> Every regimen over time from fill dates, 576 manual corrections, Complera recode, twice-daily flags <span class="pp">|</span> <span class="co">[</span><span class="ot">1. Regimens</span><span class="co">](01_regimens.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 1A Pharmacy Part 1 <span class="pp">|</span> undated <span class="pp">|</span> Cleans drug names, flags twice-daily and single-tablet products, one row per patient <span class="pp">|</span> <span class="co">[</span><span class="ot">1</span><span class="co">](01_regimens.qmd)</span> and <span class="co">[</span><span class="ot">4</span><span class="co">](04_daily_regimen.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 2 CD4, Step 3 VL <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Lab results, one row per patient <span class="pp">|</span> <span class="co">[</span><span class="ot">2. Labs and baseline</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 4 Demographic <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Demographics and risk indicators <span class="pp">|</span> <span class="co">[</span><span class="ot">2</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 4B Insurance, 4C Psych <span class="pp">|</span> Dec 2017 <span class="pp">|</span> Insurance and prior care; psychiatry visit dates (added for the revision) <span class="pp">|</span> <span class="co">[</span><span class="ot">2</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 5 Merge and Expand <span class="pp">|</span> Dec 2014 <span class="pp">|</span> One row per patient per day 2008-2013, labs carried forward and back <span class="pp">|</span> <span class="co">[</span><span class="ot">3. Patient-days</span><span class="co">](03_person_days.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 6 Tokenize Pharmacy <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Splits the pharmacy file into about 147 files to get round Stata's memory limit <span class="pp">|</span> Not needed in R (<span class="co">[</span><span class="ot">4</span><span class="co">](04_daily_regimen.qmd)</span>) <span class="pp">|</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 7 Merge Pharmacy <span class="pp">|</span> undated <span class="pp">|</span> Current regimen and dispense days on each day <span class="pp">|</span> <span class="co">[</span><span class="ot">4. Daily regimen</span><span class="co">](04_daily_regimen.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 8 Data Preparation <span class="pp">|</span> Jun 2014 <span class="pp">|</span> Pills on hand, days covered, still in care, suppression: the "Data Analytic file" <span class="pp">|</span> <span class="co">[</span><span class="ot">5. Pills on hand</span><span class="co">](05_adherence.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Do Final Analysis <span class="pp">|</span> undated; uses the Dec 2017 data <span class="pp">|</span> **The published analysis.** Three regimens; exclusions; propensity score and weights; outcomes; sensitivity analyses <span class="pp">|</span> <span class="co">[</span><span class="ot">6</span><span class="co">](06_cohort.qmd)</span> to <span class="co">[</span><span class="ot">9</span><span class="co">](09_sensitivity.qmd)</span> <span class="pp">|</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>The main do-file still contains lines for files not kept here: two earlier regimen steps (0A and 1B, already commented out because 0B replaced them) and four earlier analysis steps (9-12, quarterly outcomes and survival models that are not in the paper). A stop line after Step 8 kept them from running.</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Final Analysis and the paper</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Final Analysis.do matches the paper <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>: the three regimens compared (Atripla against darunavir or atazanavir boosted with ritonavir, each with Truvada), insurance in the propensity model, and psychiatry visits and a 50 copies/mL threshold as sensitivity analyses. Main does not call it: it was run by hand a section at a time, so it would not run straight through. A deliberate stop line sits partway down, and it creates <span class="in">`VirologicallySuppressed2`</span> twice, which Stata refuses.</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where the code is more specific than the paper</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>The code is the record of what was done, so these are kept as they are in both the Stata and the R:</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Patients with prior care elsewhere and patients with no insurance status are excluded.</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Viral suppression is 400 copies/mL *or less*, not less than 400.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>%%| fig-cap: <span class="ot">"</span><span class="st">How the do-files feed one another. Main runs Steps 0B to 8, which build the person-day file; Final Analysis was run by hand on that file.</span><span class="ot">"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  accTitle: How the Stata <span class="kw">do</span>-files fit together</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  accDescr: Do Main runs Steps <span class="dv">0</span>B to <span class="fl">8.</span> Step <span class="dv">0</span>B (current regimen) <span class="ot">and</span> Step <span class="dv">1</span>A (pharmacy fills, then <span class="fu">split</span> by Step <span class="dv">6</span>) feed Step <span class="fl">7.</span> Steps <span class="dv">2</span> to <span class="dv">4</span>C (labs, demographics, insurance <span class="ot">and</span> prior care, psychiatry visits) feed Step <span class="dv">5</span>, which expands to one row per patient per day <span class="ot">and</span> feeds Step <span class="fl">7.</span> Step <span class="dv">7</span> merges the pharmacy data <span class="ot">and</span> feeds Step <span class="dv">8</span>, which computes pills on hand <span class="ot">and</span> outcomes <span class="ot">and</span> saves the Data Analytic file. Final Analysis, the published analysis, reads that file.</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  M[<span class="ot">"</span><span class="st">Do Main do file.do&lt;br/&gt;runs Steps 0B-8</span><span class="ot">"</span>]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  subgraph build [<span class="ot">"</span><span class="st">Building the person-day data set</span><span class="ot">"</span>]</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    direction TB</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    S0B[<span class="ot">"</span><span class="st">0B Current regimen</span><span class="ot">"</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    S1A[<span class="ot">"</span><span class="st">1A Pharmacy fills</span><span class="ot">"</span>] --&gt; S6[<span class="ot">"</span><span class="st">6 Split pharmacy file</span><span class="ot">"</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    L[<span class="ot">"</span><span class="st">2-4C Labs, demographics,&lt;br/&gt;insurance, psychiatry</span><span class="ot">"</span>] --&gt; S5[<span class="ot">"</span><span class="st">5 Merge and expand to days</span><span class="ot">"</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    S0B --&gt; S7[<span class="ot">"</span><span class="st">7 Merge pharmacy</span><span class="ot">"</span>]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    S6 --&gt; S7</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    S5 --&gt; S7</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    S7 --&gt; S8[<span class="ot">"</span><span class="st">8 Pills on hand, outcomes&lt;br/&gt;= Data Analytic file</span><span class="ot">"</span>]</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  end</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  M --&gt; build</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  S8 --&gt; F[<span class="ot">"</span><span class="st">Final Analysis&lt;br/&gt;(published paper)</span><span class="ot">"</span>]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  style build fill:<span class="co">#f8f9fa,stroke:#adb5bd,color:#212529</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## File by file</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Dated <span class="pp">|</span> What it does <span class="pp">|</span> R translation <span class="pp">|</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Do Main do file <span class="pp">|</span> Nov 2015, analysis date Dec 2017 <span class="pp">|</span> Sets the analysis date and runs Steps 0B-8 with a log <span class="pp">|</span> <span class="co">[</span><span class="ot">`R/main.R`</span><span class="co">](setup.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 0B Current Regimen <span class="pp">|</span> Nov 2015 <span class="pp">|</span> Every regimen over time from fill dates, 576 manual corrections, Complera recode, twice-daily flags <span class="pp">|</span> <span class="co">[</span><span class="ot">1. Regimens</span><span class="co">](01_regimens.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 1A Pharmacy Part 1 <span class="pp">|</span> undated <span class="pp">|</span> Cleans drug names, flags twice-daily and single-tablet products, one row per patient <span class="pp">|</span> <span class="co">[</span><span class="ot">1</span><span class="co">](01_regimens.qmd)</span> and <span class="co">[</span><span class="ot">4</span><span class="co">](04_daily_regimen.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 2 CD4, Step 3 VL <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Lab results, one row per patient <span class="pp">|</span> <span class="co">[</span><span class="ot">2. Labs and baseline</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 4 Demographic <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Demographics and risk indicators <span class="pp">|</span> <span class="co">[</span><span class="ot">2</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 4B Insurance, 4C Psych <span class="pp">|</span> Dec 2017 <span class="pp">|</span> Insurance and prior care; psychiatry visit dates (added for the revision) <span class="pp">|</span> <span class="co">[</span><span class="ot">2</span><span class="co">](02_labs_and_baseline.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 5 Merge and Expand <span class="pp">|</span> Dec 2014 <span class="pp">|</span> One row per patient per day 2008-2013, labs carried forward and back <span class="pp">|</span> <span class="co">[</span><span class="ot">3. Patient-days</span><span class="co">](03_person_days.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 6 Tokenize Pharmacy <span class="pp">|</span> Dec 2014 <span class="pp">|</span> Splits the pharmacy file into one file per fill number to get round Stata's memory limit <span class="pp">|</span> Not needed in R (<span class="co">[</span><span class="ot">4</span><span class="co">](04_daily_regimen.qmd)</span>) <span class="pp">|</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 7 Merge Pharmacy <span class="pp">|</span> undated <span class="pp">|</span> Current regimen and dispense days on each day <span class="pp">|</span> <span class="co">[</span><span class="ot">4. Daily regimen</span><span class="co">](04_daily_regimen.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Step 8 Data Preparation <span class="pp">|</span> Jun 2014 <span class="pp">|</span> Pills on hand, days covered, still in care, suppression: the "Data Analytic file" <span class="pp">|</span> <span class="co">[</span><span class="ot">5. Pills on hand</span><span class="co">](05_adherence.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Do Final Analysis <span class="pp">|</span> undated; uses the Dec 2017 data <span class="pp">|</span> **The published analysis.** Three regimens; exclusions; propensity score and weights; outcomes; sensitivity analyses <span class="pp">|</span> <span class="co">[</span><span class="ot">6</span><span class="co">](06_cohort.qmd)</span> to <span class="co">[</span><span class="ot">9</span><span class="co">](09_sensitivity.qmd)</span> <span class="pp">|</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>The main do-file still contains lines for files not kept here: two earlier regimen steps (0A and 1B, already commented out because 0B replaced them) and four earlier analysis steps (9-12, quarterly outcomes and survival models that are not in the paper). A stop line after Step 8 kept them from running.</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Final Analysis and the paper</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>Final Analysis.do matches the paper <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>: the three regimens compared (Atripla against darunavir or atazanavir boosted with ritonavir, each with Truvada), insurance in the propensity model, and psychiatry visits and a 50 copies/mL threshold as sensitivity analyses. Main does not call it: it was run by hand a section at a time, so it would not run straight through. A deliberate stop line sits partway down, and it creates <span class="in">`VirologicallySuppressed2`</span> twice, which Stata refuses.</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where the code is more specific than the paper</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>The code is the record of what was done, so these are kept as they are in both the Stata and the R:</span>
 <span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Slips in the code</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Follow-up window.** The saved file computes five outcomes over all of a patient's days to the end of 2013, not the first year: regimen change (lines 63-64), suppression on the initial regimen (161-162), the proportion of days covered (167), days covered on the initial regimen (196-197), and the 50 copies/mL suppression (177). Each is a <span class="in">`by studyid: egen`</span> with nothing limiting it to year one, unlike retention and year-one suppression, which go through <span class="in">`Quarter`</span>. The 2015 version of the same calculations ran after <span class="in">`keep if DaysSinceARTInitiation&lt;365`</span>, which is missing here; Final Analysis.do was run by hand, and the R assumes that step was run but not saved. The paper reports these as first-year outcomes, so the R computes them for year one (<span class="co">[</span><span class="ot">step 8</span><span class="co">](08_outcomes.qmd#other-outcomes)</span>).</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The models meant to use the psychiatry-adjusted weights (<span class="in">`IPW2`</span>) use <span class="in">`IPW`</span>. The R uses <span class="in">`IPW2`</span> (<span class="co">[</span><span class="ot">step 9</span><span class="co">](09_sensitivity.qmd)</span>).</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`(CurrentDrug4CurrentDispense)`</span> is missing its <span class="in">`==30`</span>. It does no harm, because the value is always 0 or 30.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Patients with prior care elsewhere and patients with no insurance status are excluded.</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Viral suppression is 400 copies/mL *or less*, not less than 400.</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Slips in the code</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Follow-up window.** The saved file computes five outcomes over all of a patient's days to the end of 2013, not the first year: regimen change (lines 63-64), suppression on the initial regimen (161-162), the proportion of days covered (167), days covered on the initial regimen (196-197), and the 50 copies/mL suppression (177). Each is a <span class="in">`by studyid: egen`</span> with nothing limiting it to year one, unlike retention and year-one suppression, which go through <span class="in">`Quarter`</span>. The 2015 version of the same calculations ran after <span class="in">`keep if DaysSinceARTInitiation&lt;365`</span>, which is missing here; Final Analysis.do was run by hand, and the R assumes that step was run but not saved. The paper reports these as first-year outcomes, so the R computes them for year one (<span class="co">[</span><span class="ot">step 8</span><span class="co">](08_outcomes.qmd#other-outcomes)</span>).</span>
 <span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="fu">## Privacy {#privacy}</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>The do-files here are copies with patient-level details removed. Nothing else was changed.</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Manual corrections.** Step 0B had 576 lines correcting individual patients' regimens, 396 of them for a specific dispensing date or date range, and Step 1A five more. A study ID with an exact date is more than a de-identified data set may contain, so each block is replaced by a note saying how many lines were removed and what form they took.</span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Notes about individual patients.** Comments naming a study ID are replaced by a one-line note.</span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Paths and names.** A local folder path is replaced by <span class="in">`"&lt;your analysis folder&gt;"`</span>, and a person's name in a comment by a description.</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Stop lines.** Lines that deliberately stopped a do-file partway are replaced by a comment.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The models meant to use the psychiatry-adjusted weights (<span class="in">`IPW2`</span>) use <span class="in">`IPW`</span>. The R uses <span class="in">`IPW2`</span> (<span class="co">[</span><span class="ot">step 9</span><span class="co">](09_sensitivity.qmd)</span>).</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`(CurrentDrug4CurrentDispense)`</span> is missing its <span class="in">`==30`</span>. It does no harm, because the value is always 0 or 30.</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## Privacy {#privacy}</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>The do-files here are copies with patient-level details removed. Nothing else was changed.</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Manual corrections.** Step 0B had 576 lines correcting individual patients' regimens, 396 of them for a specific dispensing date or date range, and Step 1A five more. A study ID with an exact date is more than a de-identified data set may contain, so each block is replaced by a note saying how many lines were removed and what form they took.</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Notes about individual patients.** Comments naming a study ID are replaced by a one-line note.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Paths and names.** A local folder path is replaced by <span class="in">`"&lt;your analysis folder&gt;"`</span>, and a person's name in a comment by a description.</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Stop lines.** Lines that deliberately stopped a do-file partway are replaced by a comment.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

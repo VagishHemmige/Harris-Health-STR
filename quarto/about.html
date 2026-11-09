@@ -505,7 +505,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 
 <section id="the-study" class="level2">
 <h2 class="anchored" data-anchor-id="the-study">The study</h2>
-<p>Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as <span class="citation" data-cites="hemmige2018str">Hemmige et al. (<a href="#ref-hemmige2018str" role="doc-biblioref">2018</a>)</span>. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.</p>
+<p>Did starting HIV treatment on a single-tablet regimen, rather than three or four pills once a day, go with better retention in care and viral suppression in the first year at a county safety-net clinic? Published as <span class="citation" data-cites="hemmige2018str">Hemmige et al. (<a href="#ref-hemmige2018str" role="doc-biblioref">2018</a>)</span>. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.</p>
 <ul>
 <li><strong>Vagish Hemmige</strong>, <strong>Charlene A. Flash</strong>, <strong>Josephinel Carter</strong>, <strong>Thomas P. Giordano</strong> and <strong>Teddy Zerai</strong> (authors of the paper)</li>
 </ul>
@@ -563,6 +563,78 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Na<span>ı̈</span>ve Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
 </div>
 </div></section></div></main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1106,7 +1178,7 @@ Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Ted
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">## The study</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Did starting HIV treatment on a single-tablet regimen, rather than three or four pills once a day, go with better retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Vagish Hemmige**, **Charlene A. Flash**, **Josephinel Carter**, **Thomas P. Giordano** and **Teddy Zerai** (authors of the paper)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>

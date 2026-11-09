@@ -474,6 +474,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   <li><a href="#retention-and-viral-suppression" id="toc-retention-and-viral-suppression" class="nav-link" data-scroll-target="#retention-and-viral-suppression">Retention and viral suppression</a></li>
   <li><a href="#propensity-scores-and-inverse-probability-weights" id="toc-propensity-scores-and-inverse-probability-weights" class="nav-link" data-scroll-target="#propensity-scores-and-inverse-probability-weights">Propensity scores and inverse probability weights</a></li>
   <li><a href="#reporting" id="toc-reporting" class="nav-link" data-scroll-target="#reporting">Reporting</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/VagishHemmige/Harris-Health-STR/edit/main/quarto/methodological_background.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/Harris-Health-STR/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -511,7 +512,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>A clinic pharmacy records each dispensing: the patient, the date, the product and (usually) the quantity. Fills tell you what a patient collected, not what they swallowed, but they are recorded the same way for everyone and cover every day. Two things have to be worked out from them:</p>
 <ul>
 <li><strong>Which regimen a patient is on.</strong> A regimen is the set of drugs filled together. Patients sometimes pick up the drugs of one regimen on different days, refill one drug and not another, or keep collecting an old drug after a switch, so a rule such as “the drugs filled on the same day make the regimen” needs checking against the record.</li>
-<li><strong>Whether a patient has medication on hand.</strong> If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is <em>covered</em> when every drug in the regimen is on hand. The <strong>proportion of days covered (PDC)</strong> over a period is a standard adherence measure; 80% is the conventional cut-off. It is a lower bound when patients can also fill elsewhere.</li>
+<li><strong>Whether a patient has medication on hand.</strong> If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is <em>covered</em> when every drug in the regimen is on hand. The <strong>proportion of days covered (PDC)</strong> over a period is a common adherence measure, and 80% is a common cut-off. For ART the evidence on how much adherence is enough is mixed and depends on the regimen: the older 95% figure came from unboosted protease inhibitors, and viral suppression is common at lower adherence to non-nucleoside regimens <span class="citation" data-cites="bangsberg2006adherence">(<a href="#ref-bangsberg2006adherence" role="doc-biblioref">Bangsberg 2006</a>)</span>. PDC is a lower bound when patients can also fill elsewhere, and it is too low when a fill lasts longer than the assumed number of days.</li>
 </ul>
 </section>
 <section id="one-row-per-person-per-day" class="level2">
@@ -520,7 +521,8 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="retention-and-viral-suppression" class="level2">
 <h2 class="anchored" data-anchor-id="retention-and-viral-suppression">Retention and viral suppression</h2>
-<p>Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau’s performance measures count medical visits at least 90 days apart; studies working from laboratory data often use viral load tests as the marker of a visit. Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect: older assays reported down to 400 copies/mL, newer ones to 50 or 20.</p>
+<p>Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau’s measure counts medical visits at least 90 days apart in a calendar year; studies working from laboratory data often use viral load tests as the marker of a visit. There is no gold-standard retention measure, and the common ones agree only moderately with one another <span class="citation" data-cites="mugavero2012retention">(<a href="#ref-mugavero2012retention" role="doc-biblioref"><span class="nocase">Mugavero et al.</span> 2012</a>)</span>. This study adapted the idea to the first 365 days after starting ART (“HRSA-style”).</p>
+<p>Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect. This study used 400 copies/mL, the limit of the clinic’s assay in 2008, and 50 copies/mL in a sensitivity analysis for later years <span class="citation" data-cites="hemmige2018str">(<a href="#ref-hemmige2018str" role="doc-biblioref">Hemmige et al. 2018</a>)</span>.</p>
 </section>
 <section id="propensity-scores-and-inverse-probability-weights" class="level2">
 <h2 class="anchored" data-anchor-id="propensity-scores-and-inverse-probability-weights">Propensity scores and inverse probability weights</h2>
@@ -529,21 +531,105 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <section id="reporting" class="level2">
 <h2 class="anchored" data-anchor-id="reporting">Reporting</h2>
 <p>Observational studies using routinely collected data are reported following STROBE and its extension RECORD <span class="citation" data-cites="vonelm2007strobe benchimol2015record">(<a href="#ref-vonelm2007strobe" role="doc-biblioref"><span class="nocase">Elm et al.</span> 2007</a>; <a href="#ref-benchimol2015record" role="doc-biblioref"><span class="nocase">Benchimol et al.</span> 2015</a>)</span>.</p>
-
-
-<!-- -->
-
-
 </section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bangsberg2006adherence" class="csl-entry" role="listitem">
+Bangsberg, David R. 2006. <span>“Less Than 95% Adherence to Nonnucleoside Reverse-Transcriptase Inhibitor Therapy Can Lead to Viral Suppression.”</span> <em>Clinical Infectious Diseases</em> 43 (7): 939–41. <a href="https://doi.org/10.1086/507526">https://doi.org/10.1086/507526</a>.
+</div>
 <div id="ref-benchimol2015record" class="csl-entry" role="listitem">
 <span class="nocase">Benchimol, Eric I, Liam Smeeth, Astrid Guttmann, et al.</span> 2015. <span>“The <span>REporting</span> of Studies <span>Conducted</span> Using <span class="nocase">Observational Routinely-collected</span> Health <span>Data</span> (<span>RECORD</span>) Statement.”</span> <em>PLoS Medicine</em> 12 (10): e1001885. <a href="https://doi.org/10.1371/journal.pmed.1001885">https://doi.org/10.1371/journal.pmed.1001885</a>.
 </div>
 <div id="ref-vonelm2007strobe" class="csl-entry" role="listitem">
 <span class="nocase">Elm, Erik von, Douglas G Altman, Matthias Egger, et al.</span> 2007. <span>“The <span class="nocase">Strengthening the Reporting of Observational Studies in Epidemiology (STROBE)</span> Statement: Guidelines for Reporting Observational Studies.”</span> <em>Lancet</em> 370 (9596): 1453–57. <a href="https://doi.org/10.1016/S0140-6736(07)61602-X">https://doi.org/10.1016/S0140-6736(07)61602-X</a>.
 </div>
-</div></section></div></main> <!-- /main -->
+<div id="ref-hemmige2018str" class="csl-entry" role="listitem">
+Hemmige, Vagish, Charlene A Flash, Josephinel Carter, Thomas P Giordano, and Teddy Zerai. 2018. <span>“Single Tablet <span>HIV</span> Regimens Facilitate Virologic Suppression and Retention in Care Among Treatment Na<span>ı̈</span>ve Patients.”</span> <em>AIDS Care</em> 30 (8): 1017–24. <a href="https://doi.org/10.1080/09540121.2018.1442554">https://doi.org/10.1080/09540121.2018.1442554</a>.
+</div>
+<div id="ref-mugavero2012retention" class="csl-entry" role="listitem">
+<span class="nocase">Mugavero, Michael J, Andrew O Westfall, Anne Zinski, et al.</span> 2012. <span>“Measuring Retention in <span>HIV</span> Care: The Elusive Gold Standard.”</span> <em>Journal of Acquired Immune Deficiency Syndromes</em> 61 (5): 574–80. <a href="https://doi.org/10.1097/QAI.0b013e318273762f">https://doi.org/10.1097/QAI.0b013e318273762f</a>.
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1095,7 +1181,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>A clinic pharmacy records each dispensing: the patient, the date, the product and (usually) the quantity. Fills tell you what a patient collected, not what they swallowed, but they are recorded the same way for everyone and cover every day. Two things have to be worked out from them:</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Which regimen a patient is on.** A regimen is the set of drugs filled together. Patients sometimes pick up the drugs of one regimen on different days, refill one drug and not another, or keep collecting an old drug after a switch, so a rule such as "the drugs filled on the same day make the regimen" needs checking against the record.</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Whether a patient has medication on hand.** If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is *covered* when every drug in the regimen is on hand. The **proportion of days covered (PDC)** over a period is a standard adherence measure; 80% is the conventional cut-off. It is a lower bound when patients can also fill elsewhere.</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Whether a patient has medication on hand.** If each fill is assumed to last a fixed number of days, pills on hand can be counted forward day by day: a fill adds pills, each day uses one, and an early refill adds to what is left. A day is *covered* when every drug in the regimen is on hand. The **proportion of days covered (PDC)** over a period is a common adherence measure, and 80% is a common cut-off. For ART the evidence on how much adherence is enough is mixed and depends on the regimen: the older 95% figure came from unboosted protease inhibitors, and viral suppression is common at lower adherence to non-nucleoside regimens <span class="co">[</span><span class="ot">@bangsberg2006adherence</span><span class="co">]</span>. PDC is a lower bound when patients can also fill elsewhere, and it is too low when a fill lasts longer than the assumed number of days.</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## One row per person per day</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
@@ -1103,15 +1189,22 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## Retention and viral suppression</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau's performance measures count medical visits at least 90 days apart; studies working from laboratory data often use viral load tests as the marker of a visit. Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect: older assays reported down to 400 copies/mL, newer ones to 50 or 20.</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>Retention in care is usually measured by contacts with care separated by enough time within a year. The US Health Resources and Services Administration (HRSA) HIV/AIDS Bureau's measure counts medical visits at least 90 days apart in a calendar year; studies working from laboratory data often use viral load tests as the marker of a visit. There is no gold-standard retention measure, and the common ones agree only moderately with one another <span class="co">[</span><span class="ot">@mugavero2012retention</span><span class="co">]</span>. This study adapted the idea to the first 365 days after starting ART ("HRSA-style").</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Propensity scores and inverse probability weights</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>Viral suppression is defined by a threshold, which depends on what the laboratory assay can detect. This study used 400 copies/mL, the limit of the clinic's assay in 2008, and 50 copies/mL in a sensitivity analysis for later years <span class="co">[</span><span class="ot">@hemmige2018str</span><span class="co">]</span>.</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>In an observational study the groups being compared differ in ways that also affect the outcome. A **propensity score** is each person's probability of receiving the treatment given their measured characteristics, estimated with a logistic regression. Weighting each person by the inverse of the probability of the treatment they actually received (**inverse probability of treatment weighting**, IPTW) creates a pseudo-population in which the measured characteristics are balanced between groups, and the weighted comparison estimates the average treatment effect. Because weights are estimated and some are large, standard errors need a robust (sandwich) estimator. Weighting balances only what was measured: unmeasured confounding remains. <span class="co">[</span><span class="ot">Inverse probability weighting</span><span class="co">](ipw.qmd)</span> works through all of this with a small example.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Propensity scores and inverse probability weights</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>In an observational study the groups being compared differ in ways that also affect the outcome. A **propensity score** is each person's probability of receiving the treatment given their measured characteristics, estimated with a logistic regression. Weighting each person by the inverse of the probability of the treatment they actually received (**inverse probability of treatment weighting**, IPTW) creates a pseudo-population in which the measured characteristics are balanced between groups, and the weighted comparison estimates the average treatment effect. Because weights are estimated and some are large, standard errors need a robust (sandwich) estimator. Weighting balances only what was measured: unmeasured confounding remains. <span class="co">[</span><span class="ot">Inverse probability weighting</span><span class="co">](ipw.qmd)</span> works through all of this with a small example.</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>Observational studies using routinely collected data are reported following STROBE and its extension RECORD <span class="co">[</span><span class="ot">@vonelm2007strobe; @benchimol2015record</span><span class="co">]</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>Observational studies using routinely collected data are reported following STROBE and its extension RECORD <span class="co">[</span><span class="ot">@vonelm2007strobe; @benchimol2015record</span><span class="co">]</span>.</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

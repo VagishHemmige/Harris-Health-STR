@@ -509,7 +509,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R"><code>R/functions.R</code></a></li>
 </ul>
 <p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do"><code>stata/Do Step 0B Current Regimen.do</code></a>, with the drug-name fixes also in <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do"><code>Do Step 1A Pharmacy Part 1.do</code></a>.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="read-the-fills" class="level2">
@@ -517,11 +517,12 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>One row per drug dispensed: the patient (<code>studyid</code>), the date as text (<code>medtransdate</code>), the drug name, and the pharmacy’s product code and description.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>fills_raw <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"dispensing"</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-read-fills" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-a-source-file"><code>read_source_csv()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 1-9 (Read the dispensing file)
@@ -555,7 +556,7 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 1-5 (Read the dispensin
 <p>Some fills were recorded as “Experimental” or “Other” though the product description shows the drug. A join to the lookup table in <code>setup.R</code> replaces six Stata <code>replace</code> lines. Each fill is also flagged if its product is taken twice a day: for example, darunavir 600 mg is the twice-daily dose, while 800 mg (two 400 mg tablets) is the once-daily dose.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills_raw <span class="sc">|&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(drug_name_fixes, <span class="at">by =</span> <span class="st">"cdmdescription"</span>, <span class="at">relationship =</span> <span class="st">"many-to-one"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -648,13 +649,14 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 29-39 (Flag twice-daily
 <p>In R it is a grouped summary.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, dispense_date) <span class="sc">|&gt;</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">regimen =</span> <span class="fu">make_regimen_name</span>(drugname), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-name-regimen-per-fill-date" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#naming-a-regimen"><code>make_regimen_name()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 25-34 (Number each patient’s fill dates)
@@ -703,12 +705,13 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 42-59 (Name the regimen
 <p>Note how much of the Stata code these corrections were. A rule that merges fills a few days apart, or one that ignores a lone fill of a drug already in the regimen, might replace many of them, but would also be a different definition from the one published.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>regimen_corrections <span class="ot">&lt;-</span> <span class="fu">read_regimen_corrections</span>(regimen_corrections_file)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> <span class="fu">apply_regimen_corrections</span>(dispense_regimens, regimen_corrections)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-apply-manual-corrections" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#reading-the-manual-corrections"><code>read_regimen_corrections()</code></a>, <a href="../quarto/functions.html#applying-manual-corrections"><code>apply_regimen_corrections()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual corrections (removed))
@@ -732,7 +735,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 <p>When Complera first came onto the formulary, some fills were recorded as Truvada. Once the corrections have set a fill date’s regimen to Complera, a Truvada fill that day is recoded.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># When Complera was new, some fills were recorded as Truvada. Once a fill date's</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regimen is Complera, a Truvada fill on that date is recoded as Complera.</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
@@ -774,7 +777,7 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 21-27 (Complera correct
 <p>Stata ran <code>bysort CurrentRegimen: tab drugname</code> and then a series of <code>tab studyid if CurrentRegimen=="..." &amp;&amp; drugname=="..."</code> lines to find implausible combinations, such as a Sustiva fill during Atripla. This builds the same cross-tabulation as a table to inspect. Looking at the patients behind it is work for someone authorised to see the data.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata cross-tabulated drugs against regimens to find implausible pairs, then</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># looked at the patients behind each. This is the same table.</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>regimen_drug_check <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
@@ -846,7 +849,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 78-129 (Check which dru
 <p>A new regimen starts on the first fill date and on any fill date whose regimen name differs from the one before. A regimen is twice daily if any fill within it was a twice-daily product. One row per regimen remains, with its start date; Stata kept the same by <code>keep if NewRegimen</code> and reshaped it wide with one column per regimen.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A new regimen starts on any fill date whose regimen name differs from the</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># previous fill date's. A regimen is twice daily if any fill in it is a</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># twice-daily product.</span></span>
@@ -915,6 +918,78 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 167-177 (Keep one row p
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1473,7 +1548,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 167-177 (Keep one row p
 <span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 0B Current Regimen.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do)</span>, with the drug-name fixes also in <span class="co">[</span><span class="ot">`Do Step 1A Pharmacy Part 1.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do)</span>.</span>
 <span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>

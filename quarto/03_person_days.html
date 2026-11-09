@@ -505,7 +505,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R"><code>R/setup.R</code></a></li>
 </ul>
 <p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do"><code>stata/Do Step 5 Merge and Expand.do</code></a>.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="expand-to-days" class="level2">
@@ -513,7 +513,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p><code>cross_join()</code> pairs every patient with every day. Stata did the same with <code>expand 2192</code> and a counter.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>study_days <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">date =</span> <span class="fu">seq</span>(study_start, study_end, <span class="at">by =</span> <span class="st">"day"</span>))</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>person_days <span class="ot">&lt;-</span> baseline <span class="sc">|&gt;</span></span>
@@ -549,7 +549,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 28-36 (One row per pati
 <p>A join by patient and date does it directly. If a patient had two results on one day, the later one in the file wins in both versions.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If a patient had two results on one day, Stata kept whichever its sort put</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># last, which is arbitrary; here the last one in the file is kept.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cd4_by_day <span class="ot">&lt;-</span> cd4 <span class="sc">|&gt;</span></span>
@@ -595,7 +595,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 38-52 (Put lab results 
 <p>Days before a patient’s first test have no “last” value; days after the last test have no “next” one. That second fact defines “still in care” in <a href="../quarto/05_adherence.html">step 5</a>.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Last value carried forward (filled down) and next value (filled up), with the</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># dates they come from, so that days since the last test and days until the</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># next one can be counted. Before a patient's first test the "last" values are</span></span>
@@ -669,7 +669,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 70-85 (Days until the n
 <p>The gap is the number of days between the tests either side of a day.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>person_days <span class="ot">&lt;-</span> person_days <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">days_since_last_cd4 =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> last_cd4_date),</span>
@@ -734,6 +734,78 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 70-85 (Days until the n
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1291,7 +1363,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 70-85 (Days until the n
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 5 Merge and Expand.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do)</span>.</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>

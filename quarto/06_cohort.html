@@ -112,6 +112,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <style>
 div.callout-Pending.callout {
   border-left-color: #f0c400;
@@ -506,8 +509,8 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R"><code>R/setup.R</code></a></li>
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R"><code>R/functions.R</code></a></li>
 </ul>
-<p>Translated from the first part of <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do"><code>stata/Do Final Analysis.do</code></a> (to line 57).</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do"><code>stata/Do Final Analysis.do</code></a>, lines 1-60 and 88-100.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="start-at-the-first-regimen" class="level2">
@@ -515,7 +518,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>Days before the first regimen are dropped. Each patient’s initial regimen, and whether it was twice daily, is that of regimen 1. Stata generated the value on regimen-1 days and used <code>carryforward</code> to copy it down; taking it from regimen 1 directly gives the same value on every row.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Days before the first regimen are dropped. The first observation of a patient</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># is the first day of regimen 1.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> analytic_days <span class="sc">|&gt;</span></span>
@@ -533,6 +536,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </details>
 </div>
 <div id="r-start-at-first-regimen" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#participant-flow"><code>count_patients()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen and drop twice-daily starts)
@@ -567,11 +571,41 @@ Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen
 <section id="exclusions" class="level2">
 <h2 class="anchored" data-anchor-id="exclusions">Exclusions</h2>
 <p>In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.</p>
+<div class="cell" data-eval="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+
+<pre class="mermaid mermaid-js">flowchart TD
+  accTitle: Participant flow from the paper
+  accDescr: 2,095 patients entered care in the study period. Four exclusions follow, in the order the code applies them, with no counts reported for each: a first regimen taken twice daily or started before 2008; a first regimen other than the three compared; prior HIV care elsewhere, or no record of it; no insurance status. 1,028 patients were included, 622 starting the single-tablet regimen and 406 the multi-tablet regimens. The paper's Results give 410 for the multi-tablet group.
+  A["2,095 patients entered care, 2008-2011"]
+  A --&gt; B["Starting regimen taken once daily"]
+  B -.- X1["Excluded: twice-daily first regimen,&lt;br/&gt;or first regimen before 2008 (missing value)"]
+  B --&gt; C["Started one of the three compared regimens"]
+  C -.- X2["Excluded: any other first regimen"]
+  C --&gt; D["No prior HIV care elsewhere"]
+  D -.- X3["Excluded: prior care elsewhere,&lt;br/&gt;or no intake record"]
+  D --&gt; E["Insurance status recorded"]
+  E -.- X4["Excluded: no insurance status"]
+  E --&gt; F["1,028 included"]
+  F --&gt; G["622 single-tablet regimen&lt;br/&gt;(Atripla)"]
+  F --&gt; H["406 multi-tablet regimen*&lt;br/&gt;(atazanavir or darunavir,&lt;br/&gt;each with ritonavir and Truvada)"]
+  classDef excl fill:#f8f9fa,stroke:#adb5bd,color:#212529
+  class X1,X2,X3,X4 excl
+</pre>
+</div>
+<p></p><figcaption> Participant flow. The two totals and the group sizes are quoted from the paper; it does not report how many patients each step removed, so those boxes have no numbers. Nothing here comes from running the code.</figcaption> </figure><p></p>
+</div>
+</div>
+</div>
+<p>* The abstract gives 406 and the Results 410; 622 + 406 = 1,028. Patients with no propensity weight (a covariate missing) also drop out of the weighted analyses; the paper does not report how many.</p>
 <p>One Stata habit needs care. <code>drop if InitialRegimenBID</code> drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. This is how the code enforces the start of enrollment. It sets no upper limit on the start date; the 2008-2011 enrollment window is assumed to come from the data extract (<a href="../quarto/study_methods.html#who-is-included">details</a>). Likewise <code>drop if prevcareelsewhere</code> drops patients with that field missing. The R filters keep only an explicit “no” (<code>%in% FALSE</code>, <code>%in% 0</code>) to match.</p>
 <p><strong>From the code:</strong> the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper’s methods; the code is the record of what was done.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In the order Final Analysis.do applies them. Stata's `drop if x` also drops</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># patients whose x is missing, so each filter keeps only an explicit "no".</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(initial_regimen_bid <span class="sc">%in%</span> <span class="cn">FALSE</span>)</span>
@@ -592,6 +626,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen
 </details>
 </div>
 <div id="r-apply-exclusions" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#participant-flow"><code>count_patients()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen and drop twice-daily starts)
@@ -651,7 +686,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 40-46 (Insurance and the STR; dr
 <p>The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen 1. <code>quarter</code> is 0 for day 0, then 1 to 4 for days 1-91, 92-182, 183-273 and 274-364, and missing afterwards (Stata: <code>egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes</code>). <code>first_year</code> marks days 0-364.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">art_start_date =</span> <span class="fu">first</span>(date[first_observation])) <span class="sc">|&gt;</span></span>
@@ -701,10 +736,10 @@ Stata: <code>Do Final Analysis.do</code>, lines 54-60 (Quarters of the first yea
 </section>
 <section id="one-row-per-patient" class="level2">
 <h2 class="anchored" data-anchor-id="one-row-per-patient">One row per patient</h2>
-<p>Stata kept the daily data and picked out each patient’s first day with <code>if FirstObservationOfSubject</code> on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before.</p>
+<p>Stata kept the daily data and picked out each patient’s first day with <code>if FirstObservationOfSubject</code> on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before within the data. The day-by-day data start on 1 January 2008, so a test before then is never seen: a patient who started ART early in 2008 can have no baseline value when a later starter with a test at the same interval would have one. This matches the Stata.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row per patient, with the baseline viral load and CD4 as the last values</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># on or before the day ART started.</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
@@ -744,7 +779,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the prope
 <p>Age, baseline viral load and baseline CD4 are put in the same groups as the Stata <code>egen cut()</code> lines. The insurance term in the propensity model, <code>i3.Insurance</code>, is an indicator for the third category in alphabetical order, because <code>encode</code> numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The propensity model used "i3.Insurance": an indicator for the third</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># insurance category in the whole insurance file, in character-code order</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (insurance_categories, 02_labs_and_baseline.R). The paper describes this</span></span>
@@ -788,6 +823,78 @@ Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the prope
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1344,9 +1451,9 @@ Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the prope
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>Translated from the first part of <span class="co">[</span><span class="ot">`stata/Do Final Analysis.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do)</span> (to line 57).</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Final Analysis.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do)</span>, lines 1-60 and 88-100.</span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
@@ -1377,69 +1484,93 @@ Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the prope
 <span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.</span>
 <span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>One Stata habit needs care. <span class="in">`drop if InitialRegimenBID`</span> drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. This is how the code enforces the start of enrollment. It sets no upper limit on the start date; the 2008-2011 enrollment window is assumed to come from the data extract (<span class="co">[</span><span class="ot">details</span><span class="co">](study_methods.qmd#who-is-included)</span>). Likewise <span class="in">`drop if prevcareelsewhere`</span> drops patients with that field missing. The R filters keep only an explicit "no" (<span class="in">`%in% FALSE`</span>, <span class="in">`%in% 0`</span>) to match.</span>
-<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>**From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper's methods; the code is the record of what was done.</span>
-<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-exclusions</span></span>
-<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"apply-exclusions"</span>)</span>
-<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exposure and time</span></span>
-<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen 1. <span class="in">`quarter`</span> is 0 for day 0, then 1 to 4 for days 1-91, 92-182, 183-273 and 274-364, and missing afterwards (Stata: <span class="in">`egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes`</span>). <span class="in">`first_year`</span> marks days 0-364.</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>%%| <span class="fu">eval</span>: true</span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>%%| fig-cap: <span class="ot">"</span><span class="st">Participant flow. The two totals and the group sizes are quoted from the paper; it does not report how many patients each step removed, so those boxes have no numbers. Nothing here comes from running the code.</span><span class="ot">"</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>  accTitle: Participant flow from the paper</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>  accDescr: <span class="dv">2</span>,<span class="dv">0</span>95 patients entered care in the <span class="fu">study</span> period. Four exclusions follow, in the order the code applies them, with <span class="fu">no</span> counts reported <span class="cf">for</span> <span class="cf">each</span>: a first regimen taken twice daily <span class="ot">or</span> started before <span class="dv">2008</span>; a first regimen other than the three compared; prior HIV care elsewhere, <span class="ot">or</span> <span class="fu">no</span> record of it; <span class="fu">no</span> insurance status. <span class="dv">1</span>,<span class="bn">02</span>8 patients were included, <span class="dv">622</span> starting the single-tablet regimen <span class="ot">and</span> <span class="dv">406</span> the multi-tablet regimens. The paper<span class="ot">'</span><span class="ss">s Results give 410 for the multi-tablet group.</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="ss">  A["2,095 patients entered care, 2008-2011"]</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="ss">  A --&gt; B["Starting regimen taken once daily"]</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a><span class="ss">  B -.- X1["Excluded: twice-daily first regimen,&lt;br/&gt;or first regimen before 2008 (missing value)"]</span></span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a><span class="ss">  B --&gt; C["Started one of the three compared regimens"]</span></span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a><span class="ss">  C -.- X2["Excluded: any other first regimen"]</span></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="ss">  C --&gt; D["No prior HIV care elsewhere"]</span></span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="ss">  D -.- X3["Excluded: prior care elsewhere,&lt;br/&gt;or no intake record"]</span></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="ss">  D --&gt; E["Insurance status recorded"]</span></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="ss">  E -.- X4["Excluded: no insurance status"]</span></span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="ss">  E --&gt; F["1,028 included"]</span></span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="ss">  F --&gt; G["622 single-tablet regimen&lt;br/&gt;(Atripla)"]</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a><span class="ss">  F --&gt; H["406 multi-tablet regimen*&lt;br/&gt;(atazanavir or darunavir,&lt;br/&gt;each with ritonavir and Truvada)"]</span></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="ss">  classDef excl fill:#f8f9fa,stroke:#adb5bd,color:#212529</span></span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a><span class="ss">  class X1,X2,X3,X4 excl</span></span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
 <span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: define-exposure-and-time</span></span>
-<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"define-exposure-and-time"</span>)</span>
-<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="fu">## One row per patient</span></span>
-<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>Stata kept the daily data and picked out each patient's first day with <span class="in">`if FirstObservationOfSubject`</span> on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before.</span>
-<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-patient-table</span></span>
-<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"build-patient-table"</span>)</span>
-<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## Categories for the propensity model</span></span>
-<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>Age, baseline viral load and baseline CD4 are put in the same groups as the Stata <span class="in">`egen cut()`</span> lines. The insurance term in the propensity model, <span class="in">`i3.Insurance`</span>, is an indicator for the third category in alphabetical order, because <span class="in">`encode`</span> numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.</span>
-<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: categorise-baseline-values</span></span>
-<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"categorise-baseline-values"</span>)</span>
-<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="ss">\* The abstract gives 406 and the Results 410; 622 + 406 = 1,028. Patients with no propensity weight (a covariate missing) also drop out of the weighted analyses; the paper does not report how many.</span></span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="ss">One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. This is how the code enforces the start of enrollment. It sets no upper limit on the start date; the 2008-2011 enrollment window is assumed to come from the data extract ([details](study_methods.qmd#who-is-included)). Likewise `drop if prevcareelsewhere` drops patients with that field missing. The R filters keep only an explicit "no" (`%in% FALSE`, `%in% 0`) to match.</span></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a><span class="ss">**From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper</span><span class="ot">'</span>s methods; the code is the record of what was done.</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="st">#| label: apply-exclusions</span></span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="st">#| eval: false</span></span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="st">#| echo: false</span></span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a><span class="st">#| eval: true</span></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="st">#| output: asis</span></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="st">stata_for("apply-exclusions")</span></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a><span class="co">## Exposure and time</span></span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen <span class="fl">1.</span> <span class="ot">`</span><span class="st">quarter</span><span class="ot">`</span> is <span class="dv">0</span> <span class="cf">for</span> day <span class="dv">0</span>, then <span class="dv">1</span> to <span class="dv">4</span> <span class="cf">for</span> days <span class="dv">1-91</span>, <span class="dv">92-182</span>, <span class="dv">183-273</span> <span class="ot">and</span> <span class="dv">274-364</span>, <span class="ot">and</span> missing afterwards (Stata: <span class="ot">`</span><span class="st">egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes</span><span class="ot">`</span>). <span class="ot">`</span><span class="st">first_year</span><span class="ot">`</span> marks days <span class="dv">0</span><span class="fl">-364.</span></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a><span class="st">#| label: define-exposure-and-time</span></span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a><span class="st">#| eval: false</span></span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="st">#| echo: false</span></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a><span class="st">#| eval: true</span></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a><span class="st">#| output: asis</span></span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a><span class="st">stata_for("define-exposure-and-time")</span></span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a><span class="co">## One row per patient</span></span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a>Stata kept the daily data <span class="ot">and</span> picked out <span class="cf">each</span> patient<span class="ot">'</span><span class="ss">s first day with `if FirstObservationOfSubject` on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before within the data. The day-by-day data start on 1 January 2008, so a test before then is never seen: a patient who started ART early in 2008 can have no baseline value when a later starter with a test at the same interval would have one. This matches the Stata.</span></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="ss">#| label: build-patient-table</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: false</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a><span class="ss">#| echo: false</span></span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: true</span></span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a><span class="ss">#| output: asis</span></span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a><span class="ss">stata_for("build-patient-table")</span></span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a><span class="ss">## Categories for the propensity model</span></span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a><span class="ss">Age, baseline viral load and baseline CD4 are put in the same groups as the Stata `egen cut()` lines. The insurance term in the propensity model, `i3.Insurance`, is an indicator for the third category in alphabetical order, because `encode` numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.</span></span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a><span class="ss">#| label: categorise-baseline-values</span></span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: false</span></span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a><span class="ss">#| echo: false</span></span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: true</span></span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a><span class="ss">#| output: asis</span></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="ss">stata_for("categorise-baseline-values")</span></span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -462,6 +462,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   <li><a href="#baseline-comparisons" id="toc-baseline-comparisons" class="nav-link" data-scroll-target="#baseline-comparisons">Baseline comparisons</a></li>
   <li><a href="#weighted-category-distributions" id="toc-weighted-category-distributions" class="nav-link" data-scroll-target="#weighted-category-distributions">Weighted category distributions</a></li>
   <li><a href="#odds-ratios" id="toc-odds-ratios" class="nav-link" data-scroll-target="#odds-ratios">Odds ratios</a></li>
+  <li><a href="#statas-confidence-intervals-in-gtsummary-tables" id="toc-statas-confidence-intervals-in-gtsummary-tables" class="nav-link" data-scroll-target="#statas-confidence-intervals-in-gtsummary-tables">Stata’s confidence intervals in gtsummary tables</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/VagishHemmige/Harris-Health-STR/edit/main/quarto/functions.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/Harris-Health-STR/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -512,15 +513,14 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <ul>
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R"><code>R/setup.R</code></a></li>
 </ul>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="reading-a-source-file" class="level2">
 <h2 class="anchored" data-anchor-id="reading-a-source-file">Reading a source file</h2>
-<p>Used by <a href="../quarto/01_regimens.html">1</a> and <a href="../quarto/02_labs_and_baseline.html">2</a>.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata: insheet using "&lt;file&gt;", comma</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>read_source_csv <span class="ot">&lt;-</span> <span class="cf">function</span>(data_dir, file_name) {</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="fu">file.path</span>(data_dir, file_name), <span class="at">show_col_types =</span> <span class="cn">FALSE</span>, <span class="at">guess_max =</span> <span class="dv">100000</span>)</span>
@@ -528,6 +528,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </details>
 </div>
 <div id="r-read-source-csv" class="stata-crosslink">
+<p><strong><code>read_source_csv()</code> is used in:</strong> <a href="../quarto/01_regimens.html#r-read-fills">1. Regimens from pharmacy fills: read fills</a>; <a href="../quarto/02_labs_and_baseline.html#r-read-cd4">2. Labs and baseline data: read cd4</a>; <a href="../quarto/02_labs_and_baseline.html#r-read-viral-load">2. Labs and baseline data: read viral load</a>; <a href="../quarto/02_labs_and_baseline.html#r-read-demographics">2. Labs and baseline data: read demographics</a>; <a href="../quarto/02_labs_and_baseline.html#r-read-insurance">2. Labs and baseline data: read insurance</a>; <a href="../quarto/02_labs_and_baseline.html#r-read-psych-visits">2. Labs and baseline data: read psych visits</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 1-9 (Read the dispensing file)
@@ -547,10 +548,10 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 1-9 (Read the dispensin
 </section>
 <section id="reading-the-manual-corrections" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-manual-corrections">Reading the manual corrections</h2>
-<p>Returns an empty table if the file is not there, so the code runs without any corrections. Used by <a href="../quarto/01_regimens.html">1. Regimens</a>.</p>
+<p>Returns an empty table if the file is not there, so the code runs without any corrections.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reads the manual regimen corrections, if the file exists. Each row says: for</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># this patient, between first_date and last_date (either may be blank, meaning</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># open-ended), the regimen is really `regimen`. Later rows win, as later</span></span>
@@ -568,6 +569,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 1-9 (Read the dispensin
 </details>
 </div>
 <div id="r-read-regimen-corrections" class="stata-crosslink">
+<p><strong><code>read_regimen_corrections()</code> is used in:</strong> <a href="../quarto/01_regimens.html#r-apply-manual-corrections">1. Regimens from pharmacy fills: apply manual corrections</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual corrections (removed))
@@ -588,10 +590,10 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 </section>
 <section id="checking-one-row-per-patient" class="level2">
 <h2 class="anchored" data-anchor-id="checking-one-row-per-patient">Checking one row per patient</h2>
-<p>Stata’s <code>merge 1:1</code> refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. Used by <a href="../quarto/02_labs_and_baseline.html">2. Labs and baseline</a>; the joins elsewhere state their expected <code>relationship</code> for the same reason.</p>
+<p>Stata’s <code>merge 1:1</code> refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. The joins elsewhere state their expected <code>relationship</code> for the same reason.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's `merge 1:1` stops if a patient appears twice in either file. This</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># does the same for a table that should have one row per patient, before it is</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># joined, so a duplicate cannot silently multiply a patient's rows.</span></span>
@@ -608,6 +610,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 </details>
 </div>
 <div id="r-check-unique-patients" class="stata-crosslink">
+<p><strong><code>check_unique_patients()</code> is used in:</strong> <a href="../quarto/02_labs_and_baseline.html#r-combine-baseline">2. Labs and baseline data: combine baseline</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient-level files)
@@ -647,7 +650,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient
 <p>Stata built the name by reshaping the day’s fills wide, sorted by drug name, and gluing <code>drugname1 + "/" + drugname2 + ...</code>, then trimming trailing slashes. Sorting and pasting does the same in one line. <code>locale = "C"</code> sorts the way Stata does, by character code.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Joins the drugs filled on one day into a regimen name, in alphabetical order,</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># as Stata did by sorting on drugname and concatenating with "/". A drug filled</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># twice on the same day appears twice, as it did in Stata.</span></span>
@@ -657,6 +660,7 @@ Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient
 </details>
 </div>
 <div id="r-make-regimen-name" class="stata-crosslink">
+<p><strong><code>make_regimen_name()</code> is used in:</strong> <a href="../quarto/01_regimens.html#r-name-regimen-per-fill-date">1. Regimens from pharmacy fills: name regimen per fill date</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 42-59 (Name the regimen on each fill date)
@@ -690,7 +694,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 42-59 (Name the regimen
 <p>Here the corrections are rows of a table with a patient, an optional first and last date, and the regimen. A join finds the fill dates each correction covers. When two corrections cover the same date the later one wins, as the later <code>replace</code> did.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replaces the regimen named on a fill date when a correction covers that</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># patient and date. If several corrections cover the same date, the last one wins.</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>apply_regimen_corrections <span class="ot">&lt;-</span> <span class="cf">function</span>(dispense_regimens, corrections) {</span>
@@ -713,6 +717,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 42-59 (Name the regimen
 </details>
 </div>
 <div id="r-apply-regimen-corrections" class="stata-crosslink">
+<p><strong><code>apply_regimen_corrections()</code> is used in:</strong> <a href="../quarto/01_regimens.html#r-apply-manual-corrections">1. Regimens from pharmacy fills: apply manual corrections</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual corrections (removed))
@@ -739,7 +744,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 <p>Stata’s <code>replace</code> works down the rows in order, so <code>x[_n-1]</code> on the right is the value just computed for the row above: a running calculation. R’s vectorised functions do not work that way, so this is one of the few places a loop is the clearest code. The value is the pills available <em>including</em> today’s dose: a 30-pill fill covers that day and the next 29. A refill on a day with none left gives 30 rather than 29, because no pill from the old supply was used.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pills of one drug on hand each day of one regimen, as in Stata Step 8.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Day 1 starts with start_pills. Each later day: a 30-pill fill when the patient</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># had none left gives 30; otherwise yesterday's pills plus today's fill, less one</span></span>
@@ -761,6 +766,7 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 </details>
 </div>
 <div id="r-count-pills-on-hand" class="stata-crosslink">
+<p><strong><code>count_pills_on_hand()</code> is used in:</strong> <a href="../quarto/05_adherence.html#r-count-pills-per-regimen">5. Pills on hand and daily outcomes: count pills per regimen</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 8 Data Preparation.do</code>, lines 14-18 (Pills on hand in the first regimen)
@@ -798,7 +804,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in
 <p>When a patient switches from, say, <code>Norvir/Reyataz/Truvada</code> to <code>Norvir/Prezista/Truvada</code>, the Truvada and Norvir they still have count towards the new regimen. Stata did this with a loop over every pair of drug positions; here the leftover pills of matching drugs are passed in.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On the first day of a new regimen, pills of the same drug left over from the</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># previous regimen are added (less the one taken that day), once for each</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># matching drug in the previous regimen, as the nested Stata loop did.</span></span>
@@ -813,6 +819,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in
 </details>
 </div>
 <div id="r-carry-over-pills" class="stata-crosslink">
+<p><strong><code>carry_over_pills()</code> is used in:</strong> <a href="../quarto/05_adherence.html#r-count-pills-per-regimen">5. Pills on hand and daily outcomes: count pills per regimen</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in later regimens)
@@ -839,7 +846,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in
 <p>The daily definition used throughout. In Stata, a missing value is larger than any number, so <code>missing &lt;= 400</code> is false; <code>coalesce(..., FALSE)</code> gives R the same answer where R would otherwise return <code>NA</code>.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A day counts as virologically suppressed when the last viral load was at or</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># below the threshold and it was either measured within the last 90 days, or the</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># next one comes within 90 days and is also at or below the threshold (Stata</span></span>
@@ -855,6 +862,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 21-33 (Pills on hand in
 </details>
 </div>
 <div id="r-vl-suppressed-on-day" class="stata-crosslink">
+<p><strong><code>vl_suppressed_on_day()</code> is used in:</strong> <a href="../quarto/05_adherence.html#r-define-daily-outcomes">5. Pills on hand and daily outcomes: define daily outcomes</a>; <a href="../quarto/09_sensitivity.html#r-suppression-threshold-by-year">9. Sensitivity analyses: suppression threshold by year</a></p>
 <details>
 <summary>
 Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care and virologically suppressed)
@@ -881,7 +889,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care an
 <p>Records how many patients remain after each exclusion in <a href="../quarto/06_cohort.html">6. Cohort</a>.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row for the participant flow: the step and how many patients remain.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>count_patients <span class="ot">&lt;-</span> <span class="cf">function</span>(data, step) {</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">step =</span> step, <span class="at">patients =</span> <span class="fu">n_distinct</span>(data<span class="sc">$</span>studyid))</span>
@@ -889,6 +897,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care an
 </details>
 </div>
 <div id="r-count-patients" class="stata-crosslink">
+<p><strong><code>count_patients()</code> is used in:</strong> <a href="../quarto/06_cohort.html#r-start-at-first-regimen">6. Cohort: start at first regimen</a>; <a href="../quarto/06_cohort.html#r-apply-exclusions">6. Cohort: apply exclusions</a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 24-27 (Keep the three regimens and drop prior care elsewhere)
@@ -903,10 +912,10 @@ Stata: <code>Do Final Analysis.do</code>, lines 24-27 (Keep the three regimens a
 </section>
 <section id="baseline-comparisons" class="level2">
 <h2 class="anchored" data-anchor-id="baseline-comparisons">Baseline comparisons</h2>
-<p>The R counterparts of <code>tab ..., chi2</code>, <code>ttest</code> and <code>ranksum</code>, with the options that match Stata’s defaults. Used by <a href="../quarto/07_propensity.html">7. Propensity score</a>.</p>
+<p>The R counterparts of <code>tab ..., chi2</code>, <code>ttest</code> and <code>ranksum</code>, with the options that match Stata’s defaults.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline comparison between the STR and multi-tablet groups, as the Stata</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># tab ..., chi2 / ttest / ranksum commands did. Stata's chi2 has no continuity</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># correction, ttest assumes equal variances and ranksum uses the normal</span></span>
@@ -930,6 +939,8 @@ Stata: <code>Do Final Analysis.do</code>, lines 24-27 (Keep the three regimens a
 </details>
 </div>
 <div id="r-compare-groups" class="stata-crosslink">
+<p><strong><code>compare_categorical()</code> is used in:</strong> <a href="../quarto/07_propensity.html#r-test-baseline-differences">7. Propensity score and weights: test baseline differences</a>; <a href="../quarto/09_sensitivity.html#r-add-psych-visits-to-propensity">9. Sensitivity analyses: add psych visits to propensity</a>; <a href="../quarto/09_sensitivity.html#r-flag-possible-outside-pharmacy">9. Sensitivity analyses: flag possible outside pharmacy</a></p>
+<p><strong><code>compare_continuous()</code> is used in:</strong> <a href="../quarto/07_propensity.html#r-test-baseline-differences">7. Propensity score and weights: test baseline differences</a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 70-86 (Baseline comparisons)
@@ -957,10 +968,10 @@ Stata: <code>Do Final Analysis.do</code>, lines 70-86 (Baseline comparisons)
 </section>
 <section id="weighted-category-distributions" class="level2">
 <h2 class="anchored" data-anchor-id="weighted-category-distributions">Weighted category distributions</h2>
-<p>The R counterpart of <code>tab InitialRegimenSTR &lt;variable&gt; [aw=IPW], row</code>: within each group, the weighted percentage of patients in each category. Used by <a href="../quarto/07_propensity.html#weighted-balance-by-category">7. Propensity score</a>.</p>
+<p>The R counterpart of <code>tab InitialRegimenSTR &lt;variable&gt; [aw=IPW], row</code>: within each group, the weighted percentage of patients in each category.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Weighted percentage of each group in each category: the R counterpart of</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's `tab InitialRegimenSTR &lt;variable&gt; [aw=IPW], row`. Patients missing</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># the variable or the weight are left out, as tab leaves them out.</span></span>
@@ -976,6 +987,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 70-86 (Baseline comparisons)
 </details>
 </div>
 <div id="r-weighted-distribution" class="stata-crosslink">
+<p><strong><code>weighted_distribution()</code> is used in:</strong> <a href="../quarto/07_propensity.html#r-check-weighted-category-balance">7. Propensity score and weights: check weighted category balance</a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 113-127 (Weighted balance)
@@ -1001,10 +1013,10 @@ Stata: <code>Do Final Analysis.do</code>, lines 113-127 (Weighted balance)
 </section>
 <section id="odds-ratios" class="level2">
 <h2 class="anchored" data-anchor-id="odds-ratios">Odds ratios</h2>
-<p>The R counterpart of <code>logistic outcome InitialRegimenSTR</code> and <code>logistic outcome InitialRegimenSTR [pw=IPW]</code>. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; <code>svyglm()</code> with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata’s are. Used by <a href="../quarto/08_outcomes.html">8</a> and <a href="../quarto/09_sensitivity.html">9</a>.</p>
+<p>The R counterpart of <code>logistic outcome InitialRegimenSTR</code> and <code>logistic outcome InitialRegimenSTR [pw=IPW]</code>. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; <code>svyglm()</code> with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata’s are.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Odds ratio for an outcome comparing STR with multi-tablet regimens.</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Without weights: ordinary logistic regression (Stata: logistic y str).</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># With weights: survey-weighted logistic regression, which gives the robust</span></span>
@@ -1034,6 +1046,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 113-127 (Weighted balance)
 </details>
 </div>
 <div id="r-odds-ratio-for-str" class="stata-crosslink">
+<p><strong><code>odds_ratio_for_str()</code> is used in:</strong> <a href="../quarto/08_outcomes.html#r-fit-outcome-models">8. Outcomes: fit outcome models</a>; <a href="../quarto/09_sensitivity.html#r-add-psych-visits-to-propensity">9. Sensitivity analyses: add psych visits to propensity</a>; <a href="../quarto/09_sensitivity.html#r-exclude-possible-outside-pharmacy">9. Sensitivity analyses: exclude possible outside pharmacy</a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
@@ -1062,6 +1075,34 @@ Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
 <span id="cb27-151"><a href="#cb27-151" aria-label="151"></a><span class="kw">logistic</span> RetainedInCareFirstYear InitialRegimenSTR <span class="kw">if</span> FirstObservationOfSubject [pw=IPW]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+</section>
+<section id="statas-confidence-intervals-in-gtsummary-tables" class="level2">
+<h2 class="anchored" data-anchor-id="statas-confidence-intervals-in-gtsummary-tables">Stata’s confidence intervals in gtsummary tables</h2>
+<p>gtsummary builds its model tables from a <em>tidier</em>, a function that turns a fitted model into a table of estimates. The default for <code>glm()</code> gives profile-likelihood confidence intervals, and for <code>svyglm()</code> intervals from the t distribution. Stata’s <code>logistic</code> reports Wald intervals and p-values from the normal distribution, and so does <a href="#odds-ratios"><code>odds_ratio_for_str()</code></a>. Passing <code>tidy_wald_z()</code> as <code>tidy_fun</code> makes the publication tables report the same.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>R code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A tidier for gtsummary's model tables that reports what Stata's logistic</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># reports: Wald confidence intervals and p-values from the normal distribution.</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># broom's own glm intervals are profile likelihood, and svyglm's use the t</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># distribution, so without this the tables would differ slightly from Stata</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># and from odds_ratio_for_str().</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>tidy_wald_z <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">exponentiate =</span> <span class="cn">FALSE</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>, ...) {</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> conf.level) <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>(x) <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">conf.low =</span> estimate <span class="sc">-</span> z <span class="sc">*</span> std.error,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">conf.high =</span> estimate <span class="sc">+</span> z <span class="sc">*</span> std.error,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">p.value =</span> <span class="dv">2</span> <span class="sc">*</span> stats<span class="sc">::</span><span class="fu">pnorm</span>(<span class="sc">-</span><span class="fu">abs</span>(estimate <span class="sc">/</span> std.error)),</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">across</span>(<span class="fu">c</span>(estimate, conf.low, conf.high),</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>                    \(value) <span class="cf">if</span> (exponentiate) <span class="fu">exp</span>(value) <span class="cf">else</span> value)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-tidy-wald-z" class="stata-crosslink">
+
+</div>
 
 
 <!-- -->
@@ -1069,6 +1110,78 @@ Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1608,237 +1721,251 @@ Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Functions"</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>Reusable helper functions. Most of them hold a rule from the Stata code that was written inline, sometimes more than once, so that the rule is stated and tested in one place.</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/functions.R"</span>)</span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"_stata_links.R"</span>)</span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading a source file</span></span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>Used by <span class="co">[</span><span class="ot">1</span><span class="co">](01_regimens.qmd)</span> and <span class="co">[</span><span class="ot">2</span><span class="co">](02_labs_and_baseline.qmd)</span>.</span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-source-csv</span></span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-source-csv"</span>)</span>
-<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the manual corrections</span></span>
-<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a>Returns an empty table if the file is not there, so the code runs without any corrections. Used by <span class="co">[</span><span class="ot">1. Regimens</span><span class="co">](01_regimens.qmd)</span>.</span>
-<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-regimen-corrections</span></span>
-<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-regimen-corrections"</span>)</span>
-<span id="cb28-68"><a href="#cb28-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-69"><a href="#cb28-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checking one row per patient</span></span>
-<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`merge 1:1`</span> refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. Used by <span class="co">[</span><span class="ot">2. Labs and baseline</span><span class="co">](02_labs_and_baseline.qmd)</span>; the joins elsewhere state their expected <span class="in">`relationship`</span> for the same reason.</span>
-<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-unique-patients</span></span>
-<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-86"><a href="#cb28-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-87"><a href="#cb28-87" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"check-unique-patients"</span>)</span>
-<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## Naming a regimen</span></span>
-<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a>Stata built the name by reshaping the day's fills wide, sorted by drug name, and gluing <span class="in">`drugname1 + "/" + drugname2 + ...`</span>, then trimming trailing slashes. Sorting and pasting does the same in one line. <span class="in">`locale = "C"`</span> sorts the way Stata does, by character code.</span>
-<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-96"><a href="#cb28-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-97"><a href="#cb28-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: make-regimen-name</span></span>
-<span id="cb28-98"><a href="#cb28-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-99"><a href="#cb28-99" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-100"><a href="#cb28-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-103"><a href="#cb28-103" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-104"><a href="#cb28-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-105"><a href="#cb28-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-106"><a href="#cb28-106" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-107"><a href="#cb28-107" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"make-regimen-name"</span>)</span>
-<span id="cb28-108"><a href="#cb28-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-109"><a href="#cb28-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-110"><a href="#cb28-110" aria-hidden="true" tabindex="-1"></a><span class="fu">## Applying manual corrections</span></span>
-<span id="cb28-111"><a href="#cb28-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-112"><a href="#cb28-112" aria-hidden="true" tabindex="-1"></a>In Stata each correction was a line such as</span>
-<span id="cb28-113"><a href="#cb28-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-114"><a href="#cb28-114" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
-<span id="cb28-115"><a href="#cb28-115" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentRegimen="&lt;regimen&gt;" if ((studyid==&lt;id&gt;) &amp; (ARTDate&gt;=date("&lt;m/d/y&gt;","MDY")))</span></span>
-<span id="cb28-116"><a href="#cb28-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-117"><a href="#cb28-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-118"><a href="#cb28-118" aria-hidden="true" tabindex="-1"></a>Here the corrections are rows of a table with a patient, an optional first and last date, and the regimen. A join finds the fill dates each correction covers. When two corrections cover the same date the later one wins, as the later <span class="in">`replace`</span> did.</span>
-<span id="cb28-119"><a href="#cb28-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-122"><a href="#cb28-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-123"><a href="#cb28-123" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-regimen-corrections</span></span>
-<span id="cb28-124"><a href="#cb28-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-125"><a href="#cb28-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-126"><a href="#cb28-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-129"><a href="#cb28-129" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-130"><a href="#cb28-130" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-131"><a href="#cb28-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-132"><a href="#cb28-132" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-133"><a href="#cb28-133" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"apply-regimen-corrections"</span>)</span>
-<span id="cb28-134"><a href="#cb28-134" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-135"><a href="#cb28-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-136"><a href="#cb28-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Counting pills on hand</span></span>
-<span id="cb28-137"><a href="#cb28-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-138"><a href="#cb28-138" aria-hidden="true" tabindex="-1"></a>The core of the adherence calculation (Stata Step 8):</span>
-<span id="cb28-139"><a href="#cb28-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-140"><a href="#cb28-140" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
-<span id="cb28-141"><a href="#cb28-141" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentDrug`counter'PillsLeft=cond((CurrentDrug`counter'CurrentDispense==30)&amp;(CurrentDrug`counter'PillsLeft[_n-1]==0),30, ///</span></span>
-<span id="cb28-142"><a href="#cb28-142" aria-hidden="true" tabindex="-1"></a><span class="in">    max(0,CurrentDrug`counter'CurrentDispense+CurrentDrug`counter'PillsLeft[_n-1]-1)) if ...</span></span>
-<span id="cb28-143"><a href="#cb28-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-144"><a href="#cb28-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-145"><a href="#cb28-145" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`replace`</span> works down the rows in order, so <span class="in">`x[_n-1]`</span> on the right is the value just computed for the row above: a running calculation. R's vectorised functions do not work that way, so this is one of the few places a loop is the clearest code. The value is the pills available *including* today's dose: a 30-pill fill covers that day and the next 29. A refill on a day with none left gives 30 rather than 29, because no pill from the old supply was used.</span>
-<span id="cb28-146"><a href="#cb28-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-149"><a href="#cb28-149" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-150"><a href="#cb28-150" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-pills-on-hand</span></span>
-<span id="cb28-151"><a href="#cb28-151" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-152"><a href="#cb28-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-153"><a href="#cb28-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-156"><a href="#cb28-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-157"><a href="#cb28-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-158"><a href="#cb28-158" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-159"><a href="#cb28-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-160"><a href="#cb28-160" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"count-pills-on-hand"</span>)</span>
-<span id="cb28-161"><a href="#cb28-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-162"><a href="#cb28-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-163"><a href="#cb28-163" aria-hidden="true" tabindex="-1"></a><span class="fu">## Carrying pills into a new regimen</span></span>
-<span id="cb28-164"><a href="#cb28-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-165"><a href="#cb28-165" aria-hidden="true" tabindex="-1"></a>When a patient switches from, say, <span class="in">`Norvir/Reyataz/Truvada`</span> to <span class="in">`Norvir/Prezista/Truvada`</span>, the Truvada and Norvir they still have count towards the new regimen. Stata did this with a loop over every pair of drug positions; here the leftover pills of matching drugs are passed in.</span>
-<span id="cb28-166"><a href="#cb28-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-169"><a href="#cb28-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-170"><a href="#cb28-170" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: carry-over-pills</span></span>
-<span id="cb28-171"><a href="#cb28-171" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-172"><a href="#cb28-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-173"><a href="#cb28-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-176"><a href="#cb28-176" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-177"><a href="#cb28-177" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-178"><a href="#cb28-178" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-179"><a href="#cb28-179" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-180"><a href="#cb28-180" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"carry-over-pills"</span>)</span>
-<span id="cb28-181"><a href="#cb28-181" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-182"><a href="#cb28-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-183"><a href="#cb28-183" aria-hidden="true" tabindex="-1"></a><span class="fu">## Viral suppression on a day</span></span>
-<span id="cb28-184"><a href="#cb28-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-185"><a href="#cb28-185" aria-hidden="true" tabindex="-1"></a>The daily definition used throughout. In Stata, a missing value is larger than any number, so <span class="in">`missing &lt;= 400`</span> is false; <span class="in">`coalesce(..., FALSE)`</span> gives R the same answer where R would otherwise return <span class="in">`NA`</span>.</span>
-<span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: vl-suppressed-on-day</span></span>
-<span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-192"><a href="#cb28-192" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"vl-suppressed-on-day"</span>)</span>
-<span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Participant flow</span></span>
-<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a>Records how many patients remain after each exclusion in <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
-<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-patients</span></span>
-<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-213"><a href="#cb28-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-216"><a href="#cb28-216" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-217"><a href="#cb28-217" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-218"><a href="#cb28-218" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-219"><a href="#cb28-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-220"><a href="#cb28-220" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"count-patients"</span>)</span>
-<span id="cb28-221"><a href="#cb28-221" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-222"><a href="#cb28-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-223"><a href="#cb28-223" aria-hidden="true" tabindex="-1"></a><span class="fu">## Baseline comparisons</span></span>
-<span id="cb28-224"><a href="#cb28-224" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-225"><a href="#cb28-225" aria-hidden="true" tabindex="-1"></a>The R counterparts of <span class="in">`tab ..., chi2`</span>, <span class="in">`ttest`</span> and <span class="in">`ranksum`</span>, with the options that match Stata's defaults. Used by <span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd)</span>.</span>
-<span id="cb28-226"><a href="#cb28-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-229"><a href="#cb28-229" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-230"><a href="#cb28-230" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: compare-groups</span></span>
-<span id="cb28-231"><a href="#cb28-231" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-232"><a href="#cb28-232" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-233"><a href="#cb28-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-236"><a href="#cb28-236" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-237"><a href="#cb28-237" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-238"><a href="#cb28-238" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-239"><a href="#cb28-239" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-240"><a href="#cb28-240" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"compare-groups"</span>)</span>
-<span id="cb28-241"><a href="#cb28-241" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-242"><a href="#cb28-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-243"><a href="#cb28-243" aria-hidden="true" tabindex="-1"></a><span class="fu">## Weighted category distributions</span></span>
-<span id="cb28-244"><a href="#cb28-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-245"><a href="#cb28-245" aria-hidden="true" tabindex="-1"></a>The R counterpart of <span class="in">`tab InitialRegimenSTR &lt;variable&gt; [aw=IPW], row`</span>: within each group, the weighted percentage of patients in each category. Used by <span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd#weighted-balance-by-category)</span>.</span>
-<span id="cb28-246"><a href="#cb28-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-249"><a href="#cb28-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-250"><a href="#cb28-250" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: weighted-distribution</span></span>
-<span id="cb28-251"><a href="#cb28-251" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-252"><a href="#cb28-252" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-253"><a href="#cb28-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-256"><a href="#cb28-256" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-257"><a href="#cb28-257" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-258"><a href="#cb28-258" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-259"><a href="#cb28-259" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-260"><a href="#cb28-260" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"weighted-distribution"</span>)</span>
-<span id="cb28-261"><a href="#cb28-261" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-262"><a href="#cb28-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-263"><a href="#cb28-263" aria-hidden="true" tabindex="-1"></a><span class="fu">## Odds ratios</span></span>
-<span id="cb28-264"><a href="#cb28-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-265"><a href="#cb28-265" aria-hidden="true" tabindex="-1"></a>The R counterpart of <span class="in">`logistic outcome InitialRegimenSTR`</span> and <span class="in">`logistic outcome InitialRegimenSTR [pw=IPW]`</span>. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; <span class="in">`svyglm()`</span> with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are. Used by <span class="co">[</span><span class="ot">8</span><span class="co">](08_outcomes.qmd)</span> and <span class="co">[</span><span class="ot">9</span><span class="co">](09_sensitivity.qmd)</span>.</span>
-<span id="cb28-266"><a href="#cb28-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-269"><a href="#cb28-269" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-270"><a href="#cb28-270" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: odds-ratio-for-str</span></span>
-<span id="cb28-271"><a href="#cb28-271" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb28-272"><a href="#cb28-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb28-273"><a href="#cb28-273" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-276"><a href="#cb28-276" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb28-277"><a href="#cb28-277" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb28-278"><a href="#cb28-278" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb28-279"><a href="#cb28-279" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb28-280"><a href="#cb28-280" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"odds-ratio-for-str"</span>)</span>
-<span id="cb28-281"><a href="#cb28-281" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Functions"</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>Reusable helper functions. Most of them hold a rule from the Stata code that was written inline, sometimes more than once, so that the rule is stated and tested in one place.</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/functions.R"</span>)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"_stata_links.R"</span>)</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading a source file</span></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-source-csv</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-source-csv"</span>)</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the manual corrections</span></span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>Returns an empty table if the file is not there, so the code runs without any corrections.</span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-regimen-corrections</span></span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-regimen-corrections"</span>)</span>
+<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checking one row per patient</span></span>
+<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`merge 1:1`</span> refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. The joins elsewhere state their expected <span class="in">`relationship`</span> for the same reason.</span>
+<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-unique-patients</span></span>
+<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"check-unique-patients"</span>)</span>
+<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a><span class="fu">## Naming a regimen</span></span>
+<span id="cb29-89"><a href="#cb29-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-90"><a href="#cb29-90" aria-hidden="true" tabindex="-1"></a>Stata built the name by reshaping the day's fills wide, sorted by drug name, and gluing <span class="in">`drugname1 + "/" + drugname2 + ...`</span>, then trimming trailing slashes. Sorting and pasting does the same in one line. <span class="in">`locale = "C"`</span> sorts the way Stata does, by character code.</span>
+<span id="cb29-91"><a href="#cb29-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-94"><a href="#cb29-94" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-95"><a href="#cb29-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: make-regimen-name</span></span>
+<span id="cb29-96"><a href="#cb29-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-97"><a href="#cb29-97" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-98"><a href="#cb29-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-101"><a href="#cb29-101" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-102"><a href="#cb29-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-103"><a href="#cb29-103" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-104"><a href="#cb29-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-105"><a href="#cb29-105" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"make-regimen-name"</span>)</span>
+<span id="cb29-106"><a href="#cb29-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-107"><a href="#cb29-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-108"><a href="#cb29-108" aria-hidden="true" tabindex="-1"></a><span class="fu">## Applying manual corrections</span></span>
+<span id="cb29-109"><a href="#cb29-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-110"><a href="#cb29-110" aria-hidden="true" tabindex="-1"></a>In Stata each correction was a line such as</span>
+<span id="cb29-111"><a href="#cb29-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-112"><a href="#cb29-112" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
+<span id="cb29-113"><a href="#cb29-113" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentRegimen="&lt;regimen&gt;" if ((studyid==&lt;id&gt;) &amp; (ARTDate&gt;=date("&lt;m/d/y&gt;","MDY")))</span></span>
+<span id="cb29-114"><a href="#cb29-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-115"><a href="#cb29-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-116"><a href="#cb29-116" aria-hidden="true" tabindex="-1"></a>Here the corrections are rows of a table with a patient, an optional first and last date, and the regimen. A join finds the fill dates each correction covers. When two corrections cover the same date the later one wins, as the later <span class="in">`replace`</span> did.</span>
+<span id="cb29-117"><a href="#cb29-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-120"><a href="#cb29-120" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-121"><a href="#cb29-121" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-regimen-corrections</span></span>
+<span id="cb29-122"><a href="#cb29-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-123"><a href="#cb29-123" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-124"><a href="#cb29-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-127"><a href="#cb29-127" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-128"><a href="#cb29-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-129"><a href="#cb29-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-130"><a href="#cb29-130" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-131"><a href="#cb29-131" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"apply-regimen-corrections"</span>)</span>
+<span id="cb29-132"><a href="#cb29-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-133"><a href="#cb29-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-134"><a href="#cb29-134" aria-hidden="true" tabindex="-1"></a><span class="fu">## Counting pills on hand</span></span>
+<span id="cb29-135"><a href="#cb29-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-136"><a href="#cb29-136" aria-hidden="true" tabindex="-1"></a>The core of the adherence calculation (Stata Step 8):</span>
+<span id="cb29-137"><a href="#cb29-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-138"><a href="#cb29-138" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
+<span id="cb29-139"><a href="#cb29-139" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentDrug`counter'PillsLeft=cond((CurrentDrug`counter'CurrentDispense==30)&amp;(CurrentDrug`counter'PillsLeft[_n-1]==0),30, ///</span></span>
+<span id="cb29-140"><a href="#cb29-140" aria-hidden="true" tabindex="-1"></a><span class="in">    max(0,CurrentDrug`counter'CurrentDispense+CurrentDrug`counter'PillsLeft[_n-1]-1)) if ...</span></span>
+<span id="cb29-141"><a href="#cb29-141" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-142"><a href="#cb29-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-143"><a href="#cb29-143" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`replace`</span> works down the rows in order, so <span class="in">`x[_n-1]`</span> on the right is the value just computed for the row above: a running calculation. R's vectorised functions do not work that way, so this is one of the few places a loop is the clearest code. The value is the pills available *including* today's dose: a 30-pill fill covers that day and the next 29. A refill on a day with none left gives 30 rather than 29, because no pill from the old supply was used.</span>
+<span id="cb29-144"><a href="#cb29-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-147"><a href="#cb29-147" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-148"><a href="#cb29-148" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-pills-on-hand</span></span>
+<span id="cb29-149"><a href="#cb29-149" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-150"><a href="#cb29-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-151"><a href="#cb29-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-154"><a href="#cb29-154" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-155"><a href="#cb29-155" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-156"><a href="#cb29-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-157"><a href="#cb29-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-158"><a href="#cb29-158" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"count-pills-on-hand"</span>)</span>
+<span id="cb29-159"><a href="#cb29-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-160"><a href="#cb29-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-161"><a href="#cb29-161" aria-hidden="true" tabindex="-1"></a><span class="fu">## Carrying pills into a new regimen</span></span>
+<span id="cb29-162"><a href="#cb29-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-163"><a href="#cb29-163" aria-hidden="true" tabindex="-1"></a>When a patient switches from, say, <span class="in">`Norvir/Reyataz/Truvada`</span> to <span class="in">`Norvir/Prezista/Truvada`</span>, the Truvada and Norvir they still have count towards the new regimen. Stata did this with a loop over every pair of drug positions; here the leftover pills of matching drugs are passed in.</span>
+<span id="cb29-164"><a href="#cb29-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-167"><a href="#cb29-167" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-168"><a href="#cb29-168" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: carry-over-pills</span></span>
+<span id="cb29-169"><a href="#cb29-169" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-170"><a href="#cb29-170" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-171"><a href="#cb29-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-174"><a href="#cb29-174" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-175"><a href="#cb29-175" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-176"><a href="#cb29-176" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-177"><a href="#cb29-177" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-178"><a href="#cb29-178" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"carry-over-pills"</span>)</span>
+<span id="cb29-179"><a href="#cb29-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-180"><a href="#cb29-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-181"><a href="#cb29-181" aria-hidden="true" tabindex="-1"></a><span class="fu">## Viral suppression on a day</span></span>
+<span id="cb29-182"><a href="#cb29-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-183"><a href="#cb29-183" aria-hidden="true" tabindex="-1"></a>The daily definition used throughout. In Stata, a missing value is larger than any number, so <span class="in">`missing &lt;= 400`</span> is false; <span class="in">`coalesce(..., FALSE)`</span> gives R the same answer where R would otherwise return <span class="in">`NA`</span>.</span>
+<span id="cb29-184"><a href="#cb29-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-187"><a href="#cb29-187" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-188"><a href="#cb29-188" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: vl-suppressed-on-day</span></span>
+<span id="cb29-189"><a href="#cb29-189" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-190"><a href="#cb29-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-191"><a href="#cb29-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-194"><a href="#cb29-194" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-195"><a href="#cb29-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-196"><a href="#cb29-196" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-197"><a href="#cb29-197" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-198"><a href="#cb29-198" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"vl-suppressed-on-day"</span>)</span>
+<span id="cb29-199"><a href="#cb29-199" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-200"><a href="#cb29-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-201"><a href="#cb29-201" aria-hidden="true" tabindex="-1"></a><span class="fu">## Participant flow</span></span>
+<span id="cb29-202"><a href="#cb29-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-203"><a href="#cb29-203" aria-hidden="true" tabindex="-1"></a>Records how many patients remain after each exclusion in <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
+<span id="cb29-204"><a href="#cb29-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-207"><a href="#cb29-207" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-208"><a href="#cb29-208" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-patients</span></span>
+<span id="cb29-209"><a href="#cb29-209" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-210"><a href="#cb29-210" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-211"><a href="#cb29-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-214"><a href="#cb29-214" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-215"><a href="#cb29-215" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-216"><a href="#cb29-216" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-217"><a href="#cb29-217" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-218"><a href="#cb29-218" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"count-patients"</span>)</span>
+<span id="cb29-219"><a href="#cb29-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-220"><a href="#cb29-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-221"><a href="#cb29-221" aria-hidden="true" tabindex="-1"></a><span class="fu">## Baseline comparisons</span></span>
+<span id="cb29-222"><a href="#cb29-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-223"><a href="#cb29-223" aria-hidden="true" tabindex="-1"></a>The R counterparts of <span class="in">`tab ..., chi2`</span>, <span class="in">`ttest`</span> and <span class="in">`ranksum`</span>, with the options that match Stata's defaults.</span>
+<span id="cb29-224"><a href="#cb29-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-227"><a href="#cb29-227" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-228"><a href="#cb29-228" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: compare-groups</span></span>
+<span id="cb29-229"><a href="#cb29-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-230"><a href="#cb29-230" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-231"><a href="#cb29-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-234"><a href="#cb29-234" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-235"><a href="#cb29-235" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-236"><a href="#cb29-236" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-237"><a href="#cb29-237" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-238"><a href="#cb29-238" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"compare-groups"</span>)</span>
+<span id="cb29-239"><a href="#cb29-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-240"><a href="#cb29-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-241"><a href="#cb29-241" aria-hidden="true" tabindex="-1"></a><span class="fu">## Weighted category distributions</span></span>
+<span id="cb29-242"><a href="#cb29-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-243"><a href="#cb29-243" aria-hidden="true" tabindex="-1"></a>The R counterpart of <span class="in">`tab InitialRegimenSTR &lt;variable&gt; [aw=IPW], row`</span>: within each group, the weighted percentage of patients in each category.</span>
+<span id="cb29-244"><a href="#cb29-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-247"><a href="#cb29-247" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-248"><a href="#cb29-248" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: weighted-distribution</span></span>
+<span id="cb29-249"><a href="#cb29-249" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-250"><a href="#cb29-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-251"><a href="#cb29-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-254"><a href="#cb29-254" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-255"><a href="#cb29-255" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-256"><a href="#cb29-256" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-257"><a href="#cb29-257" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-258"><a href="#cb29-258" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"weighted-distribution"</span>)</span>
+<span id="cb29-259"><a href="#cb29-259" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-260"><a href="#cb29-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-261"><a href="#cb29-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## Odds ratios</span></span>
+<span id="cb29-262"><a href="#cb29-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-263"><a href="#cb29-263" aria-hidden="true" tabindex="-1"></a>The R counterpart of <span class="in">`logistic outcome InitialRegimenSTR`</span> and <span class="in">`logistic outcome InitialRegimenSTR [pw=IPW]`</span>. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; <span class="in">`svyglm()`</span> with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are.</span>
+<span id="cb29-264"><a href="#cb29-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-267"><a href="#cb29-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-268"><a href="#cb29-268" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: odds-ratio-for-str</span></span>
+<span id="cb29-269"><a href="#cb29-269" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-270"><a href="#cb29-270" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-271"><a href="#cb29-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-274"><a href="#cb29-274" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-275"><a href="#cb29-275" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-276"><a href="#cb29-276" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-277"><a href="#cb29-277" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-278"><a href="#cb29-278" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"odds-ratio-for-str"</span>)</span>
+<span id="cb29-279"><a href="#cb29-279" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-280"><a href="#cb29-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-281"><a href="#cb29-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## Stata's confidence intervals in gtsummary tables</span></span>
+<span id="cb29-282"><a href="#cb29-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-283"><a href="#cb29-283" aria-hidden="true" tabindex="-1"></a>gtsummary builds its model tables from a *tidier*, a function that turns a fitted model into a table of estimates. The default for <span class="in">`glm()`</span> gives profile-likelihood confidence intervals, and for <span class="in">`svyglm()`</span> intervals from the t distribution. Stata's <span class="in">`logistic`</span> reports Wald intervals and p-values from the normal distribution, and so does <span class="co">[</span><span class="ot">`odds_ratio_for_str()`</span><span class="co">](#odds-ratios)</span>. Passing <span class="in">`tidy_wald_z()`</span> as <span class="in">`tidy_fun`</span> makes the publication tables report the same.</span>
+<span id="cb29-284"><a href="#cb29-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-287"><a href="#cb29-287" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-288"><a href="#cb29-288" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tidy-wald-z</span></span>
+<span id="cb29-289"><a href="#cb29-289" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb29-290"><a href="#cb29-290" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb29-291"><a href="#cb29-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-294"><a href="#cb29-294" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-295"><a href="#cb29-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb29-296"><a href="#cb29-296" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb29-297"><a href="#cb29-297" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb29-298"><a href="#cb29-298" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"tidy-wald-z"</span>)</span>
+<span id="cb29-299"><a href="#cb29-299" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

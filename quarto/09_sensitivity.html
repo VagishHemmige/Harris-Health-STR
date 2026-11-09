@@ -507,7 +507,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <li><a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R"><code>R/functions.R</code></a></li>
 </ul>
 <p>Translated from <a href="https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do"><code>stata/Do Final Analysis.do</code></a>, lines 174-223.</p>
-<p>The code sections below are imported directly from that script when this page is rendered.</p>
+<p>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</p>
 </div>
 </div>
 <section id="a-lower-threshold-after-2008" class="level2">
@@ -516,7 +516,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>As in the main analysis, suppression is counted in the first year; the saved Stata took it over all follow-up (<a href="../quarto/stata_overview.html#slips-in-the-code">details</a>).</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards,</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># applied to the year-one suppression outcome as the paper describes. (The saved</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata takes the maximum over all follow-up.)</span></span>
@@ -543,6 +543,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </details>
 </div>
 <div id="r-suppression-threshold-by-year" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#viral-suppression-on-a-day"><code>vl_suppressed_on_day()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 49-50 (Year-specific suppression (first version))
@@ -578,7 +579,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 174-188 (Year-specific threshold
 <h2 class="anchored" data-anchor-id="str-use-by-start-year">STR use by start year</h2>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata: logistic InitialRegimenSTR i.YearofARTInitiation</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>str_by_start_year <span class="ot">&lt;-</span> <span class="fu">glm</span>(str <span class="sc">~</span> <span class="fu">factor</span>(art_start_year), <span class="at">data =</span> patients,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">family =</span> <span class="fu">binomial</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -614,7 +615,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 174-188 (Year-specific threshold
 <p><strong>R departs from the Stata:</strong> Final Analysis.do computed the new weights (<code>IPW2</code>) but its next two models were written with <code>[pw=IPW]</code>, the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The paper reports that adding psychiatry clinic visits to the propensity</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># model did not meaningfully change the odds ratios. Final Analysis.do computed</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># these weights (IPW2) but its next two models used the original weights; here</span></span>
@@ -638,6 +639,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 174-188 (Year-specific threshold
 </details>
 </div>
 <div id="r-add-psych-visits-to-propensity" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#baseline-comparisons"><code>compare_categorical()</code></a>, <a href="../quarto/functions.html#odds-ratios"><code>odds_ratio_for_str()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 189-195 (Psychiatry visits in the propensity model)
@@ -658,7 +660,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 189-195 (Psychiatry visits in th
 <p>A suppressed viral load measured 90 or more days after the last fill of a drug in the current regimen suggests the patient was getting medication somewhere else. Stata counted days since the last fill with the same running-sum trick used for labs; here the last fill date is filled down and subtracted. A patient is flagged if this happens at any time in follow-up, and the flag is compared between the groups.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A suppressed viral load (&lt;= 400) measured 90 or more days after the last fill</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># of a drug in the current regimen suggests medication from another pharmacy.</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata treats a missing "days since" (no fill yet on the current regimen) as</span></span>
@@ -689,6 +691,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 189-195 (Psychiatry visits in th
 </details>
 </div>
 <div id="r-flag-possible-outside-pharmacy" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#baseline-comparisons"><code>compare_categorical()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a recent fill)
@@ -722,7 +725,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a re
 <p>The paper reports that repeating the analysis without these patients gave similar results (data not shown). Final Analysis.do flags the patients but does not contain those models; they were run in a separate scratch file that is not part of this repository. Here the main models are refitted on the published cohort without the flagged patients, unweighted and with the original weights.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>Click to show/hide R Code</summary>
+<summary>R code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The paper reports repeating the main analyses without these patients. Final</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Analysis.do flags them but does not contain those models, so here the main</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># models are refitted on the published cohort without the flagged patients.</span></span>
@@ -739,6 +742,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a re
 </details>
 </div>
 <div id="r-exclude-possible-outside-pharmacy" class="stata-crosslink">
+<p><strong>Helper functions used here:</strong> <a href="../quarto/functions.html#odds-ratios"><code>odds_ratio_for_str()</code></a></p>
 <details>
 <summary>
 Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a recent fill)
@@ -773,6 +777,78 @@ Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a re
 </section>
 
 </main> <!-- /main -->
+<!--
+Small fixes applied to every page after it loads (included by _quarto.yml).
+They change only how pages are shown, never their content:
+- tables scroll sideways inside their own box on narrow screens;
+- table column headers get scope="col" for screen readers;
+- the empty title heading on pages that show a root document is removed;
+- each R code fold is named after its step;
+- folded code opens for printing.
+-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main") || document.body;
+
+  main.querySelectorAll("table").forEach(function (table) {
+    table.querySelectorAll("thead th").forEach(function (th) {
+      if (!th.hasAttribute("scope")) th.setAttribute("scope", "col");
+    });
+    var parent = table.parentElement;
+    if (parent && !parent.classList.contains("table-scroll") &&
+        !table.closest(".sourceCode")) {
+      var box = document.createElement("div");
+      box.className = "table-scroll";
+      parent.insertBefore(box, table);
+      box.appendChild(table);
+      // A caption inside the table would scroll away with it, so it moves
+      // above the box and still labels the table for screen readers.
+      var caption = table.querySelector("caption");
+      if (caption) {
+        var label = document.createElement("div");
+        label.className = "table-caption";
+        label.id = "table-caption-" + Math.random().toString(36).slice(2, 9);
+        label.innerHTML = caption.innerHTML;
+        parent.insertBefore(label, box);
+        table.setAttribute("aria-labelledby", label.id);
+        caption.remove();
+      }
+    }
+  });
+
+  document.querySelectorAll("h1").forEach(function (h) {
+    if (h.textContent.trim() === "") h.remove();
+  });
+
+  main.querySelectorAll("details.code-fold").forEach(function (det) {
+    var summary = det.querySelector("summary");
+    if (!summary) return;
+    var name = "";
+    var cell = det.closest(".cell");
+    var next = cell ? cell.nextElementSibling : null;
+    if (next && next.id && next.id.indexOf("r-") === 0) {
+      name = next.id.slice(2).replace(/-/g, " ");
+    } else {
+      var section = det.closest("section");
+      var heading = section ? section.querySelector("h2, h3, h4") : null;
+      if (heading) name = heading.textContent.trim();
+    }
+    summary.textContent = name ? "R code: " + name : "R code";
+  });
+
+  var openedForPrint = [];
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) {
+      d.setAttribute("open", "");
+      openedForPrint.push(d);
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    openedForPrint.forEach(function (d) { d.removeAttribute("open"); });
+    openedForPrint = [];
+  });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1331,7 +1407,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 204-223 (Suppressed without a re
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Final Analysis.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do)</span>, lines 174-223.</span>
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.</span>
 <span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
