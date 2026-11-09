@@ -1,0 +1,102 @@
+---
+title: "Inverse probability weighting"
+format: html
+---
+
+How the weighted results in this study work, built up from a small made-up example. Every number on this page comes from that example, not from the study. How the study's code does each step is on [7. Propensity score and weights](07_propensity.qmd) and [8. Outcomes](08_outcomes.qmd). Austin gives a fuller introduction [@austin2011introduction].
+
+## The problem: who gets which regimen
+
+In a trial, a coin decides the regimen, so the two groups are alike in everything except the regimen. In clinic, a clinician decides, and the decision depends on the patient. If the same things that guide the choice also affect the outcome, a simple comparison mixes the effect of the regimen with the effect of who received it. This is **confounding by indication**.
+
+Take 100 made-up patients of two kinds:
+
+- **60 with few barriers to care.** Clinicians gave 48 of them the single tablet (80%) and 12 the three-pill regimen. 90% of them reach suppression, *whichever regimen they get*.
+- **40 with many barriers.** Clinicians gave 12 of them the single tablet (30%) and 28 the three-pill regimen. 60% reach suppression, *whichever regimen they get*.
+
+The regimen makes no difference here, by construction. But compare the groups directly:
+
+| | Patients | Few barriers | Suppressed |
+|---|---|---|---|
+| Single tablet | 60 | 48 (80%) | 48 × 0.9 + 12 × 0.6 = 50.4 (84%) |
+| Three pills | 40 | 12 (30%) | 12 × 0.9 + 28 × 0.6 = 27.6 (69%) |
+
+The single tablet "wins" by 15 points, entirely because it went mostly to patients who were going to do well anyway.
+
+## The propensity score
+
+A patient's **propensity score** is the probability that a patient like them received the single tablet. In the example it is 0.8 for a patient with few barriers and 0.3 for one with many. In real data nobody knows these probabilities, so they are estimated with a logistic regression of "received the single tablet" on the patient's characteristics. In this study those were age, sex, race, ethnicity, injection drug use, sex between men, hepatitis C, insurance, and baseline viral load and CD4 ([7. Propensity score](07_propensity.qmd#propensity-model)).
+
+## The weights
+
+Each patient is weighted by one over the probability of the regimen they actually received:
+
+- Single tablet: weight = 1 / propensity score.
+- Three pills: weight = 1 / (1 − propensity score).
+
+A patient who received a regimen that was unlikely for someone like them gets a large weight, because they stand in for the similar patients who went the other way.
+
+| | Received | Probability of what they received | Weight | Patients | Weighted count |
+|---|---|---|---|---|---|
+| Few barriers | Single tablet | 0.8 | 1.25 | 48 | 60 |
+| Few barriers | Three pills | 0.2 | 5 | 12 | 60 |
+| Many barriers | Single tablet | 0.3 | 3.33 | 12 | 40 |
+| Many barriers | Three pills | 0.7 | 1.43 | 28 | 40 |
+
+After weighting, each regimen group looks like the whole cohort: 60 with few barriers and 40 with many. That is the **pseudo-population**, a version of the cohort in which the regimen no longer depends on barriers to care. Now compare:
+
+| | Weighted patients | Few barriers | Suppressed |
+|---|---|---|---|
+| Single tablet | 100 | 60 (60%) | 60 × 0.9 + 40 × 0.6 = 78 (78%) |
+| Three pills | 100 | 60 (60%) | 60 × 0.9 + 40 × 0.6 = 78 (78%) |
+
+The false 15-point difference is gone. With real data, what remains after weighting is the estimated effect of the regimen, provided the propensity model has captured everything that drove both the choice and the outcome.
+
+## What the weighted result estimates
+
+These weights make *both* groups look like the whole cohort. The comparison therefore answers: what would happen if *everyone* in the cohort started the single tablet, compared with everyone starting three pills? This is the **average treatment effect (ATE)**, and it is what this study estimated.
+
+The weighted odds ratio compares those two whole-cohort scenarios. It is a *marginal* odds ratio, so it need not equal the odds ratio from a regression that adjusts for the same covariates. That is a property of odds ratios, not an error.
+
+## Checking that it worked
+
+The weights are only as good as the propensity model, so the check is whether the weighted groups really look alike on every covariate [@austin2015iptw]. In the example, the share with few barriers goes from 80% vs 30% to 60% vs 60%.
+
+The usual summary is the **standardized difference**: the difference between groups divided by a pooled standard deviation. For a proportion, that is (p₁ − p₂) / √[(p₁(1 − p₁) + p₂(1 − p₂)) / 2]. In the example it is 1.16 before weighting and 0 after. Below about 0.1 is commonly taken as balanced. This study's code compares weighted percentages and means ([weighted balance](07_propensity.qmd#weighted-balance) and [by category](07_propensity.qmd#weighted-balance-by-category)) but does not compute standardized differences.
+
+## When weights get large
+
+Weights become extreme when some patients had almost no chance of one regimen. Suppose only 1 of the 40 patients with many barriers had received the single tablet. That patient's propensity score would be 0.025 and their weight 40: one person would stand in for all 40 patients with many barriers in the single-tablet group, and their outcome alone would drive the estimate. This is a failure of **positivity** (overlap): every kind of patient needs a real chance of either regimen.
+
+What analysts do about it:
+
+- **Look first.** Compare the distribution of propensity scores in the two groups and list the largest weights.
+- **Stabilized weights.** Multiply each weight by the overall share receiving that regimen (in the example, 0.6 for the single tablet and 0.4 for three pills). Each weighted group then adds up to its real size (60 and 40, not 100 and 100). The estimate is the same here, and the weights are easier to inspect.
+- **Trimming.** Cap weights at a percentile, or drop patients with scores near 0 or 1. This reduces noise but changes the population the answer applies to.
+- **A different question.** Weights of 1 for the single tablet and p / (1 − p) for three pills make the three-pill group look like the single-tablet group. This estimates the **average treatment effect in the treated (ATT)**: the effect among the kind of patients clinicians actually gave the single tablet.
+
+This study used unstabilized, untrimmed ATE weights and did not report the weight distribution.
+
+## Standard errors, and Stata's `aw` and `pw`
+
+A weight of 5 does not mean five patients were observed: it is one patient counted five times. Treating weighted counts as real people makes standard errors too small. Weighted analyses therefore use **robust (sandwich) standard errors**. These also ignore the fact that the propensity scores were estimated; for the ATE that usually makes them somewhat conservative (too wide) rather than too narrow [@lunceford2004stratification].
+
+Stata offers several kinds of weight. Two appear in Final Analysis.do, and they give the **same estimates but different standard errors**:
+
+| | `[aw=IPW]` (analytic weights) | `[pw=IPW]` (probability weights) |
+|---|---|---|
+| Meant for | Rows that are averages of different numbers of people, so a larger weight means a more precise row | Each row stands in for 1/p people, as in survey sampling and inverse probability weighting |
+| Weighted percentages, means, odds ratios | Same | Same |
+| Standard errors | Treated as if the weights described precision; rescaled to the sample size | Robust (sandwich) standard errors, always |
+| Used in Final Analysis.do for | The balance tables (`tab`, `summarize`): weighted percentages and means, with no tests | Every model (`logistic ... [pw=IPW]`) |
+
+That split is the right one: `aw` where only the weighted numbers matter, `pw` wherever a confidence interval or p-value is reported. The R translation does the same: weighted means and percentages for balance ([7](07_propensity.qmd#weighted-balance)), and `survey::svyglm()`, which gives robust standard errors, for the models ([`odds_ratio_for_str()`](functions.qmd#odds-ratios)). Stata has two more kinds of weight that are not used here: `fw`, where a row really is several identical people, and `iw`, for special cases.
+
+## What weighting cannot do
+
+Weighting balances only what is in the propensity model. The paper points out the obvious gap: clinicians may have chosen boosted protease inhibitors for patients they expected to adhere poorly, because those drugs are less prone to resistance, and nothing in the data measures that expectation [@hemmige2018str]. No weighting can remove a difference that was never measured.
+
+## References
+
+::: {#refs}
+:::

@@ -48,6 +48,9 @@ website:
           - href: quarto/methodological_background.qmd
             text: Methodological background
             icon: book
+          - href: quarto/ipw.qmd
+            text: Inverse probability weighting
+            icon: book
 
       # One page to start; when it grows, split it into a section of pages
       # (references/quarto.md, "Pages").

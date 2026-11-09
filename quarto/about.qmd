@@ -34,6 +34,7 @@ Four documents describe the project:
 
 -   [**Clinical background**](background.qmd): pill burden, the regimens compared, and what the study found.
 -   [**Methodological background**](methodological_background.qmd): pharmacy fills, person-day data, retention and suppression measures, propensity weighting.
+-   [**Inverse probability weighting**](ipw.qmd): how the weighted comparison works, with a small worked example; Stata's `aw` and `pw`.
 -   [**Study design and methods**](study_methods.qmd): what this study chose, in plain language, and where the code differs from the paper.
 -   [**Setup**](setup.qmd): packages, file locations and constants.
 -   [**Functions**](functions.qmd): helper functions, including the pill count.

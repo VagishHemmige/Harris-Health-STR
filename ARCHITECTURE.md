@@ -82,7 +82,7 @@ flowchart TD
 ```text
 _quarto.yml, index.qmd, 404.qmd, styles.css
 quarto/
-  background.qmd, methodological_background.qmd, study_methods.qmd
+  background.qmd, methodological_background.qmd, ipw.qmd, study_methods.qmd
   setup.qmd, functions.qmd, 01_regimens.qmd ... 09_sensitivity.qmd, tables.qmd   # one per script
   stata_overview.qmd, stata_data_build.qmd, stata_final_analysis.qmd
   published_results.qmd  # each published number and the code step behind it
