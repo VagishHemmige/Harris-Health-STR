@@ -118,12 +118,11 @@ website:
                 text: Final Analysis
                 icon: laptop
 
-      # Add when outputs are cleared for release (references/quarto.md, "Pages"):
-      # - section: Results
-      #   contents:
-      #     - href: quarto/results.qmd
-      #       text: Main results
-      #       icon: clipboard-data
+      - section: Results
+        contents:
+          - href: quarto/published_results.qmd
+            text: Published results and the code behind them
+            icon: clipboard-data
 
       - section: Project documents
         contents:

@@ -1,0 +1,66 @@
+---
+title: "Published results and the code behind them"
+format: html
+---
+
+::: {.Results title="Where these numbers come from"}
+Every number on this page is quoted from the published article [@hemmige2018str], with its place there. None was produced by the code in this repository, which has not been run on the study data. The article's tables are not reproduced; read them in the [article](https://doi.org/10.1080/09540121.2018.1442554) (free in [PubMed Central](https://pmc.ncbi.nlm.nih.gov/articles/PMC6094383/)).
+:::
+
+This page is a map from each reported result to the step of the code that computes it, so that a reader can see what each number is and an authorized analyst can check the R version against the article. "Final Analysis.do" is the [published analysis](stata_final_analysis.qmd); the R steps translate it.
+
+## The cohort
+
+| Result (article, Results, first two paragraphs) | Computed by |
+|---|---|
+| 2,095 patients entered care in the period; 1,028 met the inclusion criteria | [`apply-exclusions`](06_cohort.qmd#exclusions) (`cohort_flow` gives the patients left after each exclusion). The 2,095 is not in the code. |
+| STR more likely if male, younger, lower baseline viral load, higher baseline CD4, not injecting drugs | [`test-baseline-differences`](07_propensity.qmd#baseline-differences) |
+| After weighting, the STR and MTR groups were much more similar | [`check-weighted-balance`](07_propensity.qmd#weighted-balance) |
+| 622 (60.5%) STR patients, all on tenofovir/emtricitabine/efavirenz | [`define-exposure-and-time`](06_cohort.qmd#exposure-and-time) (`str`); counts of `initial_regimen` in `patients` |
+| 410 (39.5%) MTR patients: 65.2% atazanavir/ritonavir and 34.8% darunavir/ritonavir, each with tenofovir/emtricitabine | The same |
+
+The Results give 410 MTR patients and the abstract 406; 622 + 406 = 1,028, the cohort size the article reports. Both are quoted as the article has them.
+
+## Retention and viral suppression
+
+| Result (article, Results, third paragraph) | Computed by |
+|---|---|
+| Retention in care: 80.7% STR vs 72.7% MTR; OR 1.57 (95% CI 1.17-2.11), p = 0.003; adjusted OR 1.49 (1.10-2.02), p = 0.011 | [`define-retention`](08_outcomes.qmd#retention-in-care) (`retained_year_one`); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios) |
+| Suppression at any point in year one: 84.4% vs 77.6%; OR 1.56 (1.14-2.15), p = 0.006; adjusted OR 1.41 (1.02-1.96), p = 0.04 | [`define-patient-outcomes`](08_outcomes.qmd#other-outcomes) (`vl_suppressed_year_one`); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios). The code, the record of what was done, counts a viral load of 400 *or less*; the article's text says below 400. |
+| Suppression on the original regimen: 79.4% vs 72.9%; OR 1.43 (1.07-1.92), p = 0.016; adjusted OR 1.28 (0.95-1.73), p = 0.11 | `vl_suppressed_on_initial_regimen`, the same two steps, in days 0-364. The saved Stata looked at all follow-up ([why the R differs](stata_overview.qmd#slips-in-the-code)). |
+
+## Adherence
+
+| Result (article, Results, fourth paragraph) | Computed by |
+|---|---|
+| At least 80% of days covered for the year: 33.0% STR vs 30.1% MTR; OR 1.14 (0.87-1.50), p = 0.328; adjusted OR 1.04 (0.79-1.38), p = 0.77 | `adherent_pdc_80` in [`define-patient-outcomes`](08_outcomes.qmd#other-outcomes); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios), over days 0-364. The saved Stata averaged over all follow-up ([why the R differs](stata_overview.qmd#slips-in-the-code)). |
+| At least 80% of days covered on the initial regimen: 29.6% vs 25.9%; OR 1.20 (0.91-1.60), p = 0.195; adjusted OR 1.08 (0.81-1.45), p = 0.586 | `adherent_pdc_80_initial`, the same two steps, over days 0-364 |
+| Suppressed despite no fill in the previous 90 days: 13.3% MTR vs 15.8% STR, p = 0.28 | [`flag-possible-outside-pharmacy`](09_sensitivity.qmd#possible-outside-pharmacy) (`possible_outside_pharmacy`, `outside_pharmacy_test`) |
+| Retention and suppression rerun without those patients: similar results (data not shown) | [`exclude-possible-outside-pharmacy`](09_sensitivity.qmd#excluding-them). The article's models were run in a scratch file not kept here. |
+
+The abstract calls the adherence measure a medication possession ratio; the Methods and Results call it the proportion of days covered, which is what the code computes.
+
+## Sensitivity analyses
+
+| Result (article, Results, fifth paragraph, and Discussion) | Computed by |
+|---|---|
+| Fewer patients with psychiatry visits received an STR: 22.5% vs 28.3%, p = 0.035 | `psych_test` in [`add-psych-visits-to-propensity`](09_sensitivity.qmd#adding-psychiatry-visits-to-the-propensity-model) |
+| Adding psychiatry visits to the propensity score did not change the odds ratios meaningfully (data not shown) | `psych_models`, the same step. Final Analysis.do fitted these models with the original weights; the R uses the new ones. |
+| Year by year, with 400 copies/mL for 2008 and 50 afterwards: suppression lower, STR advantage unchanged (data not shown) | [`suppression-threshold-by-year`](09_sensitivity.qmd#a-lower-threshold-after-2008), in days 0-364 |
+| Separate analyses for men and women: little change (Discussion) | Not in the kept code; run in a scratch file not kept here |
+
+## Regimen switches
+
+| Result (article, Results, last paragraph) | Computed by |
+|---|---|
+| Switched within the first year: 53 MTR (13.1%) vs 97 STR (15.6%), p = 0.26 | `changed_regimen` in [`define-patient-outcomes`](08_outcomes.qmd#other-outcomes), in days 0-364 (Final Analysis.do counted a switch at any time) |
+| Suppressed at the time of switch: 22 of 53 MTR (41.5%) vs 34 of 97 STR (35.1%), p = 0.43 | [`suppression-at-switch`](08_outcomes.qmd#suppression-at-the-first-switch), for switches in year one |
+| Median days to switch: 162 (IQR 90-244) STR vs 140 (42-214) MTR, p = 0.17 | Not in the kept code |
+| 3 STR patients switched to another STR; 9 MTR patients switched to an STR | Not in the kept code |
+
+The rows marked "not in the kept code" came from do-files that are not part of this repository, because they did not feed the published analysis.
+
+## References
+
+::: {#refs}
+:::

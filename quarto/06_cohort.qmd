@@ -42,7 +42,7 @@ In the order Final Analysis.do applies them, with the number of patients left af
 
 One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise `drop if prevcareelsewhere` drops patients with that field missing. The R filters keep only an explicit "no" (`%in% FALSE`, `%in% 0`) to match.
 
-**Current code:** the exclusions for prior care elsewhere and missing insurance are in the code but not in the paper's methods.
+**From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper's methods; the code is the record of what was done.
 
 ```{r}
 #| label: apply-exclusions

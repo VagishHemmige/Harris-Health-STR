@@ -31,7 +31,7 @@ knitr::read_chunk("../R/09_sensitivity.R")
 
 The assay changed after 2008, so patients who started later are held to 50 copies/mL. The same daily rule is reused with a threshold that depends on the year ART started, and results are tabulated by start year, as the Stata did one `tab ... if YearofARTInitiation==2008` line at a time.
 
-**Current code:** this "ever suppressed" uses all follow-up, not only year one.
+As in the main analysis, suppression is counted in the first year; the saved Stata took it over all follow-up ([details](stata_overview.qmd#slips-in-the-code)).
 
 ```{r}
 #| label: suppression-threshold-by-year
@@ -47,9 +47,9 @@ The assay changed after 2008, so patients who started later are held to 50 copie
 
 ## Adding psychiatry visits to the propensity model
 
-`update()` refits the propensity model with one more term.
+First, whether patients with a psychiatry visit were less likely to start the STR, as prescribers may avoid efavirenz in psychiatric illness. Then `update()` refits the propensity model with one more term.
 
-**Current code:** Final Analysis.do computed the new weights (`IPW2`) but its next two models were written with `[pw=IPW]`, the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.
+**R departs from the Stata:** Final Analysis.do computed the new weights (`IPW2`) but its next two models were written with `[pw=IPW]`, the original weights. The R uses the new weights, which is what the paper describes. Anyone comparing with the Stata log should expect these two models to differ.
 
 ```{r}
 #| label: add-psych-visits-to-propensity
