@@ -72,7 +72,9 @@ Table 2 is three gtsummary tables merged side by side with `tbl_merge()`:
 - `tbl_uvregression()` with `x = str` fits one logistic regression per outcome, each with the regimen as the only predictor, and shows the odds ratio with its 95% CI and p-value. These are the unadjusted models in [8. Outcomes](08_outcomes.qmd).
 - The same function given the survey design instead of the data fits the weighted models: `svyglm()` with the inverse probability weights, Stata's `logistic ... [pw=IPW]`.
 
-`tidy_fun = tidy_wald_z` makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports ([Functions](functions.qmd#statas-confidence-intervals-in-gtsummary-tables)). Each model table has an N column: the weighted models use only patients with a weight, so their N can be smaller than the group totals, which a reader of the published table could not see.
+`tidy_fun = tidy_wald_z` makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports ([Functions](functions.qmd#statas-confidence-intervals-in-gtsummary-tables)). The unadjusted models show how many patients each used. For a weighted model gtsummary's N would be the sum of the weights, not a count of patients, so it is hidden, and a note under the table says that patients without a weight are left out. For the same reason the weighted half of Table 1 shows the number of patients (`n_unweighted`) in its header.
+
+Category codes from the extracts are replaced by readable names before the tables are made (`B` becomes Black; the viral load group `[1000,10000)` becomes 1,000-9,999), because a table label should never need a key.
 
 ```{r}
 #| label: table-2-outcomes

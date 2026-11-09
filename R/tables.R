@@ -42,9 +42,36 @@ outcome_labels <- list(
   changed_regimen ~ "Changed regimen in year one"
 )
 
+# Readable category names in place of the codes in the extracts. The viral
+# load and CD4 groups are intervals made by cut() ("[1000,10000)"), shown as
+# "1,000-9,999"; the top group, whose upper limit in setup.R is only a large
+# number, as "500 or more".
+interval_label <- function(group) {
+  limits <- stringr::str_match(as.character(group), "^\\[([0-9.e+]+),([0-9.e+]+)\\)$")
+  low <- as.numeric(limits[, 2])
+  high <- as.numeric(limits[, 3])
+  label <- dplyr::if_else(
+    low == max(low, na.rm = TRUE),
+    stringr::str_c(format(low, big.mark = ",", scientific = FALSE, trim = TRUE), " or more"),
+    stringr::str_c(format(low, big.mark = ",", scientific = FALSE, trim = TRUE), "-",
+                   format(high - 1, big.mark = ",", scientific = FALSE, trim = TRUE))
+  )
+  factor(label, levels = unique(label[order(low)]))
+}
+
 table_data <- patients |>
-  dplyr::mutate(regimen = factor(dplyr::if_else(str, "Single tablet", "Multi-tablet"),
-                                 levels = c("Single tablet", "Multi-tablet")))
+  dplyr::mutate(
+    regimen = factor(dplyr::if_else(str, "Single tablet", "Multi-tablet"),
+                     levels = c("Single tablet", "Multi-tablet")),
+    ethnicity = dplyr::recode(ethnicity, B = "Black", H = "Hispanic", W = "White"),
+    primaryriskfactor = dplyr::recode(primaryriskfactor,
+                                      HET = "Heterosexual contact",
+                                      IDU = "Injection drug use",
+                                      MSM = "Men who have sex with men",
+                                      `MSM&IDU` = "Men who have sex with men and injection drug use"),
+    baseline_vl_group = interval_label(baseline_vl_group),
+    baseline_cd4_group = interval_label(baseline_cd4_group)
+  )
 
 weighted_design <- survey::svydesign(ids = ~1, weights = ~ipw,
                                      data = dplyr::filter(table_data, !is.na(ipw)))
@@ -80,7 +107,9 @@ table_1_weighted <- weighted_design |>
     statistic = list(gtsummary::all_continuous() ~ "{mean} ({sd})",
                      gtsummary::all_categorical() ~ "{p}%"),
     missing = "no"
-  )
+  ) |>
+  # The header shows patients, not the sum of their weights.
+  gtsummary::modify_header(gtsummary::all_stat_cols() ~ "**{level}**  \nN = {n_unweighted}")
 
 table_1 <- gtsummary::tbl_merge(
   list(table_1_unweighted, table_1_weighted),
@@ -94,8 +123,9 @@ table_1 <- gtsummary::tbl_merge(
 # ratio (logistic regression); and the weighted odds ratio (survey-weighted
 # logistic regression, Stata's [pw=IPW]). tbl_uvregression() with x = str fits
 # one model per outcome. tidy_wald_z() gives Stata's Wald intervals. The N
-# column shows how many patients each model used: the weighted models use only
-# patients with a weight.
+# column shows how many patients each unadjusted model used. For the weighted
+# models gtsummary would show the sum of the weights, not patients, so N is
+# hidden there and a note says who is left out.
 outcome_counts <- table_data |>
   gtsummary::tbl_summary(
     by = regimen,
@@ -128,7 +158,8 @@ weighted_models <- weighted_design |>
     exponentiate = TRUE,
     tidy_fun = tidy_wald_z,
     label = outcome_labels,
-    show_single_row = str
+    show_single_row = str,
+    hide_n = TRUE
   )
 
 table_2 <- gtsummary::tbl_merge(
@@ -136,6 +167,9 @@ table_2 <- gtsummary::tbl_merge(
   tab_spanner = c("**Patients**", "**Unadjusted**", "**Weighted**")
 ) |>
   gtsummary::bold_labels() |>
+  gtsummary::modify_source_note(
+    "Weighted: inverse probability of treatment weights; patients without a weight (a covariate missing) are left out."
+  ) |>
   gtsummary::modify_caption("**Table 2. Outcomes in the first year by starting regimen**")
 
 ## ---- save-publication-tables
