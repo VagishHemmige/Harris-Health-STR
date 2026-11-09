@@ -6,7 +6,7 @@ Status: retrospective. Reconstructed in November 2026 from the published paper [
 
 This document is the authoritative specification of the study's scientific objectives, population, definitions, estimands and statistical methods. `ARCHITECTURE.md` documents the implementation, `AGENTS.md` the working conventions, and GitHub Issues any open questions. Neither file supersedes this plan.
 
-Where the code does something the paper's methods do not state, this plan describes what the code does and says so, marked **Differs from paper**.
+The code is the record of what was done. Where it is more specific than the paper's methods, this plan states what the code does, marked **From the code**.
 
 Reporting followed STROBE [@vonelm2007strobe]; RECORD [@benchimol2015record] applies to studies of routinely collected data like this one. The reporting map below links checklist items to sections of this plan.
 
@@ -43,8 +43,8 @@ Exclusions, in order (each a flowchart step):
 
 1. Initial regimen in the window is taken twice daily (any twice-daily product), or the first regimen started before the window.
 2. Initial regimen is not one of: Atripla; Norvir/Prezista/Truvada; Norvir/Reyataz/Truvada.
-3. Recorded as having had HIV care elsewhere, or that field missing. **Differs from paper:** not stated in the paper's methods.
-4. Insurance status missing. **Differs from paper:** not stated in the paper's methods.
+3. Recorded as having had HIV care elsewhere, or that field missing. **From the code:** the paper's methods do not mention this exclusion.
+4. Insurance status missing. **From the code:** the paper's methods do not mention this exclusion.
 
 Index event (time zero): the first day of the first regimen (first fill).
 
@@ -71,7 +71,7 @@ Daily measures, on a grid of one row per patient per day:
 
 - **Pills on hand**, per drug: every fill is 30 pills; +30 on a fill day, -1 per day, never below zero; a fill when none are left gives 30; pills of the same drug carry into a new regimen.
 - **Day covered:** every drug in the current regimen on hand.
-- **Virologically suppressed on a day:** last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. **Differs from paper:** the paper says <400.
+- **Virologically suppressed on a day:** last viral load ≤400 copies/mL and either measured within the previous 90 days, or the next viral load is within 90 days and also ≤400. **From the code:** the paper's text says <400.
 
 Patient outcomes:
 

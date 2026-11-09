@@ -26,7 +26,7 @@ The Results give 410 MTR patients and the abstract 406; 622 + 406 = 1,028, the c
 | Result (article, Results, third paragraph) | Computed by |
 |---|---|
 | Retention in care: 80.7% STR vs 72.7% MTR; OR 1.57 (95% CI 1.17-2.11), p = 0.003; adjusted OR 1.49 (1.10-2.02), p = 0.011 | [`define-retention`](08_outcomes.qmd#retention-in-care) (`retained_year_one`); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios) |
-| Suppression at any point in year one: 84.4% vs 77.6%; OR 1.56 (1.14-2.15), p = 0.006; adjusted OR 1.41 (1.02-1.96), p = 0.04 | [`define-patient-outcomes`](08_outcomes.qmd#other-outcomes) (`vl_suppressed_year_one`); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios). The code counts a viral load of 400 *or less*; the article says below 400. |
+| Suppression at any point in year one: 84.4% vs 77.6%; OR 1.56 (1.14-2.15), p = 0.006; adjusted OR 1.41 (1.02-1.96), p = 0.04 | [`define-patient-outcomes`](08_outcomes.qmd#other-outcomes) (`vl_suppressed_year_one`); [`fit-outcome-models`](08_outcomes.qmd#odds-ratios). The code, the record of what was done, counts a viral load of 400 *or less*; the article's text says below 400. |
 | Suppression on the original regimen: 79.4% vs 72.9%; OR 1.43 (1.07-1.92), p = 0.016; adjusted OR 1.28 (0.95-1.73), p = 0.11 | `vl_suppressed_on_initial_regimen`, the same two steps, in days 0-364. The saved Stata looked at all follow-up ([why the R differs](stata_overview.qmd#slips-in-the-code)). |
 
 ## Adherence
