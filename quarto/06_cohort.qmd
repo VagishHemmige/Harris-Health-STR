@@ -48,7 +48,7 @@ stata_for("start-at-first-regimen")
 
 In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.
 
-One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise `drop if prevcareelsewhere` drops patients with that field missing. The R filters keep only an explicit "no" (`%in% FALSE`, `%in% 0`) to match.
+One Stata habit needs care. `drop if InitialRegimenBID` drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. This is how the code enforces the start of enrollment. It sets no upper limit on the start date; the 2008-2011 enrollment window is assumed to come from the data extract ([details](study_methods.qmd#who-is-included)). Likewise `drop if prevcareelsewhere` drops patients with that field missing. The R filters keep only an explicit "no" (`%in% FALSE`, `%in% 0`) to match.
 
 **From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper's methods; the code is the record of what was done.
 

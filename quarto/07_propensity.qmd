@@ -62,7 +62,7 @@ stata_for("insurance-and-str")
 
 The covariates are those listed in the paper. In Stata, `Gender` was the numbered category made by `encode` (1 = F, 2 = M) entered as a number, which is the same model as a male indicator. Patients missing any covariate, for example with no viral load before ART, get no score and so no weight, and drop out of the weighted analyses, as they did in Stata.
 
-One difference to know about: if a category predicts the regimen perfectly (every patient in it started the STR, say), Stata's `logistic` drops that category and its patients with a note, while `glm()` keeps them and gives probabilities close to 0 or 1, and so very large weights. Check the fitted model for this before using the weights.
+One difference to know about: if a category predicts the regimen perfectly (every patient in it started the STR, say), Stata's `logistic` drops that category and its patients with a note, so they get no score and no weight. `glm()` keeps them, warns that fitted probabilities are numerically 0 or 1, and reports a huge coefficient and standard error for that category. Those patients' own weights are not large: each received the regimen predicted for them, so the weight is close to 1. The difference is who is weighted, so the two programs can give different results. Check for the warning before using the weights.
 
 ```{r}
 #| label: fit-propensity-model
