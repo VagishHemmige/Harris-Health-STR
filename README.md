@@ -6,6 +6,7 @@
 [![Status](https://img.shields.io/badge/status-teaching_material-blue)](#)
 [![Published](https://img.shields.io/badge/published-AIDS_Care_2018-green)](https://doi.org/10.1080/09540121.2018.1442554)
 [![Data](https://img.shields.io/badge/data-synthetic_only-lightgrey)](#)
+[![License](https://img.shields.io/badge/license-MIT_%2B_CC_BY_4.0-lightgrey)](LICENSE.md)
 <!-- badges: end -->
 
 # Single-tablet HIV regimens at Thomas Street Health Center: Stata to R
@@ -47,3 +48,10 @@ source("R/main.R")                           # runs the translation
 Packages: dplyr, tidyr, readr, stringr, lubridate, purrr, broom and
 survey. Results from synthetic data are meaningless and are not results
 of the study.
+
+## License and citation
+
+Code under the MIT License; written content under CC BY 4.0 (see
+[`LICENSE.md`](LICENSE.md)). If you use this material, please cite the
+article above; GitHub’s “Cite this repository” button gives the
+reference from [`CITATION.cff`](CITATION.cff).

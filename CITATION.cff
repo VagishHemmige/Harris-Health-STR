@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this material, please cite the published article."
+title: "Single-tablet HIV regimens at Thomas Street Health Center: Stata to R"
+type: software
+authors:
+  - family-names: Hemmige
+    given-names: Vagish
+license: MIT
+repository-code: "https://github.com/VagishHemmige/Harris-Health-STR"
+url: "https://vagishhemmige.github.io/Harris-Health-STR/"
+preferred-citation:
+  type: article
+  title: "Single tablet HIV regimens facilitate virologic suppression and retention in care among treatment naïve patients"
+  authors:
+    - family-names: Hemmige
+      given-names: Vagish
+    - family-names: Flash
+      given-names: Charlene A.
+    - family-names: Carter
+      given-names: Josephinel
+    - family-names: Giordano
+      given-names: Thomas P.
+    - family-names: Zerai
+      given-names: Teddy
+  journal: "AIDS Care"
+  year: 2018
+  volume: 30
+  issue: 8
+  start: 1017
+  end: 1024
+  doi: "10.1080/09540121.2018.1442554"

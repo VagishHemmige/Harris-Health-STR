@@ -15,7 +15,7 @@ Scientific questions about the study go to Vagish Hemmige. Known issues are in [
 
 `R/main.R` runs the R scripts in order: five that build a one-row-per-patient-per-day data set from pharmacy and laboratory extracts, and four that select the cohort, weight it and compare outcomes. `stata/` holds the original do-files. The real extracts are clinic records and are not in the repository; the code reads synthetic copies made by `R/synthetic/make_synthetic_data.R`.
 
-Contributions follow the rules in [`AGENTS.md`](agents.qmd).
+Contributions follow the rules in [`AGENTS.md`](agents.qmd). The code is under the MIT License and the written content under CC BY 4.0 ([`LICENSE.md`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/LICENSE.md)); please cite the article if you use it.
 
 ## How this website was created
 
