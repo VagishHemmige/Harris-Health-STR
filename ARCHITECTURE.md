@@ -11,7 +11,7 @@ Rscript R/synthetic/make_synthetic_data.R   # fake input files in data-synthetic
 Rscript R/main.R                            # the translation, about 30 seconds on 400 synthetic patients
 ```
 
-`R/main.R` sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables.
+`R/main.R` sources every script into one R session; each script uses objects created by earlier ones. Nothing is saved between scripts except the final tables. `.github/workflows/check-synthetic.yml` runs both commands on GitHub for every branch push.
 
 ## Data flow
 
@@ -68,7 +68,7 @@ flowchart TD
 | `07_propensity.R` | Final Analysis, baseline and propensity | `patients` | `baseline_tests`, `propensity_model`, `patients` + `propensity_score`, `ipw`; `weighted_balance`, `weighted_categories` |
 | `08_outcomes.R` | Final Analysis, outcomes | `cohort_days`, `patients` | `patients` + outcomes; `outcome_summary`, `outcome_models`, `suppression_at_switch` |
 | `09_sensitivity.R` | Final Analysis, sensitivity | `cohort_days`, `patients`, `propensity_model` | `suppression_by_start_year`, `str_by_start_year`, `psych_models`, `outside_pharmacy_summary`, `outside_pharmacy_models` |
-| `tables.R` | (the Stata wrote results to logs) | the tables above | CSV files in `tables/` |
+| `tables.R` | (the Stata wrote results to logs) | `patients` and the results above | `table_1_baseline` and `table_2_outcomes` (gtsummary) as .docx and .html, and every result as CSV, in `tables/` |
 
 `R/synthetic/make_synthetic_data.R` is a utility outside the workflow: it writes six CSVs and an example corrections file with the original column names, filled with random values.
 

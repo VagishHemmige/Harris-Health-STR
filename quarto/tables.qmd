@@ -3,7 +3,11 @@ title: "Tables"
 format: html
 ---
 
-This script writes the analysis tables to `tables/` as CSV files. The Stata wrote its results to log files.
+This script turns the results into the two tables a paper needs, formatted and ready to paste into the manuscript, and also writes every result to a CSV file.
+
+**Publication tables, from code.** With [gtsummary](https://www.danieldsjoberg.com/gtsummary/) [@sjoberg2021gtsummary], the table in the paper comes straight from the data and the models: counts, percentages, tests and odds ratios are filled in by the code and saved as a Word file. When the data or a definition changes, rerunning the script remakes the table, and no number is copied by hand.
+
+Stata did not work this way when this analysis was done. The do-files were written in Stata 12, which had no built-in command to turn results into a formatted table. Results were read from the log and typed into the manuscript tables, or assembled with user-written commands such as `estout`. Stata added `collect` and a redesigned `table` command in Stata 17 (2021), `etable` in a late-2021 update, and `dtable` for descriptive tables in Stata 18 ([Stata FAQ](https://www.stata.com/support/faqs/reporting/stata-versions-table-commands/)).
 
 ::: {.Rcode title="Source code"}
 The full R script is available at:
@@ -13,6 +17,7 @@ The full R script is available at:
 This R script file is itself reliant on the following helper files:
 
 -   [`R/setup.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)
 
 The code sections below are imported directly from that script when this page is rendered. The code has been run only on synthetic data; nothing on this page is a study result.
 :::
@@ -25,9 +30,77 @@ knitr::read_chunk("../R/tables.R")
 source("_stata_links.R")
 ```
 
-## Write the tables
+## Labels and groups
 
-A named list holds every table, and a loop over its names writes each one. `tables/` is ignored by Git: tables made from real data would need clearing before release, and tables made from synthetic data mean nothing.
+Each variable gets the label it should have in the paper, once, and both tables use the same list. The regimen group becomes a factor so the single tablet is the first column.
+
+```{r}
+#| label: prepare-table-data
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("prepare-table-data")
+```
+
+## Table 1: patients by starting regimen
+
+`tbl_summary()` makes the usual Table 1: counts and percentages for categories, mean (SD) for age, one column per group and one for everyone (`add_overall()`). `add_p()` adds the tests Final Analysis.do ran: Pearson chi-squared without continuity correction, the default of Stata's `tab ..., chi2`, and an equal-variance t-test, the default of `ttest`.
+
+The weighted half of the table comes from `tbl_svysummary()`, which takes a survey design. The design holds the inverse probability weights, so the percentages are the weighted ones Stata's `tab ... [aw=IPW]` showed. `tbl_merge()` puts the two side by side, so a reader can see the groups differ before weighting and match after it. How weighting does that is explained on [Inverse probability weighting](ipw.qmd).
+
+```{r}
+#| label: table-1-baseline
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("table-1-baseline")
+```
+
+## Table 2: outcomes and odds ratios
+
+`tbl_summary()` gives each outcome as n (%) in each group. `add_stat()` then adds two columns from a small function that calls [`odds_ratio_for_str()`](functions.qmd#odds-ratios) for each outcome, once without weights and once with them, so the odds ratios in the table are the ones the models in [8. Outcomes](08_outcomes.qmd) estimate. Writing the odds ratios through the same helper function means the table and the models cannot disagree.
+
+```{r}
+#| label: table-2-outcomes
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("table-2-outcomes")
+```
+
+## Saving the tables
+
+`as_flex_table()` turns each table into a Word table, and `save_as_docx()` saves it: the file opens in Word with the layout, bold labels and column headers already set. `as_gt()` and `gtsave()` save an HTML copy for checking in a browser.
+
+```{r}
+#| label: save-publication-tables
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("save-publication-tables")
+```
+
+## Every result as a CSV file
+
+A named list holds every result, including those that are not in the two tables (the sensitivity analyses, the insurance model, suppression at a regimen switch), and a loop over its names writes each one. Each number on [Published results](published_results.qmd) can then be found in `tables/`.
+
+`tables/` is ignored by Git: tables made from real data would need clearing before release, and tables made from synthetic data mean nothing.
 
 ```{r}
 #| label: write-tables
@@ -40,3 +113,8 @@ A named list holds every table, and a loop over its names writes each one. `tabl
 #| output: asis
 stata_for("write-tables")
 ```
+
+## References
+
+::: {#refs}
+:::

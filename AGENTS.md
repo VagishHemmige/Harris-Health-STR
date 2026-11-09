@@ -82,7 +82,7 @@ The site documents the code. It does not run the analysis.
 
 ## Outputs
 
-- `R/tables.R` writes to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site's teaching figures are described under Quarto website.
+- `R/tables.R` builds the publication tables with gtsummary (Word and HTML) and writes every result as CSV to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site's teaching figures are described under Quarto website.
 - `README.Rmd` is the source of `README.md`; edit the `.Rmd` and re-knit.
 
 ## Restricted data (applies to everyone)
@@ -104,7 +104,7 @@ The site documents the code. It does not run the analysis.
 - **Fidelity:** does the R still do what the Stata does, and is every departure documented?
 - **Structure:** is `ARCHITECTURE.md` current; are chunk labels unique and found by their pages; does every definitive script have a page and sidebar entry?
 - **Disclosure:** search every changed file, commit message and pull-request text for study IDs, dates, names and paths.
-- **Execution:** do `R/synthetic/make_synthetic_data.R` and `R/main.R` run in a fresh session; does the site render?
+- **Execution:** do `R/synthetic/make_synthetic_data.R` and `R/main.R` run in a fresh session; does the site render? The workflow `.github/workflows/check-synthetic.yml` runs both on every branch push and pull request, and keeps the synthetic tables as a download.
 
 ## Working with agents
 
