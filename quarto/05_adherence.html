@@ -691,7 +691,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 44-61 (Covered, partial
 <section id="still-in-care-and-virologically-suppressed" class="level2">
 <h2 class="anchored" data-anchor-id="still-in-care-and-virologically-suppressed">Still in care and virologically suppressed</h2>
 <p><strong>Still in care (lab-based):</strong> both a CD4 and a viral load are still to come. After a patient’s last test of either kind, they count as out of care.</p>
-<p><strong>Virologically suppressed:</strong> see <a href="../quarto/functions.html#viral-suppression-on-a-day"><code>vl_suppressed_on_day()</code></a>. A viral load of 400 or less counts for 90 days; a day just before a suppressed result also counts if that result is within 90 days.</p>
+<p><strong>Virologically suppressed:</strong> see <a href="../quarto/functions.html#viral-suppression-on-a-day"><code>vl_suppressed_on_day()</code></a>. A day counts only if the most recent viral load is 400 or less. That result then counts for 90 days. A later day also counts if the next viral load comes within 90 days and is 400 or less too, which bridges a gap between two suppressed results. A suppressed result never reaches back to the days before it.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1371,7 +1371,7 @@ Stata: <code>Do Step 8 Data Preparation.do</code>, lines 63-75 (Still in care an
 <span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>**Still in care (lab-based):** both a CD4 and a viral load are still to come. After a patient's last test of either kind, they count as out of care.</span>
 <span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>**Virologically suppressed:** see <span class="co">[</span><span class="ot">`vl_suppressed_on_day()`</span><span class="co">](functions.qmd#viral-suppression-on-a-day)</span>. A viral load of 400 or less counts for 90 days; a day just before a suppressed result also counts if that result is within 90 days.</span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>**Virologically suppressed:** see <span class="co">[</span><span class="ot">`vl_suppressed_on_day()`</span><span class="co">](functions.qmd#viral-suppression-on-a-day)</span>. A day counts only if the most recent viral load is 400 or less. That result then counts for 90 days. A later day also counts if the next viral load comes within 90 days and is 400 or less too, which bridges a gap between two suppressed results. A suppressed result never reaches back to the days before it.</span>
 <span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: define-daily-outcomes</span></span>

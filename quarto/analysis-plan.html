@@ -549,11 +549,16 @@ gives this page GitHub-style IDs and those links work on both.
 <li>Insurance status and prior HIV care elsewhere at intake.</li>
 <li>Psychiatry clinic visit dates.</li>
 </ul>
-<p>Observation window: 1 January 2008 to 31 December 2013. The data are not public and are not in this repository.</p>
+<p>Enrollment and follow-up are separate:</p>
+<ul>
+<li><strong>Enrollment:</strong> patients starting ART from 1 January 2008 to 31 December 2011 <span class="citation" data-cites="hemmige2018str">(<a href="#ref-hemmige2018str" role="doc-biblioref">Hemmige et al. 2018</a>)</span>. This restriction is not in the kept code: Final Analysis.do applies no upper limit to the start date (it tabulates a 2012 start year). It is assumed to come from how the extract was drawn; the paper reports 2,095 patients entering care in the period.</li>
+<li><strong>Follow-up:</strong> the person-day data run to 31 December 2013, so every enrolled patient has a full first year. Each outcome uses days 0-364 after the first fill (§7).</li>
+</ul>
+<p>The data are not public and are not in this repository.</p>
 </section>
 <section id="4-study-population" class="level2">
 <h2 class="anchored" data-anchor-id="4-study-population">4. Study population</h2>
-<p>Source population: patients with antiretrovirals dispensed by the clinic pharmacy during the window.</p>
+<p>Source population: patients in the extract with antiretrovirals dispensed by the clinic pharmacy. The code enforces the start of enrollment indirectly: a patient whose first regimen started before 1 January 2008 has no first regimen on the person-day grid and is dropped at exclusion 1.</p>
 <p>Exclusions, in order (each a flowchart step):</p>
 <ol type="1">
 <li>Initial regimen in the window is taken twice daily (any twice-daily product), or the first regimen started before the window.</li>
@@ -630,7 +635,6 @@ gives this page GitHub-style IDs and those links work on both.
 <li>Pharmacy fills measure collection, not ingestion, and miss fills elsewhere: PDC is a lower bound.</li>
 <li>Loss to follow-up cannot be distinguished from moving, transferring care, incarceration or death.</li>
 <li>Single clinic serving a largely uninsured, racially diverse population.</li>
-<li>Outcomes use different follow-up periods (see §7).</li>
 </ul>
 </section>
 <section id="12-reporting-map" class="level2">
