@@ -645,7 +645,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="fa-balance" class="level3">
 <h3 class="anchored" data-anchor-id="fa-balance">Lines 113-127: Weighted balance</h3>
-<p><strong>In R:</strong> <a href="../quarto/07_propensity.html#r-check-weighted-balance"><code>check-weighted-balance</code></a></p>
+<p><strong>In R:</strong> <a href="../quarto/07_propensity.html#r-check-weighted-balance"><code>check-weighted-balance</code></a>, <a href="../quarto/07_propensity.html#r-check-weighted-category-balance"><code>check-weighted-category-balance</code></a>, <a href="../quarto/functions.html#r-weighted-distribution"><code>weighted-distribution</code></a></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-startfrom="113"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 112;"><span id="cb12-113"><a href="#cb12-113" aria-label="113"></a><span class="co">//We compare demographics of people who do and don't receive an STR, now using the IPW weighting scheme</span></span>
 <span id="cb12-114"><a href="#cb12-114" aria-label="114"></a><span class="kw">tab</span> InitialRegimenSTR Gender <span class="kw">if</span> FirstObservationOfSubject [aw=IPW], <span class="ot">row</span> column</span>
 <span id="cb12-115"><a href="#cb12-115" aria-label="115"></a><span class="kw">tab</span> InitialRegimenSTR hepc <span class="kw">if</span> FirstObservationOfSubject [aw=IPW], <span class="ot">row</span> column</span>

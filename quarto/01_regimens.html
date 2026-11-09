@@ -550,7 +550,7 @@ Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 1-5 (Read the dispensin
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills_raw <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(drug_name_fixes, <span class="at">by =</span> <span class="st">"cdmdescription"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(drug_name_fixes, <span class="at">by =</span> <span class="st">"cdmdescription"</span>, <span class="at">relationship =</span> <span class="st">"many-to-one"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">drugname =</span> <span class="fu">coalesce</span>(fixed_drugname, drugname),</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">dispense_date =</span> <span class="fu">mdy</span>(medtransdate),</span>
@@ -729,9 +729,10 @@ Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual correctio
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># When Complera was new, some fills were recorded as Truvada. Once a fill date's</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regimen is Complera, a Truvada fill on that date is recoded as Complera.</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dispense_regimens, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"dispense_date"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">drugname =</span> <span class="fu">if_else</span>(drugname <span class="sc">==</span> <span class="st">"Truvada"</span> <span class="sc">&amp;</span> regimen <span class="sc">==</span> <span class="st">"Complera"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"Complera"</span>, drugname))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dispense_regimens, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"dispense_date"</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">relationship =</span> <span class="st">"many-to-one"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">drugname =</span> <span class="fu">if_else</span>(drugname <span class="sc">==</span> <span class="st">"Truvada"</span> <span class="sc">&amp;</span> regimen <span class="sc">==</span> <span class="st">"Complera"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"Complera"</span>, drugname))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div id="r-recode-early-complera" class="stata-crosslink">

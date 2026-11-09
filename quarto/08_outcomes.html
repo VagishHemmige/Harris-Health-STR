@@ -577,8 +577,8 @@ Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(retention, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(patient_outcomes, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(retention, <span class="at">by =</span> <span class="st">"studyid"</span>, <span class="at">relationship =</span> <span class="st">"one-to-one"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(patient_outcomes, <span class="at">by =</span> <span class="st">"studyid"</span>, <span class="at">relationship =</span> <span class="st">"one-to-one"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">retained_year_one =</span> <span class="fu">coalesce</span>(first_year_vl_tests <span class="sc">&gt;=</span> <span class="dv">2</span> <span class="sc">&amp;</span></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                                   first_to_last_vl_days <span class="sc">&gt;</span> retention_min_gap_days, <span class="cn">FALSE</span>),</span>

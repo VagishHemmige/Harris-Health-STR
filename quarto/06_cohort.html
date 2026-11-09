@@ -513,7 +513,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># is the first day of regimen 1.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> analytic_days <span class="sc">|&gt;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(regimen_number)) <span class="sc">|&gt;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(baseline, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(baseline, <span class="at">by =</span> <span class="st">"studyid"</span>, <span class="at">relationship =</span> <span class="st">"many-to-one"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">initial_regimen =</span> <span class="fu">first</span>(regimen[regimen_number <span class="sc">==</span> <span class="dv">1</span>]),</span>

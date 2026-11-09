@@ -527,7 +527,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(suppression_by_year_threshold, <span class="at">by =</span> <span class="st">"studyid"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(suppression_by_year_threshold, <span class="at">by =</span> <span class="st">"studyid"</span>, <span class="at">relationship =</span> <span class="st">"one-to-one"</span>)</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>suppression_by_start_year <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(art_start_year, str) <span class="sc">|&gt;</span></span>
@@ -673,7 +673,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 189-195 (Psychiatry visits in th
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">possible_outside_pharmacy =</span> <span class="fu">any</span>(suppressed_without_fill), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(outside_pharmacy, <span class="at">by =</span> <span class="st">"studyid"</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(outside_pharmacy, <span class="at">by =</span> <span class="st">"studyid"</span>, <span class="at">relationship =</span> <span class="st">"one-to-one"</span>)</span>
 <span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata: tab SwitchesPharmacy InitialRegimenSTR if FirstObservationOfSubject, chi2</span></span>
 <span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>outside_pharmacy_summary <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
