@@ -32,7 +32,7 @@ source("_stata_links.R")
 
 ## Labels and groups
 
-Each variable gets the label it should have in the paper, once, and both tables use the same list. The regimen group becomes a factor so the single tablet is the first column.
+Each variable gets the label it should have in the paper, once: one list for the baseline characteristics, used by both halves of Table 1, and one for the outcomes. The regimen group becomes a factor so the single tablet is the first column.
 
 ```{r}
 #| label: prepare-table-data

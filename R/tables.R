@@ -15,12 +15,12 @@
 #   as .docx and .html, and one CSV file per result.
 
 ## ---- prepare-table-data
-# One label per variable, used by both tables, and the regimen group as a
+# The label each variable should have in the paper, and the regimen group as a
 # labelled factor so the single tablet comes first.
 baseline_variables <- c("age", "male", "ethnicity", "primaryriskfactor", "hepc",
                         "insurance_status", "baseline_vl_group", "baseline_cd4_group")
 
-table_labels <- list(
+baseline_labels <- list(
   age ~ "Age, years",
   male ~ "Male",
   ethnicity ~ "Race/ethnicity",
@@ -28,7 +28,10 @@ table_labels <- list(
   hepc ~ "Hepatitis C",
   insurance_status ~ "Insurance",
   baseline_vl_group ~ "Viral load before ART, copies/mL",
-  baseline_cd4_group ~ "CD4 count before ART, cells/µL",
+  baseline_cd4_group ~ "CD4 count before ART, cells/µL"
+)
+
+outcome_labels <- list(
   retained_year_one ~ "Retained in care in year one",
   vl_suppressed_year_one ~ "Suppressed at least once in year one",
   vl_suppressed_on_initial_regimen ~ "Suppressed while on the starting regimen",
@@ -49,7 +52,7 @@ table_1_unweighted <- table_data |>
   tbl_summary(
     by = regimen,
     include = all_of(baseline_variables),
-    label = table_labels,
+    label = baseline_labels,
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     missing_text = "Missing"
   ) |>
@@ -68,7 +71,7 @@ table_1_weighted <- weighted_design |>
   tbl_svysummary(
     by = regimen,
     include = all_of(baseline_variables),
-    label = table_labels,
+    label = baseline_labels,
     statistic = list(all_continuous() ~ "{mean} ({sd})",
                      all_categorical() ~ "{p}%"),
     missing = "no"
@@ -99,7 +102,7 @@ table_2 <- table_data |>
   tbl_summary(
     by = regimen,
     include = all_of(outcome_names),
-    label = table_labels,
+    label = outcome_labels,
     statistic = list(all_dichotomous() ~ "{n} ({p}%)"),
     missing = "no"
   ) |>
