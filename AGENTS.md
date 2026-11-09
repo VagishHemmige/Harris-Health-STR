@@ -69,7 +69,7 @@ The site documents the code. It does not run the analysis.
 - **Provisional content.** `quarto/_pending.lua` highlights in yellow every paragraph that starts with **Decision pending:** or, in the plan, **Open:**, and any `[text]{.pending}`.
 - **Project documents.** `analysis-plan.md`, `ARCHITECTURE.md`, `AGENTS.md` and `REPOSITORY-BLUEPRINT.md` are shown by pages in `quarto/` that only include the root file: edit the root file, not the page.
 - Each script page loads its script with `knitr::read_chunk("../R/<script>.R")` and shows each labelled section with `#| eval: false`, with prose explaining what it does, why, and the Stata it replaces.
-- **Chunks that run:** the `read_chunk()` imports, the Architecture page's chunk that reads `ARCHITECTURE.md`, and the Stata pages' chunk that reads do-files as text through `quarto/_show_stata.R`. Nothing else is evaluated.
+- **Chunks that run:** the `read_chunk()` imports, the Architecture page's chunk that reads `ARCHITECTURE.md`, and the chunks that show the do-files through `quarto/_stata_links.R`, which read `stata/` and `quarto/stata_map.csv` as text. Nothing else is evaluated.
 - The site renders to `docs/`, which is not committed: the GitHub Actions workflow `.github/workflows/publish.yml` renders it and publishes it to the `gh-pages` branch on every push to `main`. When you add a script, add its page and sidebar entry in the same pull request, and render locally to check it.
 - **Prose must match the code.** If a change alters what a section does, update its explanation in the same pull request.
 
@@ -77,6 +77,7 @@ The site documents the code. It does not run the analysis.
 
 - `stata/` holds the original do-files with patient-level details removed (`stata/README.md` lists what was removed). Do not add study IDs, person-level dates, local paths or notes about individual patients back.
 - The do-files are a record and are not edited otherwise, including their bugs, which are documented on the site's "Which file does what" page (`quarto/stata_overview.qmd`).
+- **Stata-R links.** `quarto/stata_map.csv` splits each do-file into sections (line ranges) and names the R chunk labels that replace each one. The Stata pages and the folded "Stata:" blocks under each R step are both built from it. When you rename, add or remove a chunk label, update the map in the same pull request, and keep every non-blank do-file line in exactly one section.
 
 ## Outputs
 

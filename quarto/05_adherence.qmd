@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/05_adherence.R")
+source("_stata_links.R")
 ```
 
 ## Number the days of each regimen
@@ -34,6 +35,13 @@ Stata's variable `M` counts the days within a regimen: `bysort studyid CurrentRe
 ```{r}
 #| label: number-days-within-regimen
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("number-days-within-regimen")
 ```
 
 ## Count pills on hand
@@ -60,6 +68,13 @@ In R, the loop is over regimen numbers only. Matching drugs between the last day
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("count-pills-per-regimen")
+```
+
 ## Is the day covered?
 
 A day is covered when every drug in the regimen has pills on hand, partially covered when some do, and uncovered when none do. With one row per drug, these are `all()` and `any()` over the day's rows; Stata needed a loop over drug positions for each.
@@ -67,6 +82,13 @@ A day is covered when every drug in the regimen has pills on hand, partially cov
 ```{r}
 #| label: summarise-coverage-per-day
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("summarise-coverage-per-day")
 ```
 
 ## Still in care and virologically suppressed
@@ -78,4 +100,11 @@ A day is covered when every drug in the regimen has pills on hand, partially cov
 ```{r}
 #| label: define-daily-outcomes
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-daily-outcomes")
 ```

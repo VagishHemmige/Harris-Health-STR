@@ -24,6 +24,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/03_person_days.R")
+source("_stata_links.R")
 ```
 
 ## Expand to days
@@ -33,6 +34,13 @@ knitr::read_chunk("../R/03_person_days.R")
 ```{r}
 #| label: expand-to-days
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("expand-to-days")
 ```
 
 ## Attach lab results
@@ -53,6 +61,13 @@ A join by patient and date does it directly. If a patient had two results on one
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("attach-lab-results")
+```
+
 ## Carry values forward and back
 
 Stata counted days since the last test with a running sum (`replace x = 1 + x[_n-1] if x==.`), then sorted the data by *negative* date and repeated the trick to count days until the next test. `tidyr::fill()` carries a value down (or up) to the following missing rows, so the date of the last test and of the next test can be filled and subtracted from today's date. The same fill gives the last value carried forward (`LVCFCD4`, `LVCFViralLoad`) and the next value (`NextCD4`, `NextViralLoad`).
@@ -64,6 +79,13 @@ Days before a patient's first test have no "last" value; days after the last tes
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("carry-lab-values")
+```
+
 ## Count days between tests
 
 The gap is the number of days between the tests either side of a day.
@@ -71,4 +93,11 @@ The gap is the number of days between the tests either side of a day.
 ```{r}
 #| label: count-days-between-tests
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("count-days-between-tests")
 ```

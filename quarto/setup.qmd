@@ -18,6 +18,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/setup.R")
+source("_stata_links.R")
 ```
 
 ## Packages
@@ -29,6 +30,13 @@ knitr::read_chunk("../R/setup.R")
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("load-packages")
+```
+
 ## Where the data come from
 
 The analysis read six CSV extracts. In this repository they are read from `data-synthetic/`, made by `R/synthetic/make_synthetic_data.R` with the same column names and formats as the originals and entirely random values. Setting the environment variable `STR_DATA_DIR` would point the code elsewhere. There is no real data in the repository.
@@ -38,6 +46,13 @@ The manual regimen corrections are read from a separate file. The real ones name
 ```{r}
 #| label: define-paths
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-paths")
 ```
 
 ## The study window
@@ -55,6 +70,13 @@ generate CurrentDate=N+17531
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-study-window")
+```
+
 ## Drug lists
 
 Three lists that were long `replace ... if cdmdescription=="..."` chains in Stata become data here: the pharmacy descriptions that reveal the real drug behind an "Experimental" or "Other" entry, the descriptions of twice-daily products, and the regimens of interest. Putting them in one place makes them easy to check against a formulary.
@@ -62,6 +84,13 @@ Three lists that were long `replace ... if cdmdescription=="..."` chains in Stat
 ```{r}
 #| label: define-drug-lists
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-drug-lists")
 ```
 
 ## Thresholds
@@ -73,6 +102,13 @@ Every number a reader might want to change, named once. In the Stata these were 
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-thresholds")
+```
+
 ## Category limits
 
 Stata's `egen x = cut(y), at(...)` puts each value in the interval that starts at or below it, and gives a missing value at or above the last limit. `cut(..., right = FALSE)` in R uses the same convention.
@@ -80,4 +116,11 @@ Stata's `egen x = cut(y), at(...)` puts each value in the interval that starts a
 ```{r}
 #| label: define-categories
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-categories")
 ```

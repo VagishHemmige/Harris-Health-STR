@@ -25,6 +25,7 @@ The code sections below are imported directly from that script when this page is
 #| eval: true
 #| cache: false
 knitr::read_chunk("../R/08_outcomes.R")
+source("_stata_links.R")
 ```
 
 ## Retention in care
@@ -34,6 +35,13 @@ At least two viral loads in days 0-364, more than 90 days apart. Stata needed el
 ```{r}
 #| label: define-retention
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-retention")
 ```
 
 ## Other outcomes
@@ -47,6 +55,13 @@ Every outcome uses the first year, days 0-364, as the paper describes: the data 
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("define-patient-outcomes")
+```
+
 ## Suppression at the first switch
 
 Were patients who switched in the first year suppressed on the day they switched?
@@ -56,6 +71,13 @@ Were patients who switched in the first year suppressed on the day they switched
 #| eval: false
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("suppression-at-switch")
+```
+
 ## Outcome summary
 
 Counts and percentages by group, as in the `tab outcome InitialRegimenSTR, row column chi2` lines.
@@ -63,6 +85,13 @@ Counts and percentages by group, as in the `tab outcome InitialRegimenSTR, row c
 ```{r}
 #| label: summarise-outcomes
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("summarise-outcomes")
 ```
 
 ## Odds ratios
@@ -79,4 +108,11 @@ A loop over outcome names keeps every result in one table instead of in a log fi
 ```{r}
 #| label: fit-outcome-models
 #| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("fit-outcome-models")
 ```
