@@ -18,7 +18,7 @@ Read the three files before making changes. Each covers its own topic and does n
 A teaching repository for a published study [Hemmige et al., *AIDS Care* 2018](https://doi.org/10.1080/09540121.2018.1442554) comparing single-tablet with multi-tablet first-line antiretroviral regimens at Thomas Street Health Center (Harris Health System). The original Stata code is in `stata/` with patient-level details removed; `R/` is a translation into R, run only on synthetic data. The code and methods are explained on a Quarto website. The study is complete: the R is not used to rerun the published analysis.
 
 - **`analysis-plan.md` is the source of truth for design.** It was reconstructed from the paper and the code. The code is the record of what was done; the plan marks where it is more specific than the paper's methods. The R translation follows the code, except where the saved Stata is evidently a slip against the published method (for example, outcomes the paper reports for year one that the saved file computes over all follow-up); there the R follows the paper. Every such departure is stated on the script's page and in `stata_overview.qmd`.
-- **Deciders.** Scientific decisions are made by: Vagish Hemmige (all areas; to be confirmed). Anyone may open or contribute to an issue; only a decider settles it.
+- **Deciders.** Scientific decisions are made by: Vagish Hemmige (all areas). Anyone may open or contribute to an issue; only a decider settles it.
 - **This is an analysis project, not an R package.** Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.
 - **Default branch:** `main`, protected. Changes reach it only through pull requests.
 
