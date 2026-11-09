@@ -7,7 +7,7 @@ format: html
 
 Did starting HIV treatment on a single-tablet regimen, rather than three pills once a day, improve retention in care and viral suppression in the first year at a county safety-net clinic? Published as @hemmige2018str. This site is teaching material: it explains the original Stata code and an R translation of it. The R has been run only on synthetic data.
 
--   **Vagish Hemmige**, **Charlene A. Flash**, **Jacquelyn Carter**, **Thomas P. Giordano** and **Thomas Zerai** (authors of the paper)
+-   **Vagish Hemmige**, **Charlene A. Flash**, **Josephinel Carter**, **Thomas P. Giordano** and **Teddy Zerai** (authors of the paper)
 
 Scientific questions about the study go to Vagish Hemmige. Known issues are in [Issues](https://github.com/VagishHemmige/Harris-Health-STR/issues).
 
@@ -47,5 +47,6 @@ Four documents describe the project:
 -   [**8. Outcomes**](08_outcomes.qmd): retention, suppression, adherence and the odds ratios.
 -   [**9. Sensitivity analyses**](09_sensitivity.qmd): lower threshold, psychiatry visits, outside pharmacy.
 -   [**Tables**](tables.qmd): writing the tables.
+-   [**Published results and the code behind them**](published_results.qmd): each number the article reports, and the step of the code that computes it.
 -   [**Which file does what**](stata_overview.qmd): the do-files behind the paper, how they fit together, slips found, and what was removed for privacy.
 -   [**Data build (Steps 0-8)**](stata_data_build.qmd) and [**Final Analysis**](stata_final_analysis.qmd): the do-files themselves.

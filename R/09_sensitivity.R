@@ -5,8 +5,9 @@
 #   missed_fill_days (setup.R); vl_suppressed_on_day(), compare_categorical(),
 #   odds_ratio_for_str() (functions.R); cohort_days (06_cohort.R); patients
 #   (08_outcomes.R).
-# Produces: suppression_by_start_year, str_by_start_year, psych_models,
-#   outside_pharmacy_summary and outside_pharmacy_models.
+# Produces: suppression_by_start_year, str_by_start_year, psych_test,
+#   psych_models, outside_pharmacy_summary, outside_pharmacy_test and
+#   outside_pharmacy_models.
 
 ## ---- suppression-threshold-by-year
 # 400 copies/mL for patients starting ART in 2008 and 50 copies/mL afterwards.
@@ -41,6 +42,9 @@ str_by_start_year <- glm(str ~ factor(art_start_year), data = patients,
 # model did not meaningfully change the odds ratios. Final Analysis.do computed
 # these weights (IPW2) but its next two models used the original weights; here
 # the new weights are used, as the paper describes.
+# Stata: tab InitialRegimenSTR HadPsychDate if FirstObs, row column chi2
+psych_test <- compare_categorical(patients, "had_psych_visit")
+
 propensity_model_psych <- update(propensity_model, . ~ . + had_psych_visit)
 
 patients <- patients |>

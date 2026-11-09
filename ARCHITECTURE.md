@@ -85,6 +85,7 @@ quarto/
   background.qmd, methodological_background.qmd, study_methods.qmd
   setup.qmd, functions.qmd, 01_regimens.qmd ... 09_sensitivity.qmd, tables.qmd   # one per script
   stata_overview.qmd, stata_data_build.qmd, stata_final_analysis.qmd
+  published_results.qmd  # each published number and the code step behind it
   _show_stata.R          # prints do-files as code blocks for the Stata pages
   analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd
 stata/                   # the do-files behind the paper, patient-level details removed
