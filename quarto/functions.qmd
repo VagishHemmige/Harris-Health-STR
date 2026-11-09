@@ -27,8 +27,6 @@ source("_stata_links.R")
 
 ## Reading a source file
 
-Used by [1](01_regimens.qmd) and [2](02_labs_and_baseline.qmd).
-
 ```{r}
 #| label: read-source-csv
 #| eval: false
@@ -43,7 +41,7 @@ stata_for("read-source-csv")
 
 ## Reading the manual corrections
 
-Returns an empty table if the file is not there, so the code runs without any corrections. Used by [1. Regimens](01_regimens.qmd).
+Returns an empty table if the file is not there, so the code runs without any corrections.
 
 ```{r}
 #| label: read-regimen-corrections
@@ -59,7 +57,7 @@ stata_for("read-regimen-corrections")
 
 ## Checking one row per patient
 
-Stata's `merge 1:1` refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. Used by [2. Labs and baseline](02_labs_and_baseline.qmd); the joins elsewhere state their expected `relationship` for the same reason.
+Stata's `merge 1:1` refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. The joins elsewhere state their expected `relationship` for the same reason.
 
 ```{r}
 #| label: check-unique-patients
@@ -184,7 +182,7 @@ stata_for("count-patients")
 
 ## Baseline comparisons
 
-The R counterparts of `tab ..., chi2`, `ttest` and `ranksum`, with the options that match Stata's defaults. Used by [7. Propensity score](07_propensity.qmd).
+The R counterparts of `tab ..., chi2`, `ttest` and `ranksum`, with the options that match Stata's defaults.
 
 ```{r}
 #| label: compare-groups
@@ -200,7 +198,7 @@ stata_for("compare-groups")
 
 ## Weighted category distributions
 
-The R counterpart of `tab InitialRegimenSTR <variable> [aw=IPW], row`: within each group, the weighted percentage of patients in each category. Used by [7. Propensity score](07_propensity.qmd#weighted-balance-by-category).
+The R counterpart of `tab InitialRegimenSTR <variable> [aw=IPW], row`: within each group, the weighted percentage of patients in each category.
 
 ```{r}
 #| label: weighted-distribution
@@ -216,7 +214,7 @@ stata_for("weighted-distribution")
 
 ## Odds ratios
 
-The R counterpart of `logistic outcome InitialRegimenSTR` and `logistic outcome InitialRegimenSTR [pw=IPW]`. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; `svyglm()` with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are. Used by [8](08_outcomes.qmd) and [9](09_sensitivity.qmd).
+The R counterpart of `logistic outcome InitialRegimenSTR` and `logistic outcome InitialRegimenSTR [pw=IPW]`. A probability-weighted logistic regression in Stata reports robust (sandwich) standard errors; `svyglm()` with a one-stage design and the weights gives the same kind. Confidence intervals are Wald intervals, as Stata's are.
 
 ```{r}
 #| label: odds-ratio-for-str

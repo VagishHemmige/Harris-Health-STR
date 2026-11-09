@@ -3,9 +3,32 @@ title: "Clinical background"
 format: html
 ---
 
-## Why pill burden might matter
+This page covers the clinical side of the study: why staying in care and taking ART matter, what single-tablet regimens are, the setting, the regimens compared, and what was found. The general methods are on [Methodological background](methodological_background.qmd), and what this study chose on [Study design and methods](study_methods.qmd); a suggested reading order is at the [end of this page](#learn-more-on-this-site).
 
-Antiretroviral therapy (ART) works only if it is taken. Staying in care, collecting refills and taking pills every day are all harder for patients facing poverty, unstable housing, mental illness or substance use, which describes much of the population served by a county safety-net HIV clinic. One proposed help is to make the regimen simpler: a single tablet once a day rather than several.
+## Why staying in care and taking ART matter
+
+Antiretroviral therapy (ART) does not cure HIV, but taken every day it keeps the virus suppressed, lets the immune system recover, and stops sexual transmission: in the HPTN 052 trial, starting ART early reduced linked transmission to partners by 96% [@cohen2011hptn052]. The benefit depends on a chain of steps, often drawn as the **HIV care continuum**: diagnosis, linkage to care, staying in care, receiving ART, and viral suppression. Each step loses people. In the United States around 2010, only about one in five people living with HIV was estimated to have a suppressed viral load [@gardner2011spectrum].
+
+Two steps of that chain are this study's outcomes:
+
+- **Staying in care.** Patients with gaps in HIV care in their first year die sooner. Among veterans starting ART, those with visits in fewer quarters of the first year had higher mortality over the next years [@giordano2007retention], and in a Birmingham clinic, patients who missed a visit in their first year had more than twice the mortality of those who did not [@mugavero2009missed]. How retention is measured is on [Methodological background](methodological_background.qmd#retention-and-viral-suppression).
+- **Taking ART.** Early studies of protease inhibitors found that viral suppression needed very high adherence: virologic failure was 22% at 95% adherence or better, but 61% at 80-94.9% [@paterson2000adherence]. Later work showed that some regimens, notably non-nucleoside reverse transcriptase inhibitors such as efavirenz, often suppress the virus at lower adherence [@bangsberg2006adherence].
+
+Staying in care, collecting refills and taking pills every day are all harder for patients facing poverty, unstable housing, mental illness or substance use, which describes much of the population served by a county safety-net HIV clinic.
+
+## Pill burden and single-tablet regimens
+
+One proposed help is to make the regimen simpler. A **single-tablet regimen (STR)** combines a complete regimen, usually three drugs, in one pill taken once a day. The first, efavirenz/tenofovir/emtricitabine (Atripla), was approved in the United States in July 2006 ([FDA, 2006](https://webarchive.library.unt.edu/eot2008/20090509002157/http://www.fda.gov/fdac/features/2006/606_hiv.html)).
+
+The case for STRs rests on adherence. A meta-analysis of randomized trials found that fewer pills a day went with both better adherence and better viral suppression [@nachega2014pillburden]. In a large insurance database, patients on one pill a day were more likely to reach 95% adherence than those on three or more, and were hospitalized less [@sax2012pillburden]. Whether that translates into better outcomes in a safety-net population, where the barriers are often about getting to the clinic and the pharmacy at all, was the question this study asked. The evidence on that is summarised under [Other evidence](#other-evidence).
+
+## The setting
+
+Thomas Street Health Center is the main outpatient HIV clinic of Harris Health System, the publicly funded health system of Harris County, Texas, and the oldest free-standing HIV clinic in the United States [@flash2015rush]. Most patients receive their medication from the clinic's own pharmacy, which is what makes a study from pharmacy records possible: each fill is recorded, with the date and the drug, for every patient in the same way.
+
+## Measuring adherence from pharmacy records
+
+Pharmacy fills record what a patient collected, not what they swallowed, but they are recorded for everyone without extra effort. Measures built from refill records have been used and checked against other measures of adherence for decades [@steiner1997refill], and for ART, pharmacy-based measures consistently predict viral suppression, though which version predicts best is not settled [@mcmahon2011pharmacy]. This study used one of them, the **proportion of days covered**. How it is computed day by day, and what it misses (fills at other pharmacies, fills lasting longer than a month), is explained on [Methodological background](methodological_background.qmd#pharmacy-fills-as-a-record-of-treatment), shown in a figure on [Study design and methods](study_methods.qmd#medication-on-hand), and coded on [5. Pills on hand and daily outcomes](05_adherence.qmd).
 
 ## The regimens compared
 
@@ -51,11 +74,29 @@ These are associations from one clinic's records, weighted for measured differen
 
 Other studies of pill burden point in the same direction, but not uniformly:
 
-- A meta-analysis of randomized trials found that fewer pills a day went with both better adherence and more viral suppression [@nachega2014pillburden].
+- A meta-analysis of randomized trials found that fewer pills a day went with both better adherence and better viral suppression [@nachega2014pillburden].
+- In commercially insured patients, one pill a day went with better adherence and fewer hospital stays than three or more [@sax2012pillburden].
 - Among homeless and marginally housed people in San Francisco, the efavirenz-based STR was associated with higher adherence and more suppression. The suppression difference disappeared once adherence was taken into account [@bangsberg2010str].
 - In a cohort of women in the United States, STR use was associated with modestly better adherence and suppression [@hanna2014women].
 - In South Carolina Medicaid, STRs were associated with better adherence and fewer hospital stays, but not with more suppression after adjustment [@sutton2016pillburden].
 - In a large French cohort, STRs lasted longer before being stopped, but outcomes were similar once switches made only to simplify treatment were not counted as failures [@cotte2017str].
+
+## Learn more on this site
+
+A suggested order for reading the rest of the site:
+
+1. [Study design and methods](study_methods.qmd): who was included, how the outcomes were defined, and two figures showing how pills on hand and the year-one outcomes are worked out.
+2. [Methodological background](methodological_background.qmd): pharmacy fills, one row per person per day, retention and suppression measures, and propensity scores, in general terms.
+3. [Inverse probability weighting](ipw.qmd): how the weighted comparison works, with a worked example small enough to check by hand.
+4. [Published results and the code behind them](published_results.qmd): every number in the paper, and the step of the code that computes it.
+5. [Which file does what](stata_overview.qmd): the original Stata code, how the files fit together, and the slips found in it.
+6. The R translation, one page per script, from [1. Regimens from pharmacy fills](01_regimens.qmd) to [9. Sensitivity analyses](09_sensitivity.qmd). [6. Cohort](06_cohort.qmd) has the participant flow diagram.
+
+## Further reading
+
+- **Treatment guidelines.** The US Department of Health and Human Services *Guidelines for the Use of Antiretroviral Agents in Adults and Adolescents with HIV* ([current version](https://clinicalinfo.hiv.gov/sites/default/files/guidelines/documents/adult-adolescent-arv/guidelines-adult-adolescent-arv.pdf)) say which regimens are recommended today; older versions show how the recommendations of 2008-2011 differed.
+- **Retention in care.** The [National HIV Curriculum lesson on retention in care](https://hiv.uw.edu/pdf/basic-primary-care/retention-care/core-concept/all) (University of Washington) is a free introduction, and the HRSA HIV/AIDS Bureau's [core performance measures](https://ryanwhite.hrsa.gov/sites/default/files/ryanwhite/about-program/hab-core-performance-measures.pdf) give the formal definitions.
+- **The same clinic system.** The RUSH study, from the same health system and authors, looked at the care continuum from the emergency department [@flash2015rush].
 
 ## References
 

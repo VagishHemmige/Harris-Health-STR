@@ -91,6 +91,7 @@ quarto/
   published_results.qmd  # each published number and the code step behind it
   stata_map.csv          # do-file sections (line ranges) and the R chunk labels that replace them
   _stata_links.R         # builds the sectioned Stata pages and the Stata blocks under each R step from stata_map.csv
+  _function_links.R      # links each helper function to the R steps that call it, and back, by reading R/ as text
   analysis-plan.qmd, architecture.qmd, agents.qmd, repository-blueprint.qmd, about.qmd
 stata/                   # the do-files behind the paper, patient-level details removed
 docs/                    # rendered site (not committed)
