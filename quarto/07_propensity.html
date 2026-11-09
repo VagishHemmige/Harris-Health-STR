@@ -213,6 +213,13 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
  <span class="menu-text">Methodological background</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/ipw.html" class="sidebar-item-text sidebar-link"><i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text">Inverse probability weighting</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -613,7 +620,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 108-111 (Propensity score and we
 <p>Stata:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">predict</span> PropensityScore, <span class="kw">p</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">generate</span> IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The formula picks 1/p for STR patients and 1/(1-p) for the others; <code>if_else()</code> says so directly. These are average-treatment-effect weights.</p>
+<p>The formula picks 1/p for STR patients and 1/(1-p) for the others; <code>if_else()</code> says so directly. These are average-treatment-effect weights. Why they work, what they estimate, and when they go wrong are explained on <a href="../quarto/ipw.html">Inverse probability weighting</a>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1364,7 +1371,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 113-127 (Weighted balance)
 <span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="in">generate IPW=(InitialRegimenSTR/PropensityScore)+(1-InitialRegimenSTR)/(1-PropensityScore)</span></span>
 <span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a>The formula picks 1/p for STR patients and 1/(1-p) for the others; <span class="in">`if_else()`</span> says so directly. These are average-treatment-effect weights.</span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a>The formula picks 1/p for STR patients and 1/(1-p) for the others; <span class="in">`if_else()`</span> says so directly. These are average-treatment-effect weights. Why they work, what they estimate, and when they go wrong are explained on <span class="co">[</span><span class="ot">Inverse probability weighting</span><span class="co">](ipw.qmd)</span>.</span>
 <span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: compute-weights</span></span>
