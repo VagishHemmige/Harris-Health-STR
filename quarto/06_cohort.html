@@ -525,6 +525,37 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">count_patients</span>(cohort_days, <span class="st">"Dispensed antiretrovirals in the study window"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<div id="r-start-at-first-regimen" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen and drop twice-daily starts)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-start">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="kw">use</span> <span class="st">"Data Analytic file $DateOfAnalysis.dta"</span>, <span class="kw">clear</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-label="6"></a><span class="kw">generate</span> VirologicallySuppressed2=0</span>
+<span id="cb2-7"><a href="#cb2-7" aria-label="7"></a><span class="co">//The next line states that you are VL suppressed on a date if your last VL was under 400 (some pts had labs under the old system)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-label="8"></a><span class="co">//, and it was either measured in the last 90 days or it will be measured again in the next 90 days and will be suppressed then as well.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-label="9"></a><span class="co">//The new variable chooses the marker for VL suppression by year</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-label="10"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-label="11"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-label="12"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-label="13"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-label="14"></a><span class="kw">drop</span> undetectable IntakeDate FirstUndetectDate</span>
+<span id="cb2-15"><a href="#cb2-15" aria-label="15"></a><span class="kw">generate</span> InitialRegimen=CurrentRegimen <span class="kw">if</span> CurrentRegimenNumber==1</span>
+<span id="cb2-16"><a href="#cb2-16" aria-label="16"></a><span class="kw">drop</span> <span class="kw">if</span> CurrentRegimenNumber==.</span>
+<span id="cb2-17"><a href="#cb2-17" aria-label="17"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialRegimen, <span class="kw">replace</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-label="18"></a><span class="kw">generate</span> FirstObservationOfSubject=(M==1)&amp;(CurrentRegimenNumber==1)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-label="19"></a><span class="kw">generate</span> InitialRegimenBID= CurrentBIDRegimen <span class="kw">if</span> CurrentRegimenNumber==1</span>
+<span id="cb2-20"><a href="#cb2-20" aria-label="20"></a><span class="kw">by</span> studyid: carryforward InitialRegimenBID, <span class="kw">replace</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-label="21"></a><span class="kw">tab</span> InitialRegimenBID <span class="kw">if</span> FirstObservationOfSubject</span>
+<span id="cb2-22"><a href="#cb2-22" aria-label="22"></a><span class="kw">drop</span> <span class="kw">if</span> InitialRegimenBID</span>
+<span id="cb2-23"><a href="#cb2-23" aria-label="23"></a><span class="kw">drop</span> InitialRegimenBID</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
 </section>
 <section id="exclusions" class="level2">
 <h2 class="anchored" data-anchor-id="exclusions">Exclusions</h2>
@@ -534,23 +565,77 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In the order Final Analysis.do applies them. Stata's `drop if x` also drops</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># patients whose x is missing, so each filter keeps only an explicit "no".</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(initial_regimen_bid <span class="sc">%in%</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Starting regimen taken once daily"</span>))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(initial_regimen <span class="sc">%in%</span> manuscript_regimens)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Started one of the three compared regimens"</span>))</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(prior_care_elsewhere <span class="sc">%in%</span> <span class="dv">0</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"No prior HIV care elsewhere"</span>))</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(insurance_status))</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Insurance status recorded"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In the order Final Analysis.do applies them. Stata's `drop if x` also drops</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># patients whose x is missing, so each filter keeps only an explicit "no".</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(initial_regimen_bid <span class="sc">%in%</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Starting regimen taken once daily"</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(initial_regimen <span class="sc">%in%</span> manuscript_regimens)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Started one of the three compared regimens"</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(prior_care_elsewhere <span class="sc">%in%</span> <span class="dv">0</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"No prior HIV care elsewhere"</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(insurance_status))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>cohort_flow <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(cohort_flow,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">count_patients</span>(cohort_days, <span class="st">"Insurance status recorded"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-apply-exclusions" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 1-23 (Start at the first regimen and drop twice-daily starts)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-start">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="kw">use</span> <span class="st">"Data Analytic file $DateOfAnalysis.dta"</span>, <span class="kw">clear</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a><span class="kw">generate</span> VirologicallySuppressed2=0</span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a><span class="co">//The next line states that you are VL suppressed on a date if your last VL was under 400 (some pts had labs under the old system)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a><span class="co">//, and it was either measured in the last 90 days or it will be measured again in the next 90 days and will be suppressed then as well.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-label="9"></a><span class="co">//The new variable chooses the marker for VL suppression by year</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-label="10"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-label="11"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-label="12"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-label="13"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-label="14"></a><span class="kw">drop</span> undetectable IntakeDate FirstUndetectDate</span>
+<span id="cb4-15"><a href="#cb4-15" aria-label="15"></a><span class="kw">generate</span> InitialRegimen=CurrentRegimen <span class="kw">if</span> CurrentRegimenNumber==1</span>
+<span id="cb4-16"><a href="#cb4-16" aria-label="16"></a><span class="kw">drop</span> <span class="kw">if</span> CurrentRegimenNumber==.</span>
+<span id="cb4-17"><a href="#cb4-17" aria-label="17"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialRegimen, <span class="kw">replace</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-label="18"></a><span class="kw">generate</span> FirstObservationOfSubject=(M==1)&amp;(CurrentRegimenNumber==1)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-label="19"></a><span class="kw">generate</span> InitialRegimenBID= CurrentBIDRegimen <span class="kw">if</span> CurrentRegimenNumber==1</span>
+<span id="cb4-20"><a href="#cb4-20" aria-label="20"></a><span class="kw">by</span> studyid: carryforward InitialRegimenBID, <span class="kw">replace</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-label="21"></a><span class="kw">tab</span> InitialRegimenBID <span class="kw">if</span> FirstObservationOfSubject</span>
+<span id="cb4-22"><a href="#cb4-22" aria-label="22"></a><span class="kw">drop</span> <span class="kw">if</span> InitialRegimenBID</span>
+<span id="cb4-23"><a href="#cb4-23" aria-label="23"></a><span class="kw">drop</span> InitialRegimenBID</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 24-27 (Keep the three regimens and drop prior care elsewhere)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-regimens">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-startfrom="24"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 23;"><span id="cb5-24"><a href="#cb5-24" aria-label="24"></a><span class="kw">keep</span> <span class="kw">if</span> ((InitialRegimen==<span class="st">"Atripla"</span>)|(InitialRegimen==<span class="st">"Norvir/Prezista/Truvada"</span>)|(InitialRegimen==<span class="st">"Norvir/Reyataz/Truvada"</span>))</span>
+<span id="cb5-25"><a href="#cb5-25" aria-label="25"></a><span class="kw">tab</span> prevcareelsewhere <span class="kw">if</span> FirstObservationOfSubject</span>
+<span id="cb5-26"><a href="#cb5-26" aria-label="26"></a><span class="kw">display</span> 1158-1046</span>
+<span id="cb5-27"><a href="#cb5-27" aria-label="27"></a><span class="kw">drop</span> <span class="kw">if</span> prevcareelsewhere</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 40-46 (Insurance and the STR; drop missing insurance)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-insurance">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-startfrom="40"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 39;"><span id="cb6-40"><a href="#cb6-40" aria-label="40"></a><span class="kw">tab</span> Insurance <span class="kw">if</span> FirstObs</span>
+<span id="cb6-41"><a href="#cb6-41" aria-label="41"></a><span class="kw">tab</span> Insurance <span class="kw">if</span> FirstObs, <span class="fu">missing</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-label="42"></a><span class="kw">tab</span> Insurance InitialRegimenSTR <span class="kw">if</span> FirstObs, <span class="fu">missing</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-label="43"></a><span class="kw">tab</span> Insurance InitialRegimenSTR <span class="kw">if</span> FirstObs, <span class="fu">missing</span> <span class="ot">row</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-label="44"></a><span class="kw">logit</span> InitialRegimenSTR i.Insurance <span class="kw">if</span> FirstObs</span>
+<span id="cb6-45"><a href="#cb6-45" aria-label="45"></a><span class="kw">logit</span> InitialRegimenSTR i3.Insurance <span class="kw">if</span> FirstObs</span>
+<span id="cb6-46"><a href="#cb6-46" aria-label="46"></a><span class="kw">drop</span> <span class="kw">if</span> Insurance==.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -560,19 +645,50 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">art_start_date =</span> <span class="fu">first</span>(date[first_observation])) <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">str =</span> initial_regimen <span class="sc">%in%</span> single_tablet_regimens,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">on_initial_regimen =</span> regimen_number <span class="sc">==</span> <span class="dv">1</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">art_start_year =</span> <span class="fu">year</span>(art_start_date),</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">days_since_art_start =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> art_start_date),</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarter =</span> <span class="fu">cut</span>(days_since_art_start, <span class="at">breaks =</span> quarter_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">labels =</span> <span class="cn">FALSE</span>) <span class="sc">-</span> <span class="dv">1</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_year =</span> <span class="sc">!</span><span class="fu">is.na</span>(quarter)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cohort_days <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">art_start_date =</span> <span class="fu">first</span>(date[first_observation])) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">str =</span> initial_regimen <span class="sc">%in%</span> single_tablet_regimens,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">on_initial_regimen =</span> regimen_number <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">art_start_year =</span> <span class="fu">year</span>(art_start_date),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">days_since_art_start =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> art_start_date),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarter =</span> <span class="fu">cut</span>(days_since_art_start, <span class="at">breaks =</span> quarter_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">labels =</span> <span class="cn">FALSE</span>) <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_year =</span> <span class="sc">!</span><span class="fu">is.na</span>(quarter)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-define-exposure-and-time" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 29-38 (Exposure and time since ART start)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-exposure">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-startfrom="29"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 28;"><span id="cb8-29"><a href="#cb8-29" aria-label="29"></a><span class="kw">tab</span> InitialRegimen <span class="kw">if</span> (M==1)&amp;(CurrentRegimenNumber==1)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-label="30"></a><span class="kw">generate</span> InitialRegimenSTR= (InitialRegimen==<span class="st">"Stribild"</span>)|(InitialRegimen==<span class="st">"Atripla"</span>)|(InitialRegimen==<span class="st">"Complera"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-label="31"></a><span class="kw">tab</span> InitialRegimenSTR <span class="kw">if</span> FirstObservationOfSubject</span>
+<span id="cb8-32"><a href="#cb8-32" aria-label="32"></a><span class="kw">generate</span> StillTakingInitialRegimen= (CurrentRegimenNumber==1)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-label="33"></a><span class="kw">generate</span> DateofARTInitiation=CurrentDate <span class="kw">if</span> FirstObservationOfSubject</span>
+<span id="cb8-34"><a href="#cb8-34" aria-label="34"></a><span class="kw">by</span> studyid: carryforward DateofARTInitiation, <span class="kw">replace</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-label="35"></a><span class="kw">format</span> DateofARTInitiation %tdnn/dd/YY</span>
+<span id="cb8-36"><a href="#cb8-36" aria-label="36"></a><span class="kw">generate</span> YearofARTInitiation=<span class="fu">year</span>( DateofARTInitiation)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-label="37"></a><span class="kw">generate</span> DaysSinceARTInitiation= CurrentDate-DateofARTInitiation</span>
+<span id="cb8-38"><a href="#cb8-38" aria-label="38"></a><span class="kw">generate</span> WeeksSinceARTInitiation= DaysSinceARTInitiation/7</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 54-60 (Quarters of the first year)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-quarters">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-startfrom="54"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 53;"><span id="cb9-54"><a href="#cb9-54" aria-label="54"></a><span class="kw">tab</span> InitialRegimenSTR <span class="kw">if</span> FirstObs</span>
+<span id="cb9-55"><a href="#cb9-55" aria-label="55"></a></span>
+<span id="cb9-56"><a href="#cb9-56" aria-label="56"></a><span class="co">//Some quarter analysis</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-label="57"></a><span class="kw">egen</span> Quarter = <span class="fu">cut</span>( DaysSinceARTInitiation ), <span class="fu">at</span>(0,1,92,183,274,365) icodes <span class="kw">label</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-label="58"></a><span class="kw">bysort</span> studyid Quarter (CurrentDate): <span class="kw">egen</span> ProportionDaysCoveredInQuarter=<span class="kw">mean</span>( DayIsCovered)</span>
+<span id="cb9-59"><a href="#cb9-59" aria-label="59"></a><span class="kw">bysort</span> studyid Quarter (CurrentDate): <span class="kw">egen</span> AchievedVLSuppressionQuarter=<span class="fu">max</span>(VirologicallySuppressed)</span>
+<span id="cb9-60"><a href="#cb9-60" aria-label="60"></a><span class="kw">replace</span> AchievedVLSuppressionQuarter=. <span class="kw">if</span> Quarter==.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -582,16 +698,37 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row per patient, with the baseline viral load and CD4 as the last values</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># on or before the day ART started.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(first_observation) <span class="sc">|&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    studyid, str, initial_regimen, art_start_date, art_start_year,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    age, male, black, hispanic, idu, msm, hepc, primaryriskfactor, ethnicity,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    insurance_status, had_psych_visit,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_vl =</span> lvcf_vl, <span class="at">baseline_cd4 =</span> lvcf_cd4</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row per patient, with the baseline viral load and CD4 as the last values</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># on or before the day ART started.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> cohort_days <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(first_observation) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    studyid, str, initial_regimen, art_start_date, art_start_year,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    age, male, black, hispanic, idu, msm, hepc, primaryriskfactor, ethnicity,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    insurance_status, had_psych_visit,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_vl =</span> lvcf_vl, <span class="at">baseline_cd4 =</span> lvcf_cd4</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-build-patient-table" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the propensity model)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-categories">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-startfrom="88"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 87;"><span id="cb11-88"><a href="#cb11-88" aria-label="88"></a><span class="co">//We create a variable which categorizes age:</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-label="89"></a><span class="kw">egen</span> AgeCategorical = <span class="fu">cut</span>( age), <span class="fu">at</span>(0, 25,35,45,55,65, 100) icodes <span class="kw">label</span></span>
+<span id="cb11-90"><a href="#cb11-90" aria-label="90"></a><span class="kw">tab</span> InitialRegimenSTR AgeCategorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-label="91"></a></span>
+<span id="cb11-92"><a href="#cb11-92" aria-label="92"></a><span class="co">//We create a variable which categorizes initial viral load</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-label="93"></a><span class="kw">egen</span> InitialViralLoadCategorical = <span class="fu">cut</span>( LVCFViralLoad ) <span class="kw">if</span> FirstObservationOfSubject, <span class="fu">at</span>(0, 401,1000,10000,100000,1000000,10000001) icodes <span class="kw">label</span></span>
+<span id="cb11-94"><a href="#cb11-94" aria-label="94"></a><span class="kw">tab</span> InitialRegimenSTR InitialViralLoadCategorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb11-95"><a href="#cb11-95" aria-label="95"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialViralLoadCategorical, <span class="kw">replace</span></span>
+<span id="cb11-96"><a href="#cb11-96" aria-label="96"></a></span>
+<span id="cb11-97"><a href="#cb11-97" aria-label="97"></a><span class="co">//We create a variable which categorizes initial CD4</span></span>
+<span id="cb11-98"><a href="#cb11-98" aria-label="98"></a><span class="kw">egen</span> InitialCD4Categorical = <span class="fu">cut</span>( LVCFCD4 ) <span class="kw">if</span> FirstObservationOfSubject, <span class="fu">at</span>(0, 50,100,200,500,1000000) icodes <span class="kw">label</span></span>
+<span id="cb11-99"><a href="#cb11-99" aria-label="99"></a><span class="kw">tab</span> InitialRegimenSTR InitialCD4Categorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb11-100"><a href="#cb11-100" aria-label="100"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialCD4Categorical, <span class="kw">replace</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -601,19 +738,40 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The propensity model used "i3.Insurance": an indicator for the third</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># insurance category in the whole insurance file, in character-code order</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (insurance_categories, 02_labs_and_baseline.R). The paper describes this</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># covariate as insured vs uninsured.</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_group =</span> <span class="fu">cut</span>(age, <span class="at">breaks =</span> age_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_vl_group =</span> <span class="fu">cut</span>(baseline_vl, <span class="at">breaks =</span> vl_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">dig.lab =</span> <span class="dv">8</span>),</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_cd4_group =</span> <span class="fu">cut</span>(baseline_cd4, <span class="at">breaks =</span> cd4_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">dig.lab =</span> <span class="dv">8</span>),</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">insurance_category_3 =</span> insurance_status <span class="sc">==</span> insurance_categories[<span class="dv">3</span>]</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The propensity model used "i3.Insurance": an indicator for the third</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># insurance category in the whole insurance file, in character-code order</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (insurance_categories, 02_labs_and_baseline.R). The paper describes this</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># covariate as insured vs uninsured.</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> patients <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_group =</span> <span class="fu">cut</span>(age, <span class="at">breaks =</span> age_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_vl_group =</span> <span class="fu">cut</span>(baseline_vl, <span class="at">breaks =</span> vl_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">dig.lab =</span> <span class="dv">8</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_cd4_group =</span> <span class="fu">cut</span>(baseline_cd4, <span class="at">breaks =</span> cd4_breaks, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">dig.lab =</span> <span class="dv">8</span>),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">insurance_category_3 =</span> insurance_status <span class="sc">==</span> insurance_categories[<span class="dv">3</span>]</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-categorise-baseline-values" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Final Analysis.do</code>, lines 88-100 (Categories for the propensity model)
+</summary>
+<p><a href="../quarto/stata_final_analysis.html#fa-categories">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-startfrom="88"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 87;"><span id="cb13-88"><a href="#cb13-88" aria-label="88"></a><span class="co">//We create a variable which categorizes age:</span></span>
+<span id="cb13-89"><a href="#cb13-89" aria-label="89"></a><span class="kw">egen</span> AgeCategorical = <span class="fu">cut</span>( age), <span class="fu">at</span>(0, 25,35,45,55,65, 100) icodes <span class="kw">label</span></span>
+<span id="cb13-90"><a href="#cb13-90" aria-label="90"></a><span class="kw">tab</span> InitialRegimenSTR AgeCategorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb13-91"><a href="#cb13-91" aria-label="91"></a></span>
+<span id="cb13-92"><a href="#cb13-92" aria-label="92"></a><span class="co">//We create a variable which categorizes initial viral load</span></span>
+<span id="cb13-93"><a href="#cb13-93" aria-label="93"></a><span class="kw">egen</span> InitialViralLoadCategorical = <span class="fu">cut</span>( LVCFViralLoad ) <span class="kw">if</span> FirstObservationOfSubject, <span class="fu">at</span>(0, 401,1000,10000,100000,1000000,10000001) icodes <span class="kw">label</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-label="94"></a><span class="kw">tab</span> InitialRegimenSTR InitialViralLoadCategorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb13-95"><a href="#cb13-95" aria-label="95"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialViralLoadCategorical, <span class="kw">replace</span></span>
+<span id="cb13-96"><a href="#cb13-96" aria-label="96"></a></span>
+<span id="cb13-97"><a href="#cb13-97" aria-label="97"></a><span class="co">//We create a variable which categorizes initial CD4</span></span>
+<span id="cb13-98"><a href="#cb13-98" aria-label="98"></a><span class="kw">egen</span> InitialCD4Categorical = <span class="fu">cut</span>( LVCFCD4 ) <span class="kw">if</span> FirstObservationOfSubject, <span class="fu">at</span>(0, 50,100,200,500,1000000) icodes <span class="kw">label</span></span>
+<span id="cb13-99"><a href="#cb13-99" aria-label="99"></a><span class="kw">tab</span> InitialRegimenSTR InitialCD4Categorical <span class="kw">if</span> FirstObservationOfSubject, <span class="ot">row</span> column <span class="fu">chi2</span></span>
+<span id="cb13-100"><a href="#cb13-100" aria-label="100"></a><span class="kw">bysort</span> studyid (CurrentDate): carryforward InitialCD4Categorical, <span class="kw">replace</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1162,83 +1320,119 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "6. Cohort"</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>This script selects the published cohort, records how many patients each exclusion removes, and builds one row per patient with the values at the start of ART. It produces <span class="in">`cohort_days`</span>, <span class="in">`patients`</span> and <span class="in">`cohort_flow`</span> for <span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd)</span> and <span class="co">[</span><span class="ot">8. Outcomes</span><span class="co">](08_outcomes.qmd)</span>.</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/06_cohort.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/06_cohort.R)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Translated from the first part of <span class="co">[</span><span class="ot">`stata/Do Final Analysis.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do)</span> (to line 57).</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/06_cohort.R"</span>)</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start at the first regimen</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>Days before the first regimen are dropped. Each patient's initial regimen, and whether it was twice daily, is that of regimen 1. Stata generated the value on regimen-1 days and used <span class="in">`carryforward`</span> to copy it down; taking it from regimen 1 directly gives the same value on every row.</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: start-at-first-regimen</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exclusions</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>One Stata habit needs care. <span class="in">`drop if InitialRegimenBID`</span> drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise <span class="in">`drop if prevcareelsewhere`</span> drops patients with that field missing. The R filters keep only an explicit "no" (<span class="in">`%in% FALSE`</span>, <span class="in">`%in% 0`</span>) to match.</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>**From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper's methods; the code is the record of what was done.</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-exclusions</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exposure and time</span></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen 1. <span class="in">`quarter`</span> is 0 for day 0, then 1 to 4 for days 1-91, 92-182, 183-273 and 274-364, and missing afterwards (Stata: <span class="in">`egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes`</span>). <span class="in">`first_year`</span> marks days 0-364.</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: define-exposure-and-time</span></span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## One row per patient</span></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>Stata kept the daily data and picked out each patient's first day with <span class="in">`if FirstObservationOfSubject`</span> on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before.</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-patient-table</span></span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a><span class="fu">## Categories for the propensity model</span></span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>Age, baseline viral load and baseline CD4 are put in the same groups as the Stata <span class="in">`egen cut()`</span> lines. The insurance term in the propensity model, <span class="in">`i3.Insurance`</span>, is an indicator for the third category in alphabetical order, because <span class="in">`encode`</span> numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.</span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: categorise-baseline-values</span></span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "6. Cohort"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>This script selects the published cohort, records how many patients each exclusion removes, and builds one row per patient with the values at the start of ART. It produces <span class="in">`cohort_days`</span>, <span class="in">`patients`</span> and <span class="in">`cohort_flow`</span> for <span class="co">[</span><span class="ot">7. Propensity score</span><span class="co">](07_propensity.qmd)</span> and <span class="co">[</span><span class="ot">8. Outcomes</span><span class="co">](08_outcomes.qmd)</span>.</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/06_cohort.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/06_cohort.R)</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>Translated from the first part of <span class="co">[</span><span class="ot">`stata/Do Final Analysis.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Final%20Analysis.do)</span> (to line 57).</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/06_cohort.R"</span>)</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"_stata_links.R"</span>)</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start at the first regimen</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>Days before the first regimen are dropped. Each patient's initial regimen, and whether it was twice daily, is that of regimen 1. Stata generated the value on regimen-1 days and used <span class="in">`carryforward`</span> to copy it down; taking it from regimen 1 directly gives the same value on every row.</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: start-at-first-regimen</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"start-at-first-regimen"</span>)</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exclusions</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>In the order Final Analysis.do applies them, with the number of patients left after each, which is what a STROBE flow diagram reports.</span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>One Stata habit needs care. <span class="in">`drop if InitialRegimenBID`</span> drops rows where the variable is non-zero, and Stata treats a missing value as non-zero, so patients with a missing value are dropped too. A patient whose first regimen started before 2008 has no regimen-1 rows on the grid, so their value is missing and they leave here. Likewise <span class="in">`drop if prevcareelsewhere`</span> drops patients with that field missing. The R filters keep only an explicit "no" (<span class="in">`%in% FALSE`</span>, <span class="in">`%in% 0`</span>) to match.</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>**From the code:** the exclusions for prior care elsewhere and missing insurance are not mentioned in the paper's methods; the code is the record of what was done.</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-exclusions</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"apply-exclusions"</span>)</span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exposure and time</span></span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>The STR group is patients whose initial regimen is a single tablet; among the three compared regimens that is Atripla. Time zero is the first day of regimen 1. <span class="in">`quarter`</span> is 0 for day 0, then 1 to 4 for days 1-91, 92-182, 183-273 and 274-364, and missing afterwards (Stata: <span class="in">`egen Quarter = cut(DaysSinceARTInitiation), at(0,1,92,183,274,365) icodes`</span>). <span class="in">`first_year`</span> marks days 0-364.</span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: define-exposure-and-time</span></span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"define-exposure-and-time"</span>)</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="fu">## One row per patient</span></span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>Stata kept the daily data and picked out each patient's first day with <span class="in">`if FirstObservationOfSubject`</span> on every command. R keeps a separate patient table, which is easier to read and to model. The baseline viral load and CD4 are the last values on or before the day ART started, with no limit on how long before.</span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-patient-table</span></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"build-patient-table"</span>)</span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## Categories for the propensity model</span></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>Age, baseline viral load and baseline CD4 are put in the same groups as the Stata <span class="in">`egen cut()`</span> lines. The insurance term in the propensity model, <span class="in">`i3.Insurance`</span>, is an indicator for the third category in alphabetical order, because <span class="in">`encode`</span> numbers text categories alphabetically. The paper describes this covariate as insured vs uninsured; which category is third depends on the categories in the real file.</span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: categorise-baseline-values</span></span>
+<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"categorise-baseline-values"</span>)</span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

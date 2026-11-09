@@ -514,6 +514,34 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>fills_raw <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"dispensing"</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<div id="r-read-fills" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 1-9 (Read the dispensing file)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-read">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co">//Flash-Zerai analysis</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co">//Step 0 file</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co">//This file assigns an initial regimen and current regimen to every patient</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a><span class="co">//11-1-2015 version</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-label="6"></a><span class="kw">clear</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-label="7"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-label="8"></a><span class="co">//Input the antiretroviral dispensing file</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-label="9"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"Excel Antiretrovirals_Taken_DeID.csv"</span>, <span class="kw">comma</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 1-5 (Read the dispensing file again)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s1a-read">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co">//Creates pharmacy data from initial file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="co">//Inputs the pharmacy file</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-label="4"></a><span class="kw">clear</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-label="5"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"Excel Antiretrovirals_Taken_DeID.csv"</span>, <span class="kw">comma</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
 </section>
 <section id="fix-drug-names-and-flag-twice-daily-products" class="level2">
 <h2 class="anchored" data-anchor-id="fix-drug-names-and-flag-twice-daily-products">Fix drug names and flag twice-daily products</h2>
@@ -521,34 +549,144 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills_raw <span class="sc">|&gt;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(drug_name_fixes, <span class="at">by =</span> <span class="st">"cdmdescription"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">drugname =</span> <span class="fu">coalesce</span>(fixed_drugname, drugname),</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">dispense_date =</span> <span class="fu">mdy</span>(medtransdate),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">bid_drug =</span> cdmdescription <span class="sc">%in%</span> bid_descriptions</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(drugname), drugname <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(studyid, dispense_date, drugname, cdmdescription, bid_drug)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills_raw <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(drug_name_fixes, <span class="at">by =</span> <span class="st">"cdmdescription"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">drugname =</span> <span class="fu">coalesce</span>(fixed_drugname, drugname),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">dispense_date =</span> <span class="fu">mdy</span>(medtransdate),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">bid_drug =</span> cdmdescription <span class="sc">%in%</span> bid_descriptions</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(drugname), drugname <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(studyid, dispense_date, drugname, cdmdescription, bid_drug)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-fix-drug-names" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 11-23 (Fix drug names and convert dates)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-fix-names">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-startfrom="11"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 10;"><span id="cb5-11"><a href="#cb5-11" aria-label="11"></a><span class="co">//Several medications are listed as "Experimental" or "other" in drug name</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-label="12"></a><span class="co">//We replace these with the actual drug name</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-label="13"></a><span class="kw">replace</span> drugname=<span class="st">"Kaletra"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 KALETRA 200/50MG TAB"</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-label="14"></a><span class="kw">replace</span> drugname=<span class="st">"Kaletra"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LOPINAVIR/RI"</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-label="15"></a><span class="kw">replace</span> drugname=<span class="st">"Epivir"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LAMIVUDINE 1"</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-label="16"></a><span class="kw">replace</span> drugname=<span class="st">"Epivir"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LAMIVUDINE 300MG TAB"</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-label="17"></a><span class="kw">replace</span> drugname=<span class="st">"Isentress"</span> <span class="kw">if</span> cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-label="18"></a><span class="kw">replace</span> drugname=<span class="st">"Complera"</span> <span class="kw">if</span> cdmdescription==<span class="st">"COMPLERA 200-25-300 TAB"</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-label="19"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-label="20"></a><span class="co">//Converts the string date to a Stata date and drops the variable with the string date</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-label="21"></a><span class="kw">generate</span> ARTDate=<span class="fu">date</span>( medtransdate , <span class="st">"MDY"</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-label="22"></a><span class="kw">format</span> ARTDate %tdnn/dd/YY</span>
+<span id="cb5-23"><a href="#cb5-23" aria-label="23"></a><span class="kw">drop</span> medtransdate</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 36-40 (Flag twice-daily products)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-bid">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-startfrom="36"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 35;"><span id="cb6-36"><a href="#cb6-36" aria-label="36"></a><span class="co">//We create a variable BIDDrug which labels a drug being dispensed as BID.</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-label="37"></a><span class="kw">generate</span> BIDDrug=0</span>
+<span id="cb6-38"><a href="#cb6-38" aria-label="38"></a><span class="kw">replace</span> BIDDrug=1 <span class="kw">if</span> (cdmdescription==<span class="st">"KALETRA SOLN 400-100"</span> |cdmdescription==<span class="st">"KALETRA      400-100"</span>|cdmdescription==<span class="st">"ISENTRESS 400MG TAB"</span> |cdmdescription==<span class="st">"INTELENCE 200MG TAB"</span> |cdmdescription==<span class="st">"INTELENCE 100MG TAB"</span> | cdmdescription==<span class="st">"HSC-090025 RALTEGRAV"</span> |cdmdescription==<span class="st">"HSC-080661 RALTEGRAV"</span> |cdmdescription==<span class="st">"HSC-080071 RALTEGRAV"</span> | cdmdescription==<span class="st">"HSC-080071 RALTEGRAV"</span>| cdmdescription==<span class="st">"HSC-070511 RALTEGRAV"</span>| cdmdescription==<span class="st">"H-23052 LOPINAVIR/RI"</span>| cdmdescription==<span class="st">"H-23052 KALETRA 200/5"</span>| cdmdescription==<span class="st">"DARUNAVIR 600MG TAB"</span>| cdmdescription==<span class="st">"DARUNAVIR 300MG"</span>| cdmdescription==<span class="st">"COMBIVIR 300-150 TAB"</span>|cdmdescription==<span class="st">"H-23052 KALETRA 200/50MG TAB"</span>|cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"HSC-080661 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"KALETRA      400-100 LIQ"</span>|cdmdescription==<span class="st">"KALETRA 200-50MG TAB"</span>|cdmdescription==<span class="st">"KALETRA SOLN 400-100 LIQ"</span>|cdmdescription==<span class="st">"HSC-080071 RALTEGRAV 400MG T"</span> )</span>
+<span id="cb6-39"><a href="#cb6-39" aria-label="39"></a><span class="kw">replace</span> BIDDrug=1 <span class="kw">if</span> ( cdmdescription==<span class="st">"ZIDOVUDINE SYRUP 50MG/5ML SY"</span> | cdmdescription==<span class="st">"ZIDOVUDINE 300MG TAB"</span> | cdmdescription==<span class="st">"TRIZIVIR 300/150/300"</span> |cdmdescription==<span class="st">"TRIZIVIR 300-300-150 TAB"</span> | cdmdescription==<span class="st">"SELZENTRY 150MG TAB"</span> |cdmdescription==<span class="st">"RITONAVIR-LOPINAVIR"</span> |cdmdescription==<span class="st">"RETROVIR SYRUP 50MG/5ML SYR"</span>|cdmdescription==<span class="st">"RETROVIR 50MG/5ML SYR"</span> |cdmdescription==<span class="st">"RALTEGRAVIR 400MG"</span> |cdmdescription==<span class="st">"PREZISTA 600MG TAB"</span> | cdmdescription==<span class="st">"MARAVIROC 150 MG TAB"</span> |cdmdescription==<span class="st">"LOPINAVIR/RITONAVIR"</span> |cdmdescription==<span class="st">"LAMIVUDINE/ZIDOVUDIN"</span>|cdmdescription==<span class="st">"LAMIVUDINE-ZIDOVUDIN TAB"</span>   )</span>
+<span id="cb6-40"><a href="#cb6-40" aria-label="40"></a><span class="kw">tab</span> cdmdescription BIDDrug</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 7-19 (Fix drug names and convert dates)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s1a-fix">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-startfrom="7"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 6;"><span id="cb7-7"><a href="#cb7-7" aria-label="7"></a><span class="co">//Changes the patients for whom drugname is "Experimental" or "Other"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a><span class="kw">replace</span> drugname=<span class="st">"Kaletra"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 KALETRA 200/50MG TAB"</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a><span class="kw">replace</span> drugname=<span class="st">"Kaletra"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LOPINAVIR/RI"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a><span class="kw">replace</span> drugname=<span class="st">"Epivir"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LAMIVUDINE 1"</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a><span class="kw">replace</span> drugname=<span class="st">"Epivir"</span> <span class="kw">if</span> cdmdescription==<span class="st">"H-23052 LAMIVUDINE 300MG TAB"</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-label="12"></a><span class="kw">replace</span> drugname=<span class="st">"Isentress"</span> <span class="kw">if</span> cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-label="13"></a><span class="kw">replace</span> drugname=<span class="st">"Complera"</span> <span class="kw">if</span> cdmdescription==<span class="st">"COMPLERA 200-25-300 TAB"</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-label="14"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-label="15"></a><span class="co">//Convert Date from string to Stata format and sorts</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-label="16"></a><span class="kw">generate</span> ARTDate=<span class="fu">date</span>( medtransdate , <span class="st">"MDY"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-label="17"></a><span class="kw">format</span> ARTDate %tdnn/dd/YY</span>
+<span id="cb7-18"><a href="#cb7-18" aria-label="18"></a><span class="kw">drop</span> medtransdate</span>
+<span id="cb7-19"><a href="#cb7-19" aria-label="19"></a><span class="kw">sort</span> studyid ARTDate</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 29-39 (Flag twice-daily and single-tablet products)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s1a-flags">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-startfrom="29"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 28;"><span id="cb8-29"><a href="#cb8-29" aria-label="29"></a><span class="co">//we label regimens which are BID and which are single pill</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-label="30"></a><span class="kw">tab</span> cdmdescription</span>
+<span id="cb8-31"><a href="#cb8-31" aria-label="31"></a><span class="kw">generate</span> BIDDrug=0</span>
+<span id="cb8-32"><a href="#cb8-32" aria-label="32"></a><span class="kw">replace</span> BIDDrug=1 <span class="kw">if</span> ( cdmdescription==<span class="st">"ZIDOVUDINE SYRUP 50MG/5ML SY"</span> | cdmdescription==<span class="st">"ZIDOVUDINE 300MG TAB"</span> | cdmdescription==<span class="st">"TRIZIVIR 300/150/300"</span> |cdmdescription==<span class="st">"TRIZIVIR 300-300-150 TAB"</span> | cdmdescription==<span class="st">"SELZENTRY 150MG TAB"</span> |cdmdescription==<span class="st">"RITONAVIR-LOPINAVIR"</span> |cdmdescription==<span class="st">"RETROVIR SYRUP 50MG/5ML SYR"</span>|cdmdescription==<span class="st">"RETROVIR 50MG/5ML SYR"</span> |cdmdescription==<span class="st">"RALTEGRAVIR 400MG"</span> |cdmdescription==<span class="st">"PREZISTA 600MG TAB"</span> | cdmdescription==<span class="st">"MARAVIROC 150 MG TAB"</span> |cdmdescription==<span class="st">"LOPINAVIR/RITONAVIR"</span> |cdmdescription==<span class="st">"LAMIVUDINE/ZIDOVUDIN"</span>|cdmdescription==<span class="st">"LAMIVUDINE-ZIDOVUDIN TAB"</span>   )</span>
+<span id="cb8-33"><a href="#cb8-33" aria-label="33"></a><span class="kw">replace</span> BIDDrug=1 <span class="kw">if</span> (cdmdescription==<span class="st">"KALETRA SOLN 400-100"</span> |cdmdescription==<span class="st">"KALETRA      400-100"</span>|cdmdescription==<span class="st">"ISENTRESS 400MG TAB"</span> |cdmdescription==<span class="st">"INTELENCE 200MG TAB"</span> |cdmdescription==<span class="st">"INTELENCE 100MG TAB"</span> | cdmdescription==<span class="st">"HSC-090025 RALTEGRAV"</span> |cdmdescription==<span class="st">"HSC-080661 RALTEGRAV"</span> |cdmdescription==<span class="st">"HSC-080071 RALTEGRAV"</span> | cdmdescription==<span class="st">"HSC-080071 RALTEGRAV"</span>| cdmdescription==<span class="st">"HSC-070511 RALTEGRAV"</span>| cdmdescription==<span class="st">"H-23052 LOPINAVIR/RI"</span>| cdmdescription==<span class="st">"H-23052 KALETRA 200/5"</span>| cdmdescription==<span class="st">"DARUNAVIR 600MG TAB"</span>| cdmdescription==<span class="st">"DARUNAVIR 300MG"</span>| cdmdescription==<span class="st">"COMBIVIR 300-150 TAB"</span>|cdmdescription==<span class="st">"H-23052 KALETRA 200/50MG TAB"</span>|cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"HSC-070511 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"HSC-080661 RALTEGRAV 400MG T"</span>|cdmdescription==<span class="st">"KALETRA      400-100 LIQ"</span>|cdmdescription==<span class="st">"KALETRA 200-50MG TAB"</span>|cdmdescription==<span class="st">"KALETRA SOLN 400-100 LIQ"</span>|cdmdescription==<span class="st">"HSC-080071 RALTEGRAV 400MG T"</span> )</span>
+<span id="cb8-34"><a href="#cb8-34" aria-label="34"></a><span class="kw">tab</span> cdmdescription BIDDrug</span>
+<span id="cb8-35"><a href="#cb8-35" aria-label="35"></a><span class="kw">generate</span> SinglePillRegimen=0</span>
+<span id="cb8-36"><a href="#cb8-36" aria-label="36"></a><span class="kw">replace</span> SinglePillRegimen=1 <span class="kw">if</span> (cdmdescription==<span class="st">"STRIBILD  TAB"</span>|cdmdescription==<span class="st">"ATRIPLA TAB"</span>|cdmdescription==<span class="st">"ATRIPLA 200-300-600M"</span>| cdmdescription==<span class="st">"COMPLERA 200-25-300 TAB"</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-label="37"></a><span class="kw">tab</span> cdmdescription SinglePillRegimen</span>
+<span id="cb8-38"><a href="#cb8-38" aria-label="38"></a><span class="kw">sort</span> studyid</span>
+<span id="cb8-39"><a href="#cb8-39" aria-label="39"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="name-the-regimen-on-each-fill-date" class="level2">
 <h2 class="anchored" data-anchor-id="name-the-regimen-on-each-fill-date">Name the regimen on each fill date</h2>
 <p>The drugs filled on the same day, sorted alphabetically and joined with “/”, make that day’s regimen name. In Stata this took a <code>reshape wide</code> by drug, a loop to paste the names together, a string trick to trim trailing slashes, and a <code>reshape long</code> back:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">bysort</span> studyid DispenseNumber ( drugname) : <span class="kw">generate</span> M=<span class="dt">_n</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">reshape</span> <span class="kw">wide</span> drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">generate</span> CurrentRegimen=drugname1</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>forvalue i=2(1)<span class="ot">$SizeOfLargestRegimen</span> {</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">replace</span> CurrentRegimen=CurrentRegimen+<span class="st">"/"</span>+ drugname<span class="ot">`i'</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">bysort</span> studyid DispenseNumber ( drugname) : <span class="kw">generate</span> M=<span class="dt">_n</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">reshape</span> <span class="kw">wide</span> drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">generate</span> CurrentRegimen=drugname1</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>forvalue i=2(1)<span class="ot">$SizeOfLargestRegimen</span> {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">replace</span> CurrentRegimen=CurrentRegimen+<span class="st">"/"</span>+ drugname<span class="ot">`i'</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>In R it is a grouped summary.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, dispense_date) <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">regimen =</span> <span class="fu">make_regimen_name</span>(drugname), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, dispense_date) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">regimen =</span> <span class="fu">make_regimen_name</span>(drugname), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-name-regimen-per-fill-date" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 25-34 (Number each patient’s fill dates)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-dispense-number">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-startfrom="25"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 24;"><span id="cb11-25"><a href="#cb11-25" aria-label="25"></a><span class="co">//Now, we generate a variable DispenseNumber that keeps a running total of how many unique dispense dates</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-label="26"></a><span class="co">//each patient has, after sorting and creating a variable NewDispense which labels the first dispense for every pt and unique date:</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-label="27"></a><span class="kw">sort</span> studyid ARTDate drugname</span>
+<span id="cb11-28"><a href="#cb11-28" aria-label="28"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-label="29"></a><span class="kw">generate</span> NewDispense=0</span>
+<span id="cb11-30"><a href="#cb11-30" aria-label="30"></a><span class="kw">by</span> studyid: <span class="kw">replace</span> NewDispense=1 <span class="kw">if</span> ((<span class="kw">N</span>&gt;1)&amp;( ARTDate[<span class="dt">_n</span>]&gt;ARTDate[<span class="dt">_n</span>-1]))</span>
+<span id="cb11-31"><a href="#cb11-31" aria-label="31"></a><span class="kw">replace</span> NewDispense=1 <span class="kw">if</span> <span class="kw">N</span>==1</span>
+<span id="cb11-32"><a href="#cb11-32" aria-label="32"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> DispenseNumber=<span class="kw">sum</span>(NewDispense)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-label="33"></a><span class="kw">drop</span> NewDispense</span>
+<span id="cb11-34"><a href="#cb11-34" aria-label="34"></a><span class="kw">drop</span> <span class="kw">N</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 42-59 (Name the regimen on each fill date)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-name-regimen">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-startfrom="42"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 41;"><span id="cb12-42"><a href="#cb12-42" aria-label="42"></a><span class="co">//We now create a string variable CurrentRegimen which contains the current regimen on that date based on medications filled on that date</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-label="43"></a><span class="kw">bysort</span> studyid DispenseNumber ( drugname) : <span class="kw">generate</span> M=<span class="dt">_n</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-label="44"></a><span class="kw">quietly</span> <span class="kw">summarize</span> M</span>
+<span id="cb12-45"><a href="#cb12-45" aria-label="45"></a><span class="kw">global</span> SizeOfLargestRegimen <span class="ot">`r(max)'</span> <span class="co">//Stores the maximum number of drugs any patient is taking simultaneously</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-label="46"></a></span>
+<span id="cb12-47"><a href="#cb12-47" aria-label="47"></a><span class="co">//Now we reshape wide based on number of drugs dispensed on a date</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-label="48"></a><span class="kw">reshape</span> <span class="kw">wide</span> drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)</span>
+<span id="cb12-49"><a href="#cb12-49" aria-label="49"></a></span>
+<span id="cb12-50"><a href="#cb12-50" aria-label="50"></a><span class="co">//The following loop creates the variable CurrentRegimen by adding together the various drugnames for any given date</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-label="51"></a><span class="kw">generate</span> CurrentRegimen=drugname1</span>
+<span id="cb12-52"><a href="#cb12-52" aria-label="52"></a>forvalue i=2(1)<span class="ot">$SizeOfLargestRegimen</span> {</span>
+<span id="cb12-53"><a href="#cb12-53" aria-label="53"></a><span class="kw">replace</span> CurrentRegimen=CurrentRegimen+<span class="st">"/"</span>+ drugname<span class="ot">`i'</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-label="54"></a>}</span>
+<span id="cb12-55"><a href="#cb12-55" aria-label="55"></a><span class="kw">replace</span> CurrentRegimen = <span class="fu">reverse</span>(<span class="fu">substr</span>(<span class="fu">reverse</span>(CurrentRegimen), <span class="fu">indexnot</span>(<span class="fu">reverse</span>(CurrentRegimen), <span class="st">"/"</span>), .)) <span class="co">//Trims unnecessary /'s at end of line</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-label="56"></a><span class="co">//Now we reshape wide so that each row is a single drug dispensed on a single date</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-label="57"></a><span class="kw">reshape</span> <span class="kw">long</span> drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug, i( studyid DispenseNumber ) j( M)</span>
+<span id="cb12-58"><a href="#cb12-58" aria-label="58"></a><span class="kw">drop</span> M</span>
+<span id="cb12-59"><a href="#cb12-59" aria-label="59"></a><span class="kw">drop</span> <span class="kw">if</span> drugname==<span class="st">""</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -559,8 +697,26 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>regimen_corrections <span class="ot">&lt;-</span> <span class="fu">read_regimen_corrections</span>(regimen_corrections_file)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> <span class="fu">apply_regimen_corrections</span>(dispense_regimens, regimen_corrections)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>regimen_corrections <span class="ot">&lt;-</span> <span class="fu">read_regimen_corrections</span>(regimen_corrections_file)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dispense_regimens <span class="ot">&lt;-</span> <span class="fu">apply_regimen_corrections</span>(dispense_regimens, regimen_corrections)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-apply-manual-corrections" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 61-70 (Manual corrections (removed))
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-corrections">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-startfrom="61"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 60;"><span id="cb14-61"><a href="#cb14-61" aria-label="61"></a><span class="co">//Obviously, the above code fails if a patient is only filling part of the regimen.</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-label="62"></a><span class="co">//Accordingly, we manually fix the errors that result:</span></span>
+<span id="cb14-63"><a href="#cb14-63" aria-label="63"></a></span>
+<span id="cb14-64"><a href="#cb14-64" aria-label="64"></a><span class="co">//--- REMOVED FOR PRIVACY --------------------------------------------</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-label="65"></a><span class="co">// 576 manual per-patient correction(s) to CurrentRegimen were applied here, one per line, of the form</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-label="66"></a><span class="co">//   replace CurrentRegimen="&lt;regimen&gt;" if ((studyid==&lt;id&gt;) &amp; (ARTDate==date("&lt;m/d/y&gt;", "MDY")))</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-label="67"></a><span class="co">// (396 limited to a dispensing date or date range; 180 applied to all of a patient's fills).</span></span>
+<span id="cb14-68"><a href="#cb14-68" aria-label="68"></a><span class="co">// 43 comment line(s) describing individual patients were also removed.</span></span>
+<span id="cb14-69"><a href="#cb14-69" aria-label="69"></a><span class="co">// Study IDs and dates are not published. See stata/README.md.</span></span>
+<span id="cb14-70"><a href="#cb14-70" aria-label="70"></a><span class="co">//--------------------------------------------------------------------</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -570,12 +726,38 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># When Complera was new, some fills were recorded as Truvada. Once a fill date's</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regimen is Complera, a Truvada fill on that date is recoded as Complera.</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dispense_regimens, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"dispense_date"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">drugname =</span> <span class="fu">if_else</span>(drugname <span class="sc">==</span> <span class="st">"Truvada"</span> <span class="sc">&amp;</span> regimen <span class="sc">==</span> <span class="st">"Complera"</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"Complera"</span>, drugname))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># When Complera was new, some fills were recorded as Truvada. Once a fill date's</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># regimen is Complera, a Truvada fill on that date is recoded as Complera.</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fills <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dispense_regimens, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"dispense_date"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">drugname =</span> <span class="fu">if_else</span>(drugname <span class="sc">==</span> <span class="st">"Truvada"</span> <span class="sc">&amp;</span> regimen <span class="sc">==</span> <span class="st">"Complera"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"Complera"</span>, drugname))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-recode-early-complera" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 72-76 (Recode early Complera)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-complera">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-startfrom="72"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 71;"><span id="cb16-72"><a href="#cb16-72" aria-label="72"></a><span class="co">//Early after Complera came out, it is saved in the database as Truvada</span></span>
+<span id="cb16-73"><a href="#cb16-73" aria-label="73"></a><span class="co">//We need to replace this with the actual drug:</span></span>
+<span id="cb16-74"><a href="#cb16-74" aria-label="74"></a><span class="kw">tab</span> studyid <span class="kw">if</span> (drugname==<span class="st">"Truvada"</span> &amp;&amp; CurrentRegimen==<span class="st">"Complera"</span>)</span>
+<span id="cb16-75"><a href="#cb16-75" aria-label="75"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb16-76"><a href="#cb16-76" aria-label="76"></a><span class="kw">replace</span> drugname=<span class="st">"Complera"</span> <span class="kw">if</span> (drugname==<span class="st">"Truvada"</span> &amp;&amp; CurrentRegimen==<span class="st">"Complera"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 1A Pharmacy Part 1.do</code>, lines 21-27 (Complera corrections (removed))
+</summary>
+<p><a href="../quarto/stata_data_build.html#s1a-corrections">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-startfrom="21"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 20;"><span id="cb17-21"><a href="#cb17-21" aria-label="21"></a><span class="co">//--- REMOVED FOR PRIVACY --------------------------------------------</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-label="22"></a><span class="co">// 5 manual per-patient correction(s) to drugname were applied here, one per line, of the form</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-label="23"></a><span class="co">//   replace drugname="&lt;regimen&gt;" if ((studyid==&lt;id&gt;) &amp; (ARTDate==date("&lt;m/d/y&gt;", "MDY")))</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-label="24"></a><span class="co">// (3 limited to a dispensing date or date range; 2 applied to all of a patient's fills).</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-label="25"></a><span class="co">// 1 comment line(s) describing individual patients were also removed.</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-label="26"></a><span class="co">// Study IDs and dates are not published. See stata/README.md.</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-label="27"></a><span class="co">//--------------------------------------------------------------------</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -585,10 +767,69 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata cross-tabulated drugs against regimens to find implausible pairs, then</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># looked at the patients behind each. This is the same table.</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>regimen_drug_check <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(regimen, drugname)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata cross-tabulated drugs against regimens to find implausible pairs, then</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># looked at the patients behind each. This is the same table.</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>regimen_drug_check <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(regimen, drugname)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-check-drugs-within-regimens" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 78-129 (Check which drugs appear in each regimen)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-check">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-startfrom="78"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 77;"><span id="cb19-78"><a href="#cb19-78" aria-label="78"></a><span class="co">//We examine all of the final Regimens to make sure that they make sense</span></span>
+<span id="cb19-79"><a href="#cb19-79" aria-label="79"></a><span class="kw">tab</span> CurrentRegimen</span>
+<span id="cb19-80"><a href="#cb19-80" aria-label="80"></a></span>
+<span id="cb19-81"><a href="#cb19-81" aria-label="81"></a><span class="co">//We look at which medications are dispensed with every regimen to make sure that the above regimens are correct:</span></span>
+<span id="cb19-82"><a href="#cb19-82" aria-label="82"></a><span class="kw">bysort</span> CurrentRegimen: <span class="kw">tab</span> drugname</span>
+<span id="cb19-83"><a href="#cb19-83" aria-label="83"></a><span class="kw">sort</span> studyid ARTDate drugname</span>
+<span id="cb19-84"><a href="#cb19-84" aria-label="84"></a></span>
+<span id="cb19-85"><a href="#cb19-85" aria-label="85"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Atripla"</span> &amp;&amp; drugname==<span class="st">"Sustiva"</span></span>
+<span id="cb19-86"><a href="#cb19-86" aria-label="86"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-87"><a href="#cb19-87" aria-label="87"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Atripla/Norvir/Reyataz/Truvada"</span></span>
+<span id="cb19-88"><a href="#cb19-88" aria-label="88"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-89"><a href="#cb19-89" aria-label="89"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Atripla/Prezista/Viread/Ziagen"</span></span>
+<span id="cb19-90"><a href="#cb19-90" aria-label="90"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-91"><a href="#cb19-91" aria-label="91"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Combivir/Norvir/Prezista"</span> &amp;&amp; drugname==<span class="st">"Reyataz"</span></span>
+<span id="cb19-92"><a href="#cb19-92" aria-label="92"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Combivir/Norvir/Prezista"</span> &amp;&amp; drugname==<span class="st">"Truvada"</span></span>
+<span id="cb19-93"><a href="#cb19-93" aria-label="93"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Combivir/Norvir/Reyataz"</span> &amp;&amp; drugname==<span class="st">"Epzicom"</span></span>
+<span id="cb19-94"><a href="#cb19-94" aria-label="94"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-95"><a href="#cb19-95" aria-label="95"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Complera"</span> &amp;&amp; drugname!=<span class="st">"Complera"</span></span>
+<span id="cb19-96"><a href="#cb19-96" aria-label="96"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epivir"</span></span>
+<span id="cb19-97"><a href="#cb19-97" aria-label="97"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epivir/Kaletra"</span> &amp;&amp; drugname==<span class="st">"Epzicom"</span></span>
+<span id="cb19-98"><a href="#cb19-98" aria-label="98"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epivir/Norvir"</span></span>
+<span id="cb19-99"><a href="#cb19-99" aria-label="99"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-100"><a href="#cb19-100" aria-label="100"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epzicom"</span></span>
+<span id="cb19-101"><a href="#cb19-101" aria-label="101"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epzicom/Norvir/Reyataz"</span> &amp;&amp; (drugname==<span class="st">"Combivir"</span> | drugname==<span class="st">"Prezista"</span> | drugname==<span class="st">"Sustiva"</span>)</span>
+<span id="cb19-102"><a href="#cb19-102" aria-label="102"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-103"><a href="#cb19-103" aria-label="103"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Epzicom/Norvir/Prezista"</span> &amp;&amp; (drugname==<span class="st">"Combivir"</span> | drugname==<span class="st">"Reyataz"</span> | drugname==<span class="st">"Sustiva"</span>)</span>
+<span id="cb19-104"><a href="#cb19-104" aria-label="104"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress"</span></span>
+<span id="cb19-105"><a href="#cb19-105" aria-label="105"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress/Kaletra/Viread"</span> &amp;&amp; (drugname==<span class="st">"Atripla"</span>)</span>
+<span id="cb19-106"><a href="#cb19-106" aria-label="106"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress/Norvir/Truvada"</span></span>
+<span id="cb19-107"><a href="#cb19-107" aria-label="107"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-108"><a href="#cb19-108" aria-label="108"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Complera"</span> )</span>
+<span id="cb19-109"><a href="#cb19-109" aria-label="109"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Epzicom"</span> )</span>
+<span id="cb19-110"><a href="#cb19-110" aria-label="110"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Isentress/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Norvir"</span> )</span>
+<span id="cb19-111"><a href="#cb19-111" aria-label="111"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-112"><a href="#cb19-112" aria-label="112"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Kaletra"</span></span>
+<span id="cb19-113"><a href="#cb19-113" aria-label="113"></a><span class="co">// [6 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-114"><a href="#cb19-114" aria-label="114"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Kaletra/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Atripla"</span> )</span>
+<span id="cb19-115"><a href="#cb19-115" aria-label="115"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Kaletra/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Isentress"</span> )</span>
+<span id="cb19-116"><a href="#cb19-116" aria-label="116"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Prezista/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Epivir"</span> )</span>
+<span id="cb19-117"><a href="#cb19-117" aria-label="117"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Prezista/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Isentress"</span> )</span>
+<span id="cb19-118"><a href="#cb19-118" aria-label="118"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Prezista/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Epzicom"</span> )</span>
+<span id="cb19-119"><a href="#cb19-119" aria-label="119"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Prezista/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Kaletra"</span> )</span>
+<span id="cb19-120"><a href="#cb19-120" aria-label="120"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Reyataz/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Atripla"</span> )</span>
+<span id="cb19-121"><a href="#cb19-121" aria-label="121"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Reyataz/Truvada"</span> &amp;&amp; (drugname==<span class="st">"Prezista"</span> )</span>
+<span id="cb19-122"><a href="#cb19-122" aria-label="122"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Norvir/Reyataz/Viread/Ziagen"</span> &amp;&amp; (drugname==<span class="st">"Truvada"</span> )</span>
+<span id="cb19-123"><a href="#cb19-123" aria-label="123"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Reyataz"</span></span>
+<span id="cb19-124"><a href="#cb19-124" aria-label="124"></a><span class="co">//Only filled Reyataz; never filled another medication</span></span>
+<span id="cb19-125"><a href="#cb19-125" aria-label="125"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Truvada"</span></span>
+<span id="cb19-126"><a href="#cb19-126" aria-label="126"></a><span class="co">// [8 note(s) about individual patients removed for privacy]</span></span>
+<span id="cb19-127"><a href="#cb19-127" aria-label="127"></a><span class="kw">tab</span> studyid <span class="kw">if</span> CurrentRegimen==<span class="st">"Ziagen"</span></span>
+<span id="cb19-128"><a href="#cb19-128" aria-label="128"></a><span class="co">// [1 note(s) about individual patients removed for privacy]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -598,25 +839,65 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A new regimen starts on any fill date whose regimen name differs from the</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># previous fill date's. A regimen is twice daily if any fill in it is a</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># twice-daily product.</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>regimen_episodes <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, dispense_date, regimen) <span class="sc">|&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">bid_dispense =</span> <span class="fu">any</span>(bid_drug), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(studyid, dispense_date) <span class="sc">|&gt;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_regimen =</span> regimen <span class="sc">!=</span> <span class="fu">lag</span>(regimen, <span class="at">default =</span> <span class="st">""</span>),</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen_number =</span> <span class="fu">cumsum</span>(new_regimen)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, regimen_number) <span class="sc">|&gt;</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen =</span> <span class="fu">first</span>(regimen),</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen_start =</span> <span class="fu">first</span>(dispense_date),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">bid_regimen =</span> <span class="fu">any</span>(bid_dispense),</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A new regimen starts on any fill date whose regimen name differs from the</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># previous fill date's. A regimen is twice daily if any fill in it is a</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># twice-daily product.</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>regimen_episodes <span class="ot">&lt;-</span> fills <span class="sc">|&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, dispense_date, regimen) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">bid_dispense =</span> <span class="fu">any</span>(bid_drug), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(studyid, dispense_date) <span class="sc">|&gt;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_regimen =</span> regimen <span class="sc">!=</span> <span class="fu">lag</span>(regimen, <span class="at">default =</span> <span class="st">""</span>),</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen_number =</span> <span class="fu">cumsum</span>(new_regimen)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid, regimen_number) <span class="sc">|&gt;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen =</span> <span class="fu">first</span>(regimen),</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">regimen_start =</span> <span class="fu">first</span>(dispense_date),</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">bid_regimen =</span> <span class="fu">any</span>(bid_dispense),</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-number-regimen-episodes" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 136-150 (Number the regimens and flag twice-daily ones)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-number">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-startfrom="136"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 135;"><span id="cb21-136"><a href="#cb21-136" aria-label="136"></a><span class="co">//We now create a file which contains one line for each new regimen and the start date.</span></span>
+<span id="cb21-137"><a href="#cb21-137" aria-label="137"></a><span class="co">//The maximum number of new regimens per subject is saved in the global $MaxNumberRegimens</span></span>
+<span id="cb21-138"><a href="#cb21-138" aria-label="138"></a></span>
+<span id="cb21-139"><a href="#cb21-139" aria-label="139"></a><span class="kw">bysort</span> studyid (ARTDate): <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span>
+<span id="cb21-140"><a href="#cb21-140" aria-label="140"></a><span class="kw">generate</span> NewRegimen=0</span>
+<span id="cb21-141"><a href="#cb21-141" aria-label="141"></a><span class="kw">replace</span> NewRegimen=1 <span class="kw">if</span> <span class="kw">N</span>==1</span>
+<span id="cb21-142"><a href="#cb21-142" aria-label="142"></a><span class="kw">by</span> studyid: <span class="kw">replace</span> NewRegimen=1 <span class="kw">if</span> ((<span class="kw">N</span>&gt;1)&amp;( CurrentRegimen[<span class="dt">_n</span>]~=CurrentRegimen[<span class="dt">_n</span>-1]))</span>
+<span id="cb21-143"><a href="#cb21-143" aria-label="143"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> RegimenNumber=<span class="kw">sum</span>(NewRegimen)</span>
+<span id="cb21-144"><a href="#cb21-144" aria-label="144"></a><span class="kw">quietly</span> <span class="kw">summarize</span> RegimenNumber</span>
+<span id="cb21-145"><a href="#cb21-145" aria-label="145"></a><span class="kw">global</span> MaxNumberRegimens <span class="ot">`r(max)'</span></span>
+<span id="cb21-146"><a href="#cb21-146" aria-label="146"></a><span class="kw">display</span> <span class="st">"Maximum number of regimens: "</span> <span class="ot">$MaxNumberRegimens</span></span>
+<span id="cb21-147"><a href="#cb21-147" aria-label="147"></a></span>
+<span id="cb21-148"><a href="#cb21-148" aria-label="148"></a><span class="co">//Now we write code that labels whether dispenses or regimens are BID:</span></span>
+<span id="cb21-149"><a href="#cb21-149" aria-label="149"></a><span class="kw">bysort</span> studyid DispenseNumber: <span class="kw">egen</span> BIDDispense=<span class="fu">max</span>(BIDDrug) <span class="co">//Labels each dispense as being BID or not</span></span>
+<span id="cb21-150"><a href="#cb21-150" aria-label="150"></a><span class="kw">bysort</span> studyid RegimenNumber: <span class="kw">egen</span> BIDRegimen=<span class="fu">max</span>(BIDDrug) <span class="co">//Labels each new regimen as BID</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<details>
+<summary>
+Stata: <code>Do Step 0B Current Regimen.do</code>, lines 167-177 (Keep one row per regimen and save)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s0b-save">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22" data-startfrom="167"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata" style="counter-reset: source-line 166;"><span id="cb22-167"><a href="#cb22-167" aria-label="167"></a><span class="co">//We only keep the observations correlating to regimen changes and dump the unnecessary variables:</span></span>
+<span id="cb22-168"><a href="#cb22-168" aria-label="168"></a><span class="kw">keep</span> <span class="kw">if</span> NewRegimen</span>
+<span id="cb22-169"><a href="#cb22-169" aria-label="169"></a><span class="kw">drop</span> NewRegimen</span>
+<span id="cb22-170"><a href="#cb22-170" aria-label="170"></a><span class="kw">drop</span> <span class="kw">N</span></span>
+<span id="cb22-171"><a href="#cb22-171" aria-label="171"></a><span class="kw">rename</span> ARTDate RegimenStartDate</span>
+<span id="cb22-172"><a href="#cb22-172" aria-label="172"></a><span class="kw">keep</span> studyid CurrentRegimen RegimenNumber BIDRegimen RegimenStartDate</span>
+<span id="cb22-173"><a href="#cb22-173" aria-label="173"></a></span>
+<span id="cb22-174"><a href="#cb22-174" aria-label="174"></a><span class="co">//We reshape wide and then save:</span></span>
+<span id="cb22-175"><a href="#cb22-175" aria-label="175"></a><span class="kw">reshape</span> <span class="kw">wide</span> RegimenStartDate CurrentRegimen BIDRegimen, i(studyid) j(RegimenNumber)</span>
+<span id="cb22-176"><a href="#cb22-176" aria-label="176"></a><span class="kw">save</span> <span class="st">"Data CurrentRegimen $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span>
+<span id="cb22-177"><a href="#cb22-177" aria-label="177"></a><span class="kw">clear</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1165,110 +1446,160 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "1. Regimens from pharmacy fills"</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>This script turns the pharmacy dispensing record into each patient's sequence of regimens, with the date each one started and whether it is taken twice daily. It produces <span class="in">`fills`</span> and <span class="in">`regimen_episodes`</span> for <span class="co">[</span><span class="ot">4. Daily regimen</span><span class="co">](04_daily_regimen.qmd)</span>.</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/01_regimens.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/01_regimens.R)</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 0B Current Regimen.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do)</span>, with the drug-name fixes also in <span class="co">[</span><span class="ot">`Do Step 1A Pharmacy Part 1.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do)</span>.</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/01_regimens.R"</span>)</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Read the fills</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>One row per drug dispensed: the patient (<span class="in">`studyid`</span>), the date as text (<span class="in">`medtransdate`</span>), the drug name, and the pharmacy's product code and description.</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-fills</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fix drug names and flag twice-daily products</span></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>Some fills were recorded as "Experimental" or "Other" though the product description shows the drug. A join to the lookup table in <span class="in">`setup.R`</span> replaces six Stata <span class="in">`replace`</span> lines. Each fill is also flagged if its product is taken twice a day: for example, darunavir 600 mg is the twice-daily dose, while 800 mg (two 400 mg tablets) is the once-daily dose.</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fix-drug-names</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## Name the regimen on each fill date</span></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>The drugs filled on the same day, sorted alphabetically and joined with "/", make that day's regimen name. In Stata this took a <span class="in">`reshape wide`</span> by drug, a loop to paste the names together, a string trick to trim trailing slashes, and a <span class="in">`reshape long`</span> back:</span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="in">bysort studyid DispenseNumber ( drugname) : generate M=_n</span></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="in">reshape wide drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)</span></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="in">generate CurrentRegimen=drugname1</span></span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="in">forvalue i=2(1)$SizeOfLargestRegimen {</span></span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentRegimen=CurrentRegimen+"/"+ drugname`i'</span></span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>In R it is a grouped summary.</span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: name-regimen-per-fill-date</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Apply manual corrections</span></span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>The rule above fails when a patient picks up part of a regimen on its own day: Norvir and Truvada on Monday and Reyataz on Wednesday gives two short-lived "regimens", <span class="in">`Norvir/Truvada`</span> and <span class="in">`Reyataz`</span>, and two spurious switches. The original analyst reviewed the patients whose sequences looked wrong and wrote 576 corrections, one <span class="in">`replace`</span> line each, for the patient and date or date range. They name individual patients and dispensing dates, so they are left out of this repository (<span class="co">[</span><span class="ot">why</span><span class="co">](stata_overview.qmd#privacy)</span>). The code reads them from a file kept with the data; the synthetic example has three made-up rows.</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>Note how much of the Stata code these corrections were. A rule that merges fills a few days apart, or one that ignores a lone fill of a drug already in the regimen, might replace many of them, but would also be a different definition from the one published.</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-manual-corrections</span></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recode early Complera</span></span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>When Complera first came onto the formulary, some fills were recorded as Truvada. Once the corrections have set a fill date's regimen to Complera, a Truvada fill that day is recoded.</span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: recode-early-complera</span></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check which drugs appear in each regimen</span></span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>Stata ran <span class="in">`bysort CurrentRegimen: tab drugname`</span> and then a series of <span class="in">`tab studyid if CurrentRegimen=="..." &amp;&amp; drugname=="..."`</span> lines to find implausible combinations, such as a Sustiva fill during Atripla. This builds the same cross-tabulation as a table to inspect. Looking at the patients behind it is work for someone authorised to see the data.</span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-drugs-within-regimens</span></span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="fu">## Number the regimens</span></span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>A new regimen starts on the first fill date and on any fill date whose regimen name differs from the one before. A regimen is twice daily if any fill within it was a twice-daily product. One row per regimen remains, with its start date; Stata kept the same by <span class="in">`keep if NewRegimen`</span> and reshaped it wide with one column per regimen.</span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: number-regimen-episodes</span></span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "1. Regimens from pharmacy fills"</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>This script turns the pharmacy dispensing record into each patient's sequence of regimens, with the date each one started and whether it is taken twice daily. It produces <span class="in">`fills`</span> and <span class="in">`regimen_episodes`</span> for <span class="co">[</span><span class="ot">4. Daily regimen</span><span class="co">](04_daily_regimen.qmd)</span>.</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/01_regimens.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/01_regimens.R)</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>Translated from <span class="co">[</span><span class="ot">`stata/Do Step 0B Current Regimen.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%200B%20Current%20Regimen.do)</span>, with the drug-name fixes also in <span class="co">[</span><span class="ot">`Do Step 1A Pharmacy Part 1.do`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%201A%20Pharmacy%20Part%201.do)</span>.</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/01_regimens.R"</span>)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"_stata_links.R"</span>)</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Read the fills</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>One row per drug dispensed: the patient (<span class="in">`studyid`</span>), the date as text (<span class="in">`medtransdate`</span>), the drug name, and the pharmacy's product code and description.</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-fills</span></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-fills"</span>)</span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fix drug names and flag twice-daily products</span></span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>Some fills were recorded as "Experimental" or "Other" though the product description shows the drug. A join to the lookup table in <span class="in">`setup.R`</span> replaces six Stata <span class="in">`replace`</span> lines. Each fill is also flagged if its product is taken twice a day: for example, darunavir 600 mg is the twice-daily dose, while 800 mg (two 400 mg tablets) is the once-daily dose.</span>
+<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fix-drug-names</span></span>
+<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"fix-drug-names"</span>)</span>
+<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Name the regimen on each fill date</span></span>
+<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a>The drugs filled on the same day, sorted alphabetically and joined with "/", make that day's regimen name. In Stata this took a <span class="in">`reshape wide`</span> by drug, a loop to paste the names together, a string trick to trim trailing slashes, and a <span class="in">`reshape long`</span> back:</span>
+<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a><span class="in">```stata</span></span>
+<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a><span class="in">bysort studyid DispenseNumber ( drugname) : generate M=_n</span></span>
+<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a><span class="in">reshape wide drugname cdmcode cdmdescription cdpdrugcode drugconstituents BIDDrug , i( studyid DispenseNumber ) j( M)</span></span>
+<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a><span class="in">generate CurrentRegimen=drugname1</span></span>
+<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a><span class="in">forvalue i=2(1)$SizeOfLargestRegimen {</span></span>
+<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a><span class="in">replace CurrentRegimen=CurrentRegimen+"/"+ drugname`i'</span></span>
+<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a>In R it is a grouped summary.</span>
+<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: name-regimen-per-fill-date</span></span>
+<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"name-regimen-per-fill-date"</span>)</span>
+<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## Apply manual corrections</span></span>
+<span id="cb23-105"><a href="#cb23-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-106"><a href="#cb23-106" aria-hidden="true" tabindex="-1"></a>The rule above fails when a patient picks up part of a regimen on its own day: Norvir and Truvada on Monday and Reyataz on Wednesday gives two short-lived "regimens", <span class="in">`Norvir/Truvada`</span> and <span class="in">`Reyataz`</span>, and two spurious switches. The original analyst reviewed the patients whose sequences looked wrong and wrote 576 corrections, one <span class="in">`replace`</span> line each, for the patient and date or date range. They name individual patients and dispensing dates, so they are left out of this repository (<span class="co">[</span><span class="ot">why</span><span class="co">](stata_overview.qmd#privacy)</span>). The code reads them from a file kept with the data; the synthetic example has three made-up rows.</span>
+<span id="cb23-107"><a href="#cb23-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-108"><a href="#cb23-108" aria-hidden="true" tabindex="-1"></a>Note how much of the Stata code these corrections were. A rule that merges fills a few days apart, or one that ignores a lone fill of a drug already in the regimen, might replace many of them, but would also be a different definition from the one published.</span>
+<span id="cb23-109"><a href="#cb23-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-112"><a href="#cb23-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-113"><a href="#cb23-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: apply-manual-corrections</span></span>
+<span id="cb23-114"><a href="#cb23-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-115"><a href="#cb23-115" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-116"><a href="#cb23-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-119"><a href="#cb23-119" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-120"><a href="#cb23-120" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-121"><a href="#cb23-121" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-122"><a href="#cb23-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"apply-manual-corrections"</span>)</span>
+<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-126"><a href="#cb23-126" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recode early Complera</span></span>
+<span id="cb23-127"><a href="#cb23-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-128"><a href="#cb23-128" aria-hidden="true" tabindex="-1"></a>When Complera first came onto the formulary, some fills were recorded as Truvada. Once the corrections have set a fill date's regimen to Complera, a Truvada fill that day is recoded.</span>
+<span id="cb23-129"><a href="#cb23-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-132"><a href="#cb23-132" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-133"><a href="#cb23-133" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: recode-early-complera</span></span>
+<span id="cb23-134"><a href="#cb23-134" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-135"><a href="#cb23-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-136"><a href="#cb23-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-139"><a href="#cb23-139" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-140"><a href="#cb23-140" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-141"><a href="#cb23-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-142"><a href="#cb23-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-143"><a href="#cb23-143" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"recode-early-complera"</span>)</span>
+<span id="cb23-144"><a href="#cb23-144" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-145"><a href="#cb23-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-146"><a href="#cb23-146" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check which drugs appear in each regimen</span></span>
+<span id="cb23-147"><a href="#cb23-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-148"><a href="#cb23-148" aria-hidden="true" tabindex="-1"></a>Stata ran <span class="in">`bysort CurrentRegimen: tab drugname`</span> and then a series of <span class="in">`tab studyid if CurrentRegimen=="..." &amp;&amp; drugname=="..."`</span> lines to find implausible combinations, such as a Sustiva fill during Atripla. This builds the same cross-tabulation as a table to inspect. Looking at the patients behind it is work for someone authorised to see the data.</span>
+<span id="cb23-149"><a href="#cb23-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-152"><a href="#cb23-152" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-153"><a href="#cb23-153" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-drugs-within-regimens</span></span>
+<span id="cb23-154"><a href="#cb23-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-155"><a href="#cb23-155" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-156"><a href="#cb23-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-159"><a href="#cb23-159" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-160"><a href="#cb23-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-161"><a href="#cb23-161" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-162"><a href="#cb23-162" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-163"><a href="#cb23-163" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"check-drugs-within-regimens"</span>)</span>
+<span id="cb23-164"><a href="#cb23-164" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-165"><a href="#cb23-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-166"><a href="#cb23-166" aria-hidden="true" tabindex="-1"></a><span class="fu">## Number the regimens</span></span>
+<span id="cb23-167"><a href="#cb23-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-168"><a href="#cb23-168" aria-hidden="true" tabindex="-1"></a>A new regimen starts on the first fill date and on any fill date whose regimen name differs from the one before. A regimen is twice daily if any fill within it was a twice-daily product. One row per regimen remains, with its start date; Stata kept the same by <span class="in">`keep if NewRegimen`</span> and reshaped it wide with one column per regimen.</span>
+<span id="cb23-169"><a href="#cb23-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-172"><a href="#cb23-172" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-173"><a href="#cb23-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: number-regimen-episodes</span></span>
+<span id="cb23-174"><a href="#cb23-174" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb23-175"><a href="#cb23-175" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-176"><a href="#cb23-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-179"><a href="#cb23-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-180"><a href="#cb23-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb23-181"><a href="#cb23-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb23-182"><a href="#cb23-182" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb23-183"><a href="#cb23-183" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"number-regimen-episodes"</span>)</span>
+<span id="cb23-184"><a href="#cb23-184" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

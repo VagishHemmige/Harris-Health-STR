@@ -514,14 +514,78 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">lab_date =</span> <span class="fu">mdy</span>(testdate), <span class="at">cd4 =</span> resultnumeric)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<div id="r-read-cd4" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 2 CD4.do</code>, lines 1-24 (Read CD4 results and reshape)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s2-cd4">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co">//Flash-Zerai analysis</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co">//CD4 file</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co">//This file inputs the CD4 data from comma-separated variable files, and creates a wide format Stata data set with CD4s and dates obtained.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a><span class="co">//12-16-2014 edition</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-label="6"></a><span class="co">//We input the CD4 data from the CSV and we drop the meaningless testtype variable:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-label="7"></a><span class="kw">clear</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-label="8"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"Excel CD_4_DeID.csv"</span>, <span class="kw">comma</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-label="9"></a><span class="kw">drop</span> testtype</span>
+<span id="cb2-10"><a href="#cb2-10" aria-label="10"></a><span class="kw">rename</span> resultnumeric CD4Result</span>
+<span id="cb2-11"><a href="#cb2-11" aria-label="11"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-label="12"></a><span class="co">//We convert the string dates to Stata format:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-label="13"></a><span class="kw">generate</span> CD4Date=<span class="fu">date</span>( testdate , <span class="st">"MDY"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-label="14"></a><span class="kw">drop</span> testdate</span>
+<span id="cb2-15"><a href="#cb2-15" aria-label="15"></a><span class="kw">format</span> CD4Date %tdnn/dd/YY</span>
+<span id="cb2-16"><a href="#cb2-16" aria-label="16"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-label="17"></a><span class="co">//Now, we create a wide format data set, saving the width in the Global $MaxNumberCD4Measurements</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-label="18"></a><span class="kw">sort</span> studyid CD4Date</span>
+<span id="cb2-19"><a href="#cb2-19" aria-label="19"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-label="20"></a><span class="kw">quietly</span> <span class="kw">summarize</span> <span class="kw">N</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-label="21"></a><span class="kw">global</span> MaxNumberCD4Measurements <span class="ot">`r(max)'</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-label="22"></a><span class="kw">reshape</span> <span class="kw">wide</span> CD4Result CD4Date, i(studyid) j(<span class="kw">N</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-label="23"></a><span class="kw">save</span> <span class="st">"Data CD4 $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-label="24"></a><span class="kw">clear</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
 </section>
 <section id="viral-loads" class="level2">
 <h2 class="anchored" data-anchor-id="viral-loads">Viral loads</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>viral_load <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"viral_load"</span>]]) <span class="sc">|&gt;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">lab_date =</span> <span class="fu">mdy</span>(testdate), <span class="at">vl =</span> resultnumeric)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>viral_load <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"viral_load"</span>]]) <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">lab_date =</span> <span class="fu">mdy</span>(testdate), <span class="at">vl =</span> resultnumeric)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-read-viral-load" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 3 VL.do</code>, lines 1-24 (Read viral loads and reshape)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s3-vl">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co">//Flash single vs double data set</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co">//This creates a VL file</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co">//12-16-2014 edition</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a><span class="co">//This file inputs the VL data from comma-separated variable files, and creates a wide format Stata data set with viral loads and dates obtained.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a><span class="co">//We input the VL data from the CSV, drop unnecessary variables, and rename the output as "VLResultNumeric"</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a><span class="kw">clear</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"Excel VL_DeID.csv"</span>, <span class="kw">comma</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-label="9"></a><span class="kw">drop</span> testtype result</span>
+<span id="cb4-10"><a href="#cb4-10" aria-label="10"></a><span class="kw">rename</span> resultnumeric VLResultNumeric</span>
+<span id="cb4-11"><a href="#cb4-11" aria-label="11"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-label="12"></a><span class="co">//We convert the date variable to Stata format</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-label="13"></a><span class="kw">generate</span> VLDate=<span class="fu">date</span>( testdate , <span class="st">"MDY"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-label="14"></a><span class="kw">format</span> VLDate %tdnn/dd/YY</span>
+<span id="cb4-15"><a href="#cb4-15" aria-label="15"></a><span class="kw">drop</span> testdate</span>
+<span id="cb4-16"><a href="#cb4-16" aria-label="16"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-label="17"></a><span class="co">//We now reshape wide for the purposes of merging after saving the width of the file in the Global $MaxNumberVLMeasurements</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-label="18"></a><span class="kw">sort</span> studyid VLDate</span>
+<span id="cb4-19"><a href="#cb4-19" aria-label="19"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-label="20"></a><span class="kw">quietly</span> <span class="kw">summarize</span> <span class="kw">N</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-label="21"></a><span class="kw">global</span> MaxNumberVLMeasurements <span class="ot">`r(max)'</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-label="22"></a><span class="kw">reshape</span> <span class="kw">wide</span> VLResultNumeric VLDate , i(studyid) j(<span class="kw">N</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-label="23"></a><span class="kw">save</span> <span class="st">"Data VL $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-label="24"></a><span class="kw">clear</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -531,20 +595,72 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lower-case codes are corrected, and indicators are made for Black and Hispanic</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ethnicity, injection drug use and men who have sex with men.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>demographics <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"demographics"</span>]]) <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">if_else</span>(gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"f"</span>, <span class="st">"m"</span>), <span class="fu">str_to_upper</span>(gender), gender),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnicity =</span> <span class="fu">if_else</span>(ethnicity <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"b"</span>, <span class="st">"h"</span>), <span class="fu">str_to_upper</span>(ethnicity), ethnicity),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">male =</span> gender <span class="sc">==</span> <span class="st">"M"</span>,  <span class="co"># Stata entered Gender (F = 1, M = 2) as a number: the same if only F and M occur</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">black =</span> ethnicity <span class="sc">==</span> <span class="st">"B"</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">hispanic =</span> ethnicity <span class="sc">==</span> <span class="st">"H"</span>,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">idu =</span> primaryriskfactor <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"IDU"</span>, <span class="st">"MSM&amp;IDU"</span>),</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">msm =</span> primaryriskfactor <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MSM"</span>, <span class="st">"MSM&amp;IDU"</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(studyid, age, gender, male, ethnicity, black, hispanic,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>         primaryriskfactor, idu, msm, hepc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lower-case codes are corrected, and indicators are made for Black and Hispanic</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ethnicity, injection drug use and men who have sex with men.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>demographics <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"demographics"</span>]]) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">if_else</span>(gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"f"</span>, <span class="st">"m"</span>), <span class="fu">str_to_upper</span>(gender), gender),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnicity =</span> <span class="fu">if_else</span>(ethnicity <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"b"</span>, <span class="st">"h"</span>), <span class="fu">str_to_upper</span>(ethnicity), ethnicity),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">male =</span> gender <span class="sc">==</span> <span class="st">"M"</span>,  <span class="co"># Stata entered Gender (F = 1, M = 2) as a number: the same if only F and M occur</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">black =</span> ethnicity <span class="sc">==</span> <span class="st">"B"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">hispanic =</span> ethnicity <span class="sc">==</span> <span class="st">"H"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">idu =</span> primaryriskfactor <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"IDU"</span>, <span class="st">"MSM&amp;IDU"</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">msm =</span> primaryriskfactor <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MSM"</span>, <span class="st">"MSM&amp;IDU"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(studyid, age, gender, male, ethnicity, black, hispanic,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>         primaryriskfactor, idu, msm, hepc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-read-demographics" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 4 Demographic.do</code>, lines 1-44 (Read and clean demographics)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s4-demo">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co">//Flash single vs double data set</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="co">//Creates a Stata file with demographic characteristics</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co">//12-16-2014 edition</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-label="4"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-label="5"></a><span class="kw">clear</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-label="6"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-label="7"></a><span class="co">//First, we input the demographic information</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-label="8"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"Excel Cohort_DeID.csv"</span>, <span class="kw">comma</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-label="9"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-label="10"></a><span class="co">//We convert the date variables "IntakeDate" and "first_undetect_date" to Stata format</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-label="11"></a><span class="kw">generate</span> IntakeDate=<span class="fu">date</span>( intake_date , <span class="st">"MDY"</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-label="12"></a><span class="kw">format</span> IntakeDate %tdnn/dd/YY</span>
+<span id="cb6-13"><a href="#cb6-13" aria-label="13"></a><span class="kw">drop</span> intake_date</span>
+<span id="cb6-14"><a href="#cb6-14" aria-label="14"></a><span class="kw">generate</span> FirstUndetectDate=<span class="fu">date</span>( first_undetect_date, <span class="st">"MDY"</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-label="15"></a><span class="kw">drop</span> first_undetect_date</span>
+<span id="cb6-16"><a href="#cb6-16" aria-label="16"></a><span class="kw">format</span> FirstUndetectDate %tdnn/dd/YY</span>
+<span id="cb6-17"><a href="#cb6-17" aria-label="17"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-label="18"></a><span class="co">//We examine all of the predictors and clean up the variables a little bit.</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-label="19"></a><span class="co">//We also define the variables Black, Hispanic, IDU, and MSM based on the underlying variables</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-label="20"></a><span class="kw">summarize</span> age, <span class="kw">detail</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-label="21"></a><span class="kw">tab</span> age, <span class="fu">missing</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-label="22"></a><span class="kw">tab</span> gender, <span class="fu">missing</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-label="23"></a><span class="kw">replace</span> gender=<span class="st">"F"</span> <span class="kw">if</span> gender==<span class="st">"f"</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-label="24"></a><span class="kw">replace</span> gender=<span class="st">"M"</span> <span class="kw">if</span> gender==<span class="st">"m"</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-label="25"></a><span class="kw">tab</span> ethnicity, <span class="fu">missing</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-label="26"></a><span class="kw">replace</span> ethnicity=<span class="st">"B"</span> <span class="kw">if</span> ethnicity==<span class="st">"b"</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-label="27"></a><span class="kw">replace</span> ethnicity=<span class="st">"H"</span> <span class="kw">if</span> ethnicity==<span class="st">"h"</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-label="28"></a><span class="kw">generate</span> Black=(ethnicity==<span class="st">"B"</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-label="29"></a><span class="kw">generate</span> Hispanic=(ethnicity==<span class="st">"H"</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-label="30"></a><span class="kw">tab</span> primaryriskfactor, <span class="fu">missing</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-label="31"></a><span class="kw">generate</span> IDU=( primaryriskfactor==<span class="st">"IDU"</span> | primaryriskfactor==<span class="st">"MSM&amp;IDU"</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-label="32"></a><span class="kw">generate</span> MSM=( primaryriskfactor==<span class="st">"MSM"</span> |primaryriskfactor==<span class="st">"MSM&amp;IDU"</span> )</span>
+<span id="cb6-33"><a href="#cb6-33" aria-label="33"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-label="34"></a><span class="co">//Now, we encode Gender, Ethnicity, and RiskFactor variables as numbers, instead of strings, to save space:</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-label="35"></a><span class="kw">encode</span> gender, <span class="kw">generate</span>(Gender)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-label="36"></a><span class="kw">drop</span> gender</span>
+<span id="cb6-37"><a href="#cb6-37" aria-label="37"></a><span class="kw">encode</span> ethnicity, <span class="kw">generate</span>(Ethnicity)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-label="38"></a><span class="kw">drop</span> ethnicity</span>
+<span id="cb6-39"><a href="#cb6-39" aria-label="39"></a><span class="kw">encode</span> primaryriskfactor, <span class="kw">generate</span>(RiskFactor)</span>
+<span id="cb6-40"><a href="#cb6-40" aria-label="40"></a><span class="kw">drop</span> primaryriskfactor</span>
+<span id="cb6-41"><a href="#cb6-41" aria-label="41"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-label="42"></a><span class="co">//We save the dataset</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-label="43"></a><span class="kw">save</span> <span class="st">"Data Demographic $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-label="44"></a><span class="kw">clear</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -554,13 +670,32 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>insurance <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"insurance"</span>]]) <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">insurance_status =</span> insurancestatus,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">prior_care_elsewhere =</span> prevcareelsewhere)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's encode numbered the categories found in the whole file, in character</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># code order. The propensity model uses the third (see 06_cohort.R).</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>insurance_categories <span class="ot">&lt;-</span> <span class="fu">str_sort</span>(<span class="fu">unique</span>(<span class="fu">na.omit</span>(insurance<span class="sc">$</span>insurance_status)), <span class="at">locale =</span> <span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>insurance <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"insurance"</span>]]) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(studyid, <span class="at">insurance_status =</span> insurancestatus,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">prior_care_elsewhere =</span> prevcareelsewhere)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's encode numbered the categories found in the whole file, in character</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># code order. The propensity model uses the third (see 06_cohort.R).</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>insurance_categories <span class="ot">&lt;-</span> <span class="fu">str_sort</span>(<span class="fu">unique</span>(<span class="fu">na.omit</span>(insurance<span class="sc">$</span>insurance_status)), <span class="at">locale =</span> <span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-read-insurance" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 4B Insurance.do</code>, lines 1-11 (Read insurance and prior care)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s4b-insurance">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co">//Flash single vs double data set</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="co">//This creates an insurance file</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co">//12-20-2017 edition</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-label="4"></a><span class="co">//This file inputs the insurance and prior care data</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-label="5"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-label="6"></a><span class="kw">clear</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-label="7"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"ElementsAtIntake_DeID.csv"</span>, <span class="kw">comma</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-label="8"></a><span class="kw">encode</span> insurancestatus, <span class="kw">generate</span>(Insurance)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-label="9"></a><span class="kw">drop</span> insurancestatus</span>
+<span id="cb8-10"><a href="#cb8-10" aria-label="10"></a><span class="kw">save</span> <span class="st">"Data Insurance $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-label="11"></a><span class="kw">clear</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -570,11 +705,39 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The analysis uses only whether a patient ever had a psychiatry visit date.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>psych_visits <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"psych_visits"</span>]]) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psych_date =</span> <span class="fu">mdy</span>(psychvisitdate)) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">had_psych_visit =</span> <span class="fu">any</span>(<span class="sc">!</span><span class="fu">is.na</span>(psych_date)), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The analysis uses only whether a patient ever had a psychiatry visit date.</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>psych_visits <span class="ot">&lt;-</span> <span class="fu">read_source_csv</span>(data_dir, source_files[[<span class="st">"psych_visits"</span>]]) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">psych_date =</span> <span class="fu">mdy</span>(psychvisitdate)) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(studyid) <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">had_psych_visit =</span> <span class="fu">any</span>(<span class="sc">!</span><span class="fu">is.na</span>(psych_date)), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-read-psych-visits" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 4C Psych.do</code>, lines 1-21 (Read psychiatry visits)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s4c-psych">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co">//Flash single vs double data set</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co">//This creates a psych file</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co">//12-20-2017 edition</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-label="4"></a><span class="co">//This file inputs the data of any psych visits</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-label="5"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-label="6"></a><span class="kw">clear</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-label="7"></a><span class="kw">insheet</span> <span class="kw">using</span> <span class="st">"PsychVisits_DeID.csv"</span>, <span class="kw">comma</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-label="8"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-label="9"></a><span class="co">//We convert the date variable to Stata format</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-label="10"></a><span class="kw">generate</span> PsychDate=<span class="fu">date</span>( psychvisitdate , <span class="st">"MDY"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-label="11"></a><span class="kw">format</span> PsychDate %tdnn/dd/YY</span>
+<span id="cb10-12"><a href="#cb10-12" aria-label="12"></a><span class="kw">drop</span> psychvisitdate</span>
+<span id="cb10-13"><a href="#cb10-13" aria-label="13"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-label="14"></a><span class="kw">sort</span> studyid PsychDate</span>
+<span id="cb10-15"><a href="#cb10-15" aria-label="15"></a><span class="kw">by</span> studyid: <span class="kw">generate</span> <span class="kw">N</span>=<span class="dt">_n</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-label="16"></a><span class="kw">quietly</span> <span class="kw">summarize</span> <span class="kw">N</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-label="17"></a><span class="kw">global</span> MaxNumberPsychMeasurements <span class="ot">`r(max)'</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-label="18"></a><span class="kw">reshape</span> <span class="kw">wide</span> PsychDate , i(studyid) j(<span class="kw">N</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-label="19"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-label="20"></a><span class="kw">save</span> <span class="st">"Data Psych visits $DateOfAnalysis.dta"</span>, <span class="kw">replace</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -584,14 +747,48 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata merged these files one to one and kept patients found in any of them,</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># including patients with lab results but no demographic record.</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> demographics <span class="sc">|&gt;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">distinct</span>(cd4, studyid), <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">distinct</span>(viral_load, studyid), <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(insurance, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(psych_visits, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">had_psych_visit =</span> <span class="fu">coalesce</span>(had_psych_visit, <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata merged these files one to one and kept patients found in any of them,</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># including patients with lab results but no demographic record.</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> demographics <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">distinct</span>(cd4, studyid), <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">distinct</span>(viral_load, studyid), <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(insurance, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(psych_visits, <span class="at">by =</span> <span class="st">"studyid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">had_psych_visit =</span> <span class="fu">coalesce</span>(had_psych_visit, <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="r-combine-baseline" class="stata-crosslink">
+<details>
+<summary>
+Stata: <code>Do Step 5 Merge and Expand.do</code>, lines 1-26 (Merge the patient-level files)
+</summary>
+<p><a href="../quarto/stata_data_build.html#s5-merge">See it in context</a></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-startfrom="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co">//Flash-Zerai analysis</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co">//This file creates the long version data set from demographic variables, CD4, and VL</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="co">//The data set created is "Data ExpandedCD4VLDemo $DateOfAnalysis.dta"</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-label="4"></a><span class="co">//12-16-2014 edition</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-label="5"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-label="6"></a><span class="co">//First, we open the data set with the demographic variables</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-label="7"></a><span class="kw">use</span> <span class="st">"Data Demographic $DateOfAnalysis.dta"</span>, <span class="kw">clear</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-label="8"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-label="9"></a><span class="co">//Now, we add the CD4 variables, listing the observations who fail the merge (for whom there are no CD4 observations):</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-label="10"></a><span class="kw">merge</span> 1:1 studyid <span class="kw">using</span> <span class="st">"Data CD4 $DateOfAnalysis.dta"</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-label="11"></a><span class="kw">tab</span> studyid <span class="kw">if</span> <span class="dt">_merge</span>&lt;3</span>
+<span id="cb12-12"><a href="#cb12-12" aria-label="12"></a><span class="kw">drop</span> <span class="dt">_merge</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-label="13"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-label="14"></a><span class="co">//Now, we add the VL variables, listing the observations who fail the merge (for whom there are no VL observations):</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-label="15"></a><span class="kw">merge</span> 1:1 studyid <span class="kw">using</span> <span class="st">"Data VL $DateOfAnalysis.dta"</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-label="16"></a><span class="kw">tab</span> studyid <span class="kw">if</span> <span class="dt">_merge</span>&lt;3</span>
+<span id="cb12-17"><a href="#cb12-17" aria-label="17"></a><span class="kw">drop</span> <span class="dt">_merge</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-label="18"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-label="19"></a><span class="co">//Merge Insurance Data</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-label="20"></a><span class="kw">merge</span> 1:1 studyid <span class="kw">using</span> <span class="st">"Data Insurance $DateOfAnalysis.dta"</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-label="21"></a><span class="kw">tab</span> studyid <span class="kw">if</span> <span class="dt">_merge</span>&lt;3</span>
+<span id="cb12-22"><a href="#cb12-22" aria-label="22"></a><span class="kw">drop</span> <span class="dt">_merge</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-label="23"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-label="24"></a><span class="co">//Merge Psych visit data</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-label="25"></a><span class="kw">merge</span> 1:1 studyid <span class="kw">using</span> <span class="st">"Data Psych Visits $DateOfAnalysis.dta"</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-label="26"></a><span class="kw">drop</span> <span class="dt">_merge</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1140,86 +1337,129 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "2. Labs and baseline data"</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>This script reads the CD4 and viral load results and the patient-level information: demographics, insurance, prior care and psychiatry visits. It produces <span class="in">`cd4`</span>, <span class="in">`viral_load`</span> and <span class="in">`baseline`</span> for <span class="co">[</span><span class="ot">3. One row per patient-day</span><span class="co">](03_person_days.qmd)</span> and <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/02_labs_and_baseline.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/02_labs_and_baseline.R)</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>Translated from Stata Steps <span class="co">[</span><span class="ot">2 (CD4)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%202%20CD4.do)</span>, <span class="co">[</span><span class="ot">3 (VL)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%203%20VL.do)</span>, <span class="co">[</span><span class="ot">4 (demographics)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204%20Demographic.do)</span>, <span class="co">[</span><span class="ot">4B (insurance)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204B%20Insurance.do)</span> and <span class="co">[</span><span class="ot">4C (psychiatry)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204C%20Psych.do)</span>, and the merges at the top of <span class="co">[</span><span class="ot">Step 5</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do)</span>.</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/02_labs_and_baseline.R"</span>)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## CD4 counts</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>Each Stata lab step read the file, converted the date, then reshaped to one row per patient with columns <span class="in">`CD4Result1`</span>, <span class="in">`CD4Date1`</span>, <span class="in">`CD4Result2`</span> ... so that it could be merged one-to-one later. R keeps one row per test (long format) and joins by patient and date when needed, so no reshape is required.</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-cd4</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Viral loads</span></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-viral-load</span></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Demographics</span></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>Lower-case codes (<span class="in">`f`</span>, <span class="in">`m`</span>, <span class="in">`b`</span>, <span class="in">`h`</span>) are corrected, then indicators are made for the propensity model. Injection drug use and MSM each include the combined <span class="in">`MSM&amp;IDU`</span> category. In Stata, <span class="in">`encode`</span> then turned the text into numbered categories "to save space", which R does not need.</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-demographics</span></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Insurance and prior care</span></span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>Added in December 2017, probably for the revision of the paper. The insurance categories are used in the propensity model; <span class="in">`prevcareelsewhere`</span> is used as an exclusion in <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-insurance</span></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## Psychiatry visits</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>Also added in December 2017, for a sensitivity analysis. The analysis only asks whether a patient had any psychiatry visit date on file, at any time.</span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-psych-visits</span></span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a><span class="fu">## Combine</span></span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`merge 1:1`</span> keeps patients found in either file and records which in <span class="in">`_merge`</span>; the Step 5 code listed the unmatched patients and then kept them all. <span class="in">`full_join()`</span> does the same. A patient in the lab files but not in the demographics file is kept, with missing demographics.</span>
-<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: combine-baseline</span></span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "2. Labs and baseline data"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>This script reads the CD4 and viral load results and the patient-level information: demographics, insurance, prior care and psychiatry visits. It produces <span class="in">`cd4`</span>, <span class="in">`viral_load`</span> and <span class="in">`baseline`</span> for <span class="co">[</span><span class="ot">3. One row per patient-day</span><span class="co">](03_person_days.qmd)</span> and <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/02_labs_and_baseline.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/02_labs_and_baseline.R)</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/setup.R)</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/R/functions.R)</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>Translated from Stata Steps <span class="co">[</span><span class="ot">2 (CD4)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%202%20CD4.do)</span>, <span class="co">[</span><span class="ot">3 (VL)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%203%20VL.do)</span>, <span class="co">[</span><span class="ot">4 (demographics)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204%20Demographic.do)</span>, <span class="co">[</span><span class="ot">4B (insurance)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204B%20Insurance.do)</span> and <span class="co">[</span><span class="ot">4C (psychiatry)</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%204C%20Psych.do)</span>, and the merges at the top of <span class="co">[</span><span class="ot">Step 5</span><span class="co">](https://github.com/VagishHemmige/Harris-Health-STR/blob/main/stata/Do%20Step%205%20Merge%20and%20Expand.do)</span>.</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/02_labs_and_baseline.R"</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"_stata_links.R"</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## CD4 counts</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>Each Stata lab step read the file, converted the date, then reshaped to one row per patient with columns <span class="in">`CD4Result1`</span>, <span class="in">`CD4Date1`</span>, <span class="in">`CD4Result2`</span> ... so that it could be merged one-to-one later. R keeps one row per test (long format) and joins by patient and date when needed, so no reshape is required.</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-cd4</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-cd4"</span>)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Viral loads</span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-viral-load</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-viral-load"</span>)</span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Demographics</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>Lower-case codes (<span class="in">`f`</span>, <span class="in">`m`</span>, <span class="in">`b`</span>, <span class="in">`h`</span>) are corrected, then indicators are made for the propensity model. Injection drug use and MSM each include the combined <span class="in">`MSM&amp;IDU`</span> category. In Stata, <span class="in">`encode`</span> then turned the text into numbered categories "to save space", which R does not need.</span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-demographics</span></span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-demographics"</span>)</span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a><span class="fu">## Insurance and prior care</span></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a>Added in December 2017, probably for the revision of the paper. The insurance categories are used in the propensity model; <span class="in">`prevcareelsewhere`</span> is used as an exclusion in <span class="co">[</span><span class="ot">6. Cohort</span><span class="co">](06_cohort.qmd)</span>.</span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-insurance</span></span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-insurance"</span>)</span>
+<span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a><span class="fu">## Psychiatry visits</span></span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a>Also added in December 2017, for a sensitivity analysis. The analysis only asks whether a patient had any psychiatry visit date on file, at any time.</span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: read-psych-visits</span></span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"read-psych-visits"</span>)</span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a><span class="fu">## Combine</span></span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a>Stata's <span class="in">`merge 1:1`</span> keeps patients found in either file and records which in <span class="in">`_merge`</span>; the Step 5 code listed the unmatched patients and then kept them all. <span class="in">`full_join()`</span> does the same. A patient in the lab files but not in the demographics file is kept, with missing demographics.</span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: combine-baseline</span></span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb13-147"><a href="#cb13-147" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb13-148"><a href="#cb13-148" aria-hidden="true" tabindex="-1"></a><span class="fu">stata_for</span>(<span class="st">"combine-baseline"</span>)</span>
+<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

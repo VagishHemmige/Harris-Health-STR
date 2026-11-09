@@ -619,7 +619,7 @@ edit that file, not this page. Its first heading is the page title.
 <li><strong>Provisional content.</strong> <code>quarto/_pending.lua</code> highlights in yellow every paragraph that starts with <strong>Decision pending:</strong> or, in the plan, <strong>Open:</strong>, and any <code>[text]{.pending}</code>.</li>
 <li><strong>Project documents.</strong> <code>analysis-plan.md</code>, <code>ARCHITECTURE.md</code>, <code>AGENTS.md</code> and <code>REPOSITORY-BLUEPRINT.md</code> are shown by pages in <code>quarto/</code> that only include the root file: edit the root file, not the page.</li>
 <li>Each script page loads its script with <code>knitr::read_chunk("../R/&lt;script&gt;.R")</code> and shows each labelled section with <code>#| eval: false</code>, with prose explaining what it does, why, and the Stata it replaces.</li>
-<li><strong>Chunks that run:</strong> the <code>read_chunk()</code> imports, the Architecture page’s chunk that reads <code>ARCHITECTURE.md</code>, and the Stata pages’ chunk that reads do-files as text through <code>quarto/_show_stata.R</code>. Nothing else is evaluated.</li>
+<li><strong>Chunks that run:</strong> the <code>read_chunk()</code> imports, the Architecture page’s chunk that reads <code>ARCHITECTURE.md</code>, and the chunks that show the do-files through <code>quarto/_stata_links.R</code>, which read <code>stata/</code> and <code>quarto/stata_map.csv</code> as text. Nothing else is evaluated.</li>
 <li>The site renders to <code>docs/</code>, which is not committed: the GitHub Actions workflow <code>.github/workflows/publish.yml</code> renders it and publishes it to the <code>gh-pages</code> branch on every push to <code>main</code>. When you add a script, add its page and sidebar entry in the same pull request, and render locally to check it.</li>
 <li><strong>Prose must match the code.</strong> If a change alters what a section does, update its explanation in the same pull request.</li>
 </ul>
@@ -629,6 +629,7 @@ edit that file, not this page. Its first heading is the page title.
 <ul>
 <li><code>stata/</code> holds the original do-files with patient-level details removed (<code>stata/README.md</code> lists what was removed). Do not add study IDs, person-level dates, local paths or notes about individual patients back.</li>
 <li>The do-files are a record and are not edited otherwise, including their bugs, which are documented on the site’s “Which file does what” page (<code>quarto/stata_overview.qmd</code>).</li>
+<li><strong>Stata-R links.</strong> <code>quarto/stata_map.csv</code> splits each do-file into sections (line ranges) and names the R chunk labels that replace each one. The Stata pages and the folded “Stata:” blocks under each R step are both built from it. When you rename, add or remove a chunk label, update the map in the same pull request, and keep every non-blank do-file line in exactly one section.</li>
 </ul>
 </section>
 <section id="outputs" class="level2">
