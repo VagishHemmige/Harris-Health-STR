@@ -33,11 +33,16 @@ Thomas Street Health Center, Harris Health System, Houston, Texas. De-identified
 - Insurance status and prior HIV care elsewhere at intake.
 - Psychiatry clinic visit dates.
 
-Observation window: 1 January 2008 to 31 December 2013. The data are not public and are not in this repository.
+Enrollment and follow-up are separate:
+
+- **Enrollment:** patients starting ART from 1 January 2008 to 31 December 2011 [@hemmige2018str]. This restriction is not in the kept code: Final Analysis.do applies no upper limit to the start date (it tabulates a 2012 start year). It is assumed to come from how the extract was drawn; the paper reports 2,095 patients entering care in the period.
+- **Follow-up:** the person-day data run to 31 December 2013, so every enrolled patient has a full first year. Each outcome uses days 0-364 after the first fill (§7).
+
+The data are not public and are not in this repository.
 
 ## 4. Study population
 
-Source population: patients with antiretrovirals dispensed by the clinic pharmacy during the window.
+Source population: patients in the extract with antiretrovirals dispensed by the clinic pharmacy. The code enforces the start of enrollment indirectly: a patient whose first regimen started before 1 January 2008 has no first regimen on the person-day grid and is dropped at exclusion 1.
 
 Exclusions, in order (each a flowchart step):
 
@@ -111,7 +116,6 @@ The data are clinic records under the study's IRB approval and Harris Health pol
 - Pharmacy fills measure collection, not ingestion, and miss fills elsewhere: PDC is a lower bound.
 - Loss to follow-up cannot be distinguished from moving, transferring care, incarceration or death.
 - Single clinic serving a largely uninsured, racially diverse population.
-- Outcomes use different follow-up periods (see §7).
 
 ## 12. Reporting map
 

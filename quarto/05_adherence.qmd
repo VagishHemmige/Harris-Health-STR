@@ -95,7 +95,7 @@ stata_for("summarise-coverage-per-day")
 
 **Still in care (lab-based):** both a CD4 and a viral load are still to come. After a patient's last test of either kind, they count as out of care.
 
-**Virologically suppressed:** see [`vl_suppressed_on_day()`](functions.qmd#viral-suppression-on-a-day). A viral load of 400 or less counts for 90 days; a day just before a suppressed result also counts if that result is within 90 days.
+**Virologically suppressed:** see [`vl_suppressed_on_day()`](functions.qmd#viral-suppression-on-a-day). A day counts only if the most recent viral load is 400 or less. That result then counts for 90 days. A later day also counts if the next viral load comes within 90 days and is 400 or less too, which bridges a gap between two suppressed results. A suppressed result never reaches back to the days before it.
 
 ```{r}
 #| label: define-daily-outcomes

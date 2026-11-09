@@ -35,7 +35,11 @@ Every fill is assumed to be 30 pills. For each drug, pills on hand go up by 30 o
 
 ## Who is included
 
-Patients are included if their first regimen in the window is one of the three compared regimens and is taken once daily. Time zero is the first day of the first regimen.
+Patients are included if their first regimen is one of the three compared regimens and is taken once daily. Time zero is the first day of the first regimen.
+
+Enrollment and follow-up are different windows. Patients started ART in 2008-2011; the data then follow them to the end of 2013, so everyone has a full first year. The code enforces only the start of enrollment, because a regimen begun before 2008 is not on the day-by-day grid. The end of enrollment, 2011, is not in the kept code; it is assumed to come from how the data extract was drawn.
+
+**From the code:** no upper limit on the ART start date; the extract is assumed to have supplied it.
 
 **Specified in:** [§4 Study population](analysis-plan.qmd#4-study-population).
 

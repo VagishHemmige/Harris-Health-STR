@@ -83,7 +83,7 @@ manuscript_regimens <- c("Atripla", "Norvir/Prezista/Truvada", "Norvir/Reyataz/T
 fill_size_pills        <- 30    # every fill assumed to be 30 pills (30 days)
 vl_suppression_main    <- 400   # copies/mL, assay limit in 2008
 vl_suppression_later   <- 50    # copies/mL, sensitivity analysis for starts after 2008
-lab_window_days        <- 90    # a viral load counts for 90 days either side
+lab_window_days        <- 90    # days a suppressed viral load counts for (see vl_suppressed_on_day())
 pdc_adherent           <- 0.8   # proportion of days covered counted as adherent
 retention_min_gap_days <- 90    # HRSA retention: two viral loads more than 90 days apart
 missed_fill_days       <- 90    # days without a fill used to flag outside pharmacies
