@@ -11,7 +11,7 @@ fills_raw <- read_source_csv(data_dir, source_files[["dispensing"]])
 
 ## ---- fix-drug-names
 fills <- fills_raw |>
-  left_join(drug_name_fixes, by = "cdmdescription") |>
+  left_join(drug_name_fixes, by = "cdmdescription", relationship = "many-to-one") |>
   mutate(
     drugname = coalesce(fixed_drugname, drugname),
     dispense_date = mdy(medtransdate),
@@ -33,7 +33,8 @@ dispense_regimens <- apply_regimen_corrections(dispense_regimens, regimen_correc
 # When Complera was new, some fills were recorded as Truvada. Once a fill date's
 # regimen is Complera, a Truvada fill on that date is recoded as Complera.
 fills <- fills |>
-  left_join(dispense_regimens, by = c("studyid", "dispense_date")) |>
+  left_join(dispense_regimens, by = c("studyid", "dispense_date"),
+            relationship = "many-to-one") |>
   mutate(drugname = if_else(drugname == "Truvada" & regimen == "Complera",
                             "Complera", drugname))
 

@@ -60,7 +60,9 @@ stata_for("read-viral-load")
 
 ## Demographics
 
-Lower-case codes (`f`, `m`, `b`, `h`) are corrected, then indicators are made for the propensity model. Injection drug use and MSM each include the combined `MSM&IDU` category. In Stata, `encode` then turned the text into numbered categories "to save space", which R does not need.
+Lower-case codes (`f`, `m`, `b`, `h`) are corrected, then indicators are made for the propensity model. Injection drug use and MSM each include the combined `MSM&IDU` category.
+
+A blank ethnicity needs care. In Stata, `generate Black=(ethnicity=="B")` compares the blank text with "B" and gets 0, so the patient counts as not Black and keeps a propensity score. R reads a blank as missing, and `ethnicity == "B"` would give a missing value, which would drop the patient from the weighted analyses. `ethnicity %in% "B"` gives `FALSE` for a missing value, which matches Stata. In Stata, `encode` then turned the text into numbered categories "to save space", which R does not need.
 
 ```{r}
 #| label: read-demographics
@@ -109,6 +111,8 @@ stata_for("read-psych-visits")
 ## Combine
 
 Stata's `merge 1:1` keeps patients found in either file and records which in `_merge`; the Step 5 code listed the unmatched patients and then kept them all. `full_join()` does the same. A patient in the lab files but not in the demographics file is kept, with missing demographics.
+
+`merge 1:1` also stops if a patient appears twice in either file. [`check_unique_patients()`](functions.qmd#checking-one-row-per-patient) does that check first, and `relationship = "one-to-one"` makes each join stop rather than duplicate a patient.
 
 ```{r}
 #| label: combine-baseline

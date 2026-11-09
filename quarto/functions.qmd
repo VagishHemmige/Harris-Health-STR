@@ -57,6 +57,22 @@ Returns an empty table if the file is not there, so the code runs without any co
 stata_for("read-regimen-corrections")
 ```
 
+## Checking one row per patient
+
+Stata's `merge 1:1` refuses to run if a patient appears twice in either file. A join in R has no such check by default: a duplicate row would quietly give that patient two rows, and every later count and model would include them twice. This function stops with a message instead. Used by [2. Labs and baseline](02_labs_and_baseline.qmd); the joins elsewhere state their expected `relationship` for the same reason.
+
+```{r}
+#| label: check-unique-patients
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("check-unique-patients")
+```
+
 ## Naming a regimen
 
 Stata built the name by reshaping the day's fills wide, sorted by drug name, and gluing `drugname1 + "/" + drugname2 + ...`, then trimming trailing slashes. Sorting and pasting does the same in one line. `locale = "C"` sorts the way Stata does, by character code.
@@ -180,6 +196,22 @@ The R counterparts of `tab ..., chi2`, `ttest` and `ranksum`, with the options t
 #| eval: true
 #| output: asis
 stata_for("compare-groups")
+```
+
+## Weighted category distributions
+
+The R counterpart of `tab InitialRegimenSTR <variable> [aw=IPW], row`: within each group, the weighted percentage of patients in each category. Used by [7. Propensity score](07_propensity.qmd#weighted-balance-by-category).
+
+```{r}
+#| label: weighted-distribution
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("weighted-distribution")
 ```
 
 ## Odds ratios

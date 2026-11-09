@@ -62,7 +62,7 @@ flowchart TD
 | `04_daily_regimen.R` | Steps 6, 7 | `person_days`, `fills`, `regimen_episodes` | `daily` (patient × day, current regimen), `daily_drugs` (patient × day × drug, pills dispensed) |
 | `05_adherence.R` | Step 8 | `daily`, `daily_drugs` | `daily_drugs` with `pills_on_hand`; `analytic_days` (patient × day: coverage, still in care, suppressed) |
 | `06_cohort.R` | Final Analysis, cohort | `analytic_days`, `baseline`, `insurance_categories` | `cohort_days` (patient × day from ART start), `patients` (one row per patient), `cohort_flow` |
-| `07_propensity.R` | Final Analysis, baseline and propensity | `patients` | `baseline_tests`, `propensity_model`, `patients` + `propensity_score`, `ipw`; `weighted_balance` |
+| `07_propensity.R` | Final Analysis, baseline and propensity | `patients` | `baseline_tests`, `propensity_model`, `patients` + `propensity_score`, `ipw`; `weighted_balance`, `weighted_categories` |
 | `08_outcomes.R` | Final Analysis, outcomes | `cohort_days`, `patients` | `patients` + outcomes; `outcome_summary`, `outcome_models`, `suppression_at_switch` |
 | `09_sensitivity.R` | Final Analysis, sensitivity | `cohort_days`, `patients`, `propensity_model` | `suppression_by_start_year`, `str_by_start_year`, `psych_models`, `outside_pharmacy_summary`, `outside_pharmacy_models` |
 | `tables.R` | (the Stata wrote results to logs) | the tables above | CSV files in `tables/` |

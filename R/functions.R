@@ -23,6 +23,21 @@ read_regimen_corrections <- function(path) {
   ))
 }
 
+## ---- check-unique-patients
+# Stata's `merge 1:1` stops if a patient appears twice in either file. This
+# does the same for a table that should have one row per patient, before it is
+# joined, so a duplicate cannot silently multiply a patient's rows.
+check_unique_patients <- function(data, table_name) {
+  duplicated_ids <- data |>
+    count(studyid) |>
+    filter(n > 1)
+  if (nrow(duplicated_ids) > 0) {
+    stop(table_name, " has more than one row for ", nrow(duplicated_ids),
+         " patient(s); it should have one row per patient.")
+  }
+  invisible(data)
+}
+
 ## ---- make-regimen-name
 # Joins the drugs filled on one day into a regimen name, in alphabetical order,
 # as Stata did by sorting on drugname and concatenating with "/". A drug filled
@@ -47,7 +62,7 @@ apply_regimen_corrections <- function(dispense_regimens, corrections) {
     select(studyid, dispense_date, corrected_regimen = regimen)
 
   dispense_regimens |>
-    left_join(matched, by = c("studyid", "dispense_date")) |>
+    left_join(matched, by = c("studyid", "dispense_date"), relationship = "one-to-one") |>
     mutate(regimen = coalesce(corrected_regimen, regimen)) |>
     select(-corrected_regimen)
 }
@@ -125,6 +140,20 @@ compare_continuous <- function(patients, variable) {
     test = c("t-test", "Wilcoxon rank-sum"),
     p_value = c(t_test$p.value, rank_test$p.value)
   )
+}
+
+## ---- weighted-distribution
+# Weighted percentage of each group in each category: the R counterpart of
+# Stata's `tab InitialRegimenSTR <variable> [aw=IPW], row`. Patients missing
+# the variable or the weight are left out, as tab leaves them out.
+weighted_distribution <- function(patients, variable, weight) {
+  patients |>
+    filter(!is.na(.data[[variable]]), !is.na(.data[[weight]])) |>
+    group_by(str, category = as.character(.data[[variable]])) |>
+    summarise(weight_total = sum(.data[[weight]]), .groups = "drop_last") |>
+    mutate(weighted_percent = 100 * weight_total / sum(weight_total)) |>
+    ungroup() |>
+    transmute(variable = variable, str, category, weighted_percent)
 }
 
 ## ---- odds-ratio-for-str

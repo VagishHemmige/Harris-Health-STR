@@ -1,7 +1,8 @@
 # Purpose: read the CD4 and viral load results and the patient-level baseline
 #   information: demographics, insurance, prior care and psychiatry visits
 #   (Stata Steps 2, 3, 4, 4B and 4C).
-# Needs: source_files (setup.R); read_source_csv() (functions.R).
+# Needs: source_files (setup.R); read_source_csv(), check_unique_patients()
+#   (functions.R).
 # Produces: cd4 and viral_load (one row per test) and baseline (one row per patient).
 
 ## ---- read-cd4
@@ -14,14 +15,17 @@ viral_load <- read_source_csv(data_dir, source_files[["viral_load"]]) |>
 
 ## ---- read-demographics
 # Lower-case codes are corrected, and indicators are made for Black and Hispanic
-# ethnicity, injection drug use and men who have sex with men.
+# ethnicity, injection drug use and men who have sex with men. As in Stata,
+# where `generate Black=(ethnicity=="B")` gives 0 for a blank, a missing
+# ethnicity or risk factor counts as "no" rather than missing, so the patient
+# keeps a propensity score.
 demographics <- read_source_csv(data_dir, source_files[["demographics"]]) |>
   mutate(
     gender = if_else(gender %in% c("f", "m"), str_to_upper(gender), gender),
     ethnicity = if_else(ethnicity %in% c("b", "h"), str_to_upper(ethnicity), ethnicity),
     male = gender == "M",  # Stata entered Gender (F = 1, M = 2) as a number: the same if only F and M occur
-    black = ethnicity == "B",
-    hispanic = ethnicity == "H",
+    black = ethnicity %in% "B",
+    hispanic = ethnicity %in% "H",
     idu = primaryriskfactor %in% c("IDU", "MSM&IDU"),
     msm = primaryriskfactor %in% c("MSM", "MSM&IDU")
   ) |>
@@ -46,10 +50,14 @@ psych_visits <- read_source_csv(data_dir, source_files[["psych_visits"]]) |>
 
 ## ---- combine-baseline
 # Stata merged these files one to one and kept patients found in any of them,
-# including patients with lab results but no demographic record.
+# including patients with lab results but no demographic record. `merge 1:1`
+# stops if a patient appears twice, so the same check comes first here.
+check_unique_patients(demographics, "The demographics file")
+check_unique_patients(insurance, "The insurance file")
+
 baseline <- demographics |>
-  full_join(distinct(cd4, studyid), by = "studyid") |>
-  full_join(distinct(viral_load, studyid), by = "studyid") |>
-  full_join(insurance, by = "studyid") |>
-  full_join(psych_visits, by = "studyid") |>
+  full_join(distinct(cd4, studyid), by = "studyid", relationship = "one-to-one") |>
+  full_join(distinct(viral_load, studyid), by = "studyid", relationship = "one-to-one") |>
+  full_join(insurance, by = "studyid", relationship = "one-to-one") |>
+  full_join(psych_visits, by = "studyid", relationship = "one-to-one") |>
   mutate(had_psych_visit = coalesce(had_psych_visit, FALSE))

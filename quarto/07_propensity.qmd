@@ -114,3 +114,19 @@ Stata repeated the baseline tables with `[aw=IPW]`. Weighted means and proportio
 #| output: asis
 stata_for("check-weighted-balance")
 ```
+
+## Weighted balance by category
+
+Stata also ran `tab InitialRegimenSTR <variable> [aw=IPW], row` for ethnicity, risk factor, age group, baseline viral load and CD4 groups, and insurance (lines 116-117 and 124-127). A loop over the variable names applies [`weighted_distribution()`](functions.qmd#weighted-category-distributions) to each and stacks the results into one table, so the whole distribution can be compared between groups, not just the means.
+
+```{r}
+#| label: check-weighted-category-balance
+#| eval: false
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: asis
+stata_for("check-weighted-category-balance")
+```
