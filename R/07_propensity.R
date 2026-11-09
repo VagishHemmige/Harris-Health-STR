@@ -1,9 +1,9 @@
 # Purpose: compare the two groups at baseline, fit the propensity score model and
 #   compute inverse probability of treatment weights (Final Analysis.do).
-# Needs: compare_categorical(), compare_continuous() (functions.R);
-#   patients (06_cohort.R).
+# Needs: compare_categorical(), compare_continuous(), weighted_distribution()
+#   (functions.R); patients (06_cohort.R).
 # Produces: baseline_tests, propensity_model, patients with propensity_score and
-#   ipw added, and weighted_balance.
+#   ipw added, weighted_balance and weighted_categories.
 
 ## ---- test-baseline-differences
 # Stata: tab InitialRegimenSTR <variable> if FirstObservationOfSubject, chi2
@@ -64,3 +64,16 @@ weighted_balance <- patients |>
     mean_baseline_cd4 = weighted.mean(baseline_cd4, ipw, na.rm = TRUE),
     .groups = "drop"
   )
+
+## ---- check-weighted-category-balance
+# Stata also tabulated each categorical covariate with [aw=IPW]: ethnicity,
+# risk factor, age group, baseline viral load and CD4 groups, and insurance.
+# Weighted percentages in each category, by group.
+balance_variables <- c("ethnicity", "primaryriskfactor", "age_group",
+                       "baseline_vl_group", "baseline_cd4_group", "insurance_status")
+
+weighted_categories <- list()
+for (variable in balance_variables) {
+  weighted_categories[[variable]] <- weighted_distribution(patients, variable, "ipw")
+}
+weighted_categories <- bind_rows(weighted_categories)

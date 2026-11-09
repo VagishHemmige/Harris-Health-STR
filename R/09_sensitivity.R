@@ -27,7 +27,7 @@ suppression_by_year_threshold <- cohort_days |>
             .groups = "drop")
 
 patients <- patients |>
-  left_join(suppression_by_year_threshold, by = "studyid")
+  left_join(suppression_by_year_threshold, by = "studyid", relationship = "one-to-one")
 
 suppression_by_start_year <- patients |>
   group_by(art_start_year, str) |>
@@ -83,7 +83,7 @@ outside_pharmacy <- fill_gaps |>
   summarise(possible_outside_pharmacy = any(suppressed_without_fill), .groups = "drop")
 
 patients <- patients |>
-  left_join(outside_pharmacy, by = "studyid")
+  left_join(outside_pharmacy, by = "studyid", relationship = "one-to-one")
 
 # Stata: tab SwitchesPharmacy InitialRegimenSTR if FirstObservationOfSubject, chi2
 outside_pharmacy_summary <- patients |>

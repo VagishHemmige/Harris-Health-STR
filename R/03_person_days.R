@@ -25,8 +25,8 @@ vl_by_day <- viral_load |>
   summarise(current_vl = last(vl), .groups = "drop")
 
 person_days <- person_days |>
-  left_join(cd4_by_day, by = c("studyid", "date" = "lab_date")) |>
-  left_join(vl_by_day, by = c("studyid", "date" = "lab_date"))
+  left_join(cd4_by_day, by = c("studyid", "date" = "lab_date"), relationship = "one-to-one") |>
+  left_join(vl_by_day, by = c("studyid", "date" = "lab_date"), relationship = "one-to-one")
 
 ## ---- carry-lab-values
 # Last value carried forward (filled down) and next value (filled up), with the

@@ -12,7 +12,7 @@
 # is the first day of regimen 1.
 cohort_days <- analytic_days |>
   filter(!is.na(regimen_number)) |>
-  left_join(baseline, by = "studyid") |>
+  left_join(baseline, by = "studyid", relationship = "many-to-one") |>
   group_by(studyid) |>
   mutate(
     initial_regimen = first(regimen[regimen_number == 1]),

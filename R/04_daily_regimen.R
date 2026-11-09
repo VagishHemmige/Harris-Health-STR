@@ -16,7 +16,8 @@ daily <- person_days |>
 # Each regimen is placed on its start date and carried forward until the next
 # one starts. Days before the first regimen in the study window have none.
 daily <- daily |>
-  left_join(regimen_episodes, by = c("studyid", "date" = "regimen_start")) |>
+  left_join(regimen_episodes, by = c("studyid", "date" = "regimen_start"),
+            relationship = "one-to-one") |>
   mutate(new_regimen = !is.na(regimen_number)) |>
   arrange(studyid, date) |>
   group_by(studyid) |>
@@ -42,5 +43,6 @@ dispensed_drugs <- fills |>
   mutate(pills_dispensed = fill_size_pills)
 
 daily_drugs <- daily_drugs |>
-  left_join(dispensed_drugs, by = c("studyid", "date", "drug_name")) |>
+  left_join(dispensed_drugs, by = c("studyid", "date", "drug_name"),
+            relationship = "many-to-one") |>
   mutate(pills_dispensed = coalesce(pills_dispensed, 0))

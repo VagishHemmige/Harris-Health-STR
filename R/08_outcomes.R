@@ -38,8 +38,8 @@ patient_outcomes <- cohort_days |>
   )
 
 patients <- patients |>
-  left_join(retention, by = "studyid") |>
-  left_join(patient_outcomes, by = "studyid") |>
+  left_join(retention, by = "studyid", relationship = "one-to-one") |>
+  left_join(patient_outcomes, by = "studyid", relationship = "one-to-one") |>
   mutate(
     retained_year_one = coalesce(first_year_vl_tests >= 2 &
                                    first_to_last_vl_days > retention_min_gap_days, FALSE),

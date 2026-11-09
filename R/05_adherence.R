@@ -45,7 +45,7 @@ for (episode in sort(unique(daily_drugs$regimen_number))) {
               .groups = "drop")
 
   pills_by_regimen[[as.character(episode)]] <- episode_drugs |>
-    left_join(first_day, by = c("studyid", "drug_position")) |>
+    left_join(first_day, by = c("studyid", "drug_position"), relationship = "many-to-one") |>
     arrange(studyid, drug_position, date) |>
     group_by(studyid, drug_position) |>
     mutate(pills_on_hand = count_pills_on_hand(pills_dispensed, first(start_pills),
@@ -75,7 +75,7 @@ day_coverage <- daily_drugs |>
 # Still in care: a CD4 and a viral load are both still to come. Virologically
 # suppressed: see vl_suppressed_on_day() in functions.R.
 analytic_days <- daily |>
-  left_join(day_coverage, by = c("studyid", "date")) |>
+  left_join(day_coverage, by = c("studyid", "date"), relationship = "one-to-one") |>
   mutate(
     still_in_care_cd4vl = !is.na(days_until_next_cd4) & !is.na(days_until_next_vl),
     vl_suppressed = vl_suppressed_on_day(lvcf_vl, days_since_last_vl,
