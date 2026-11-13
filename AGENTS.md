@@ -19,7 +19,7 @@ A teaching repository for a published study [Hemmige et al., *AIDS Care* 2018](h
 
 - **`analysis-plan.md` is the source of truth for design.** It was reconstructed from the paper and the code. The code is the record of what was done; the plan marks where it is more specific than the paper's methods. The R translation follows the code, except where the saved Stata is evidently a slip against the published method (for example, outcomes the paper reports for year one that the saved file computes over all follow-up); there the R follows the paper. Every such departure is stated on the script's page and in `stata_overview.qmd`.
 - **Deciders.** Scientific decisions are made by: Vagish Hemmige (all areas). Anyone may open or contribute to an issue; only a decider settles it.
-- **This is an analysis project, not an R package.** Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.
+- **This is an analysis project, not an R package.** Do not add DESCRIPTION, NAMESPACE, roxygen, or [{pkgdown}](https://pkgdown.r-lib.org/) infrastructure, or apply CRAN conventions.
 - **Default branch:** `main`, protected. Changes reach it only through pull requests.
 
 ## Data sources
@@ -82,7 +82,7 @@ The site documents the code. It does not run the analysis.
 
 ## Outputs
 
-- `R/tables.R` builds the publication tables with gtsummary (Word and HTML) and writes every result as CSV to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site's teaching figures are described under Quarto website.
+- `R/tables.R` builds the publication tables with [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/) (Word and HTML) and writes every result as CSV to `tables/`, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site's teaching figures are described under Quarto website.
 - `README.Rmd` is the source of `README.md`; edit the `.Rmd` and re-knit.
 
 ## Restricted data (applies to everyone)

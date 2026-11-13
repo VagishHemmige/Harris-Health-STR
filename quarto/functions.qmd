@@ -230,7 +230,7 @@ stata_for("odds-ratio-for-str")
 
 ## Stata's confidence intervals in gtsummary tables
 
-gtsummary builds its model tables from a *tidier*, a function that turns a fitted model into a table of estimates. The default for `glm()` gives profile-likelihood confidence intervals, and for `svyglm()` intervals from the t distribution. Stata's `logistic` reports Wald intervals and p-values from the normal distribution, and so does [`odds_ratio_for_str()`](#odds-ratios). Passing `tidy_wald_z()` as `tidy_fun` makes the publication tables report the same.
+[{gtsummary}](https://www.danieldsjoberg.com/gtsummary/) builds its model tables from a *tidier*, a function that turns a fitted model into a table of estimates. The default for `glm()` gives profile-likelihood confidence intervals, and for `svyglm()` intervals from the t distribution. Stata's `logistic` reports Wald intervals and p-values from the normal distribution, and so does [`odds_ratio_for_str()`](#odds-ratios). Passing `tidy_wald_z()` as `tidy_fun` makes the publication tables report the same.
 
 ```{r}
 #| label: tidy-wald-z
