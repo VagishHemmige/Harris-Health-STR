@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e3a35904f429b4d0baa96e5eab7940c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4163d1d55cb47a20bda86bfd99a5cd12.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -507,7 +507,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </div>
 <section id="packages" class="level2">
 <h2 class="anchored" data-anchor-id="packages">Packages</h2>
-<p><code>dplyr</code> and <code>tidyr</code> do the data work that Stata did with <code>generate</code>, <code>replace</code>, <code>by</code>, <code>egen</code>, <code>merge</code> and <code>reshape</code>. <code>readr</code> replaces <code>insheet</code>, <code>lubridate</code> replaces <code>date(x, "MDY")</code>, and <code>stringr</code> handles the regimen names. <code>survey</code> fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after <code>[pw=IPW]</code>.</p>
+<p><a href="https://dplyr.tidyverse.org/">{dplyr}</a> and <a href="https://tidyr.tidyverse.org/">{tidyr}</a> do the data work that Stata did with <code>generate</code>, <code>replace</code>, <code>by</code>, <code>egen</code>, <code>merge</code> and <code>reshape</code>. <a href="https://readr.tidyverse.org/">{readr}</a> replaces <code>insheet</code>, <a href="https://lubridate.tidyverse.org/">{lubridate}</a> replaces <code>date(x, "MDY")</code>, and <a href="https://stringr.tidyverse.org/">{stringr}</a> handles the regimen names. <a href="https://CRAN.R-project.org/package=survey">{survey}</a> fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after <code>[pw=IPW]</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R code</summary>
@@ -1380,7 +1380,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Packages</span></span>
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="in">`dplyr`</span> and <span class="in">`tidyr`</span> do the data work that Stata did with <span class="in">`generate`</span>, <span class="in">`replace`</span>, <span class="in">`by`</span>, <span class="in">`egen`</span>, <span class="in">`merge`</span> and <span class="in">`reshape`</span>. <span class="in">`readr`</span> replaces <span class="in">`insheet`</span>, <span class="in">`lubridate`</span> replaces <span class="in">`date(x, "MDY")`</span>, and <span class="in">`stringr`</span> handles the regimen names. <span class="in">`survey`</span> fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after <span class="in">`[pw=IPW]`</span>.</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">{dplyr}</span><span class="co">](https://dplyr.tidyverse.org/)</span> and <span class="co">[</span><span class="ot">{tidyr}</span><span class="co">](https://tidyr.tidyverse.org/)</span> do the data work that Stata did with <span class="in">`generate`</span>, <span class="in">`replace`</span>, <span class="in">`by`</span>, <span class="in">`egen`</span>, <span class="in">`merge`</span> and <span class="in">`reshape`</span>. <span class="co">[</span><span class="ot">{readr}</span><span class="co">](https://readr.tidyverse.org/)</span> replaces <span class="in">`insheet`</span>, <span class="co">[</span><span class="ot">{lubridate}</span><span class="co">](https://lubridate.tidyverse.org/)</span> replaces <span class="in">`date(x, "MDY")`</span>, and <span class="co">[</span><span class="ot">{stringr}</span><span class="co">](https://stringr.tidyverse.org/)</span> handles the regimen names. <span class="co">[</span><span class="ot">{survey}</span><span class="co">](https://CRAN.R-project.org/package=survey)</span> fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after <span class="in">`[pw=IPW]`</span>.</span>
 <span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-packages</span></span>

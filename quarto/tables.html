@@ -103,7 +103,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e3a35904f429b4d0baa96e5eab7940c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4163d1d55cb47a20bda86bfd99a5cd12.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -507,7 +507,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 
 
 <p>This script turns the results into the two tables a paper needs, formatted and ready to paste into the manuscript, and also writes every result to a CSV file.</p>
-<p><strong>Publication tables, from code.</strong> With <a href="https://www.danieldsjoberg.com/gtsummary/">gtsummary</a> <span class="citation" data-cites="sjoberg2021gtsummary">(<a href="#ref-sjoberg2021gtsummary" role="doc-biblioref">Sjoberg et al. 2021</a>)</span>, the table in the paper comes straight from the data and the models: counts, percentages, tests and odds ratios are filled in by the code and saved as a Word file. When the data or a definition changes, rerunning the script remakes the table, and no number is copied by hand.</p>
+<p><strong>Publication tables, from code.</strong> With <a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a> <span class="citation" data-cites="sjoberg2021gtsummary">(<a href="#ref-sjoberg2021gtsummary" role="doc-biblioref">Sjoberg et al. 2021</a>)</span>, the table in the paper comes straight from the data and the models: counts, percentages, tests and odds ratios are filled in by the code and saved as a Word file. When the data or a definition changes, rerunning the script remakes the table, and no number is copied by hand.</p>
 <p>Stata did not work this way when this analysis was done. The do-files were written in Stata 12, which had no built-in command to turn results into a formatted table. Results were read from the log and typed into the manuscript tables, or assembled with user-written commands such as <code>estout</code>. Stata added <code>collect</code> and a redesigned <code>table</code> command in Stata 17 (2021), <code>etable</code> in a late-2021 update, and <code>dtable</code> for descriptive tables in Stata 18 (<a href="https://www.stata.com/support/faqs/reporting/stata-versions-table-commands/">Stata FAQ</a>).</p>
 <div class="callout callout-style-default callout-Rcode callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -657,13 +657,13 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="table-2-outcomes-and-odds-ratios" class="level2">
 <h2 class="anchored" data-anchor-id="table-2-outcomes-and-odds-ratios">Table 2: outcomes and odds ratios</h2>
-<p>Table 2 is three gtsummary tables merged side by side with <code>tbl_merge()</code>:</p>
+<p>Table 2 is three {gtsummary} tables merged side by side with <code>tbl_merge()</code>:</p>
 <ul>
 <li><code>tbl_summary()</code> gives each outcome as n (%) in each group.</li>
 <li><code>tbl_uvregression()</code> with <code>x = str</code> fits one logistic regression per outcome, each with the regimen as the only predictor, and shows the odds ratio with its 95% CI and p-value. These are the unadjusted models in <a href="../quarto/08_outcomes.html">8. Outcomes</a>.</li>
 <li>The same function given the survey design instead of the data fits the weighted models: <code>svyglm()</code> with the inverse probability weights, Stata’s <code>logistic ... [pw=IPW]</code>.</li>
 </ul>
-<p><code>tidy_fun = tidy_wald_z</code> makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports (<a href="../quarto/functions.html#statas-confidence-intervals-in-gtsummary-tables">Functions</a>). The unadjusted models show how many patients each used. For a weighted model gtsummary’s N would be the sum of the weights, not a count of patients, so it is hidden, and a note under the table says that patients without a weight are left out. For the same reason the weighted half of Table 1 shows the number of patients (<code>n_unweighted</code>) in its header.</p>
+<p><code>tidy_fun = tidy_wald_z</code> makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports (<a href="../quarto/functions.html#statas-confidence-intervals-in-gtsummary-tables">Functions</a>). The unadjusted models show how many patients each used. For a weighted model {gtsummary}’s N would be the sum of the weights, not a count of patients, so it is hidden, and a note under the table says that patients without a weight are left out. For the same reason the weighted half of Table 1 shows the number of patients (<code>n_unweighted</code>) in its header.</p>
 <p>Category codes from the extracts are replaced by readable names before the tables are made (<code>B</code> becomes Black; the viral load group <code>[1000,10000)</code> becomes 1,000-9,999), because a table label should never need a key.</p>
 <div class="cell">
 <details class="code-fold">
@@ -729,7 +729,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <section id="saving-the-tables" class="level2">
 <h2 class="anchored" data-anchor-id="saving-the-tables">Saving the tables</h2>
 <p><code>as_flex_table()</code> turns each table into a Word table, and <code>save_as_docx()</code> saves it: the file opens in Word with the layout, bold labels and column headers already set. <code>as_gt()</code> and <code>gtsave()</code> save an HTML copy for checking in a browser, and <code>as_tibble()</code> a plain CSV copy that the automatic check prints.</p>
-<p>No journal theme is set. gtsummary’s <code>theme_gtsummary_journal()</code> can format a table to a journal’s style (for example, <code>"jama"</code> or <code>"lancet"</code>); which journal to use is a choice for the authors.</p>
+<p>No journal theme is set. {gtsummary}’s <code>theme_gtsummary_journal()</code> can format a table to a journal’s style (for example, <code>"jama"</code> or <code>"lancet"</code>); which journal to use is a choice for the authors.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R code</summary>
@@ -1424,7 +1424,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>This script turns the results into the two tables a paper needs, formatted and ready to paste into the manuscript, and also writes every result to a CSV file.</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>**Publication tables, from code.** With <span class="co">[</span><span class="ot">gtsummary</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span> <span class="co">[</span><span class="ot">@sjoberg2021gtsummary</span><span class="co">]</span>, the table in the paper comes straight from the data and the models: counts, percentages, tests and odds ratios are filled in by the code and saved as a Word file. When the data or a definition changes, rerunning the script remakes the table, and no number is copied by hand.</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>**Publication tables, from code.** With <span class="co">[</span><span class="ot">{gtsummary}</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span> <span class="co">[</span><span class="ot">@sjoberg2021gtsummary</span><span class="co">]</span>, the table in the paper comes straight from the data and the models: counts, percentages, tests and odds ratios are filled in by the code and saved as a Word file. When the data or a definition changes, rerunning the script remakes the table, and no number is copied by hand.</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Stata did not work this way when this analysis was done. The do-files were written in Stata 12, which had no built-in command to turn results into a formatted table. Results were read from the log and typed into the manuscript tables, or assembled with user-written commands such as <span class="in">`estout`</span>. Stata added <span class="in">`collect`</span> and a redesigned <span class="in">`table`</span> command in Stata 17 (2021), <span class="in">`etable`</span> in a late-2021 update, and <span class="in">`dtable`</span> for descriptive tables in Stata 18 (<span class="co">[</span><span class="ot">Stata FAQ</span><span class="co">](https://www.stata.com/support/faqs/reporting/stata-versions-table-commands/)</span>).</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -1485,13 +1485,13 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## Table 2: outcomes and odds ratios</span></span>
 <span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>Table 2 is three gtsummary tables merged side by side with <span class="in">`tbl_merge()`</span>:</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>Table 2 is three {gtsummary} tables merged side by side with <span class="in">`tbl_merge()`</span>:</span>
 <span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`tbl_summary()`</span> gives each outcome as n (%) in each group.</span>
 <span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`tbl_uvregression()`</span> with <span class="in">`x = str`</span> fits one logistic regression per outcome, each with the regimen as the only predictor, and shows the odds ratio with its 95% CI and p-value. These are the unadjusted models in <span class="co">[</span><span class="ot">8. Outcomes</span><span class="co">](08_outcomes.qmd)</span>.</span>
 <span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The same function given the survey design instead of the data fits the weighted models: <span class="in">`svyglm()`</span> with the inverse probability weights, Stata's <span class="in">`logistic ... [pw=IPW]`</span>.</span>
 <span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="in">`tidy_fun = tidy_wald_z`</span> makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports (<span class="co">[</span><span class="ot">Functions</span><span class="co">](functions.qmd#statas-confidence-intervals-in-gtsummary-tables)</span>). The unadjusted models show how many patients each used. For a weighted model gtsummary's N would be the sum of the weights, not a count of patients, so it is hidden, and a note under the table says that patients without a weight are left out. For the same reason the weighted half of Table 1 shows the number of patients (<span class="in">`n_unweighted`</span>) in its header.</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="in">`tidy_fun = tidy_wald_z`</span> makes the intervals and p-values Wald intervals from the normal distribution, as Stata reports (<span class="co">[</span><span class="ot">Functions</span><span class="co">](functions.qmd#statas-confidence-intervals-in-gtsummary-tables)</span>). The unadjusted models show how many patients each used. For a weighted model {gtsummary}'s N would be the sum of the weights, not a count of patients, so it is hidden, and a note under the table says that patients without a weight are left out. For the same reason the weighted half of Table 1 shows the number of patients (<span class="in">`n_unweighted`</span>) in its header.</span>
 <span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>Category codes from the extracts are replaced by readable names before the tables are made (<span class="in">`B`</span> becomes Black; the viral load group <span class="in">`[1000,10000)`</span> becomes 1,000-9,999), because a table label should never need a key.</span>
 <span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a></span>
@@ -1511,7 +1511,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="in">`as_flex_table()`</span> turns each table into a Word table, and <span class="in">`save_as_docx()`</span> saves it: the file opens in Word with the layout, bold labels and column headers already set. <span class="in">`as_gt()`</span> and <span class="in">`gtsave()`</span> save an HTML copy for checking in a browser, and <span class="in">`as_tibble()`</span> a plain CSV copy that the automatic check prints.</span>
 <span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>No journal theme is set. gtsummary's <span class="in">`theme_gtsummary_journal()`</span> can format a table to a journal's style (for example, <span class="in">`"jama"`</span> or <span class="in">`"lancet"`</span>); which journal to use is a choice for the authors.</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>No journal theme is set. {gtsummary}'s <span class="in">`theme_gtsummary_journal()`</span> can format a table to a journal's style (for example, <span class="in">`"jama"`</span> or <span class="in">`"lancet"`</span>); which journal to use is a choice for the authors.</span>
 <span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: save-publication-tables</span></span>

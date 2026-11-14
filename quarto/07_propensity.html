@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e3a35904f429b4d0baa96e5eab7940c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4163d1d55cb47a20bda86bfd99a5cd12.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -513,7 +513,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </div>
 <section id="baseline-differences" class="level2">
 <h2 class="anchored" data-anchor-id="baseline-differences">Baseline differences</h2>
-<p>Each Stata line such as <code>tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2</code> becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as <code>gtsummary</code>.</p>
+<p>Each Stata line such as <code>tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2</code> becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as <a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R code</summary>
@@ -1390,7 +1390,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Baseline differences</span></span>
 <span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>Each Stata line such as <span class="in">`tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2`</span> becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as <span class="in">`gtsummary`</span>.</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>Each Stata line such as <span class="in">`tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2`</span> becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as <span class="co">[</span><span class="ot">{gtsummary}</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span>.</span>
 <span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: test-baseline-differences</span></span>

@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e3a35904f429b4d0baa96e5eab7940c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4163d1d55cb47a20bda86bfd99a5cd12.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -1078,7 +1078,7 @@ Stata: <code>Do Final Analysis.do</code>, lines 131-151 (Retention in care)
 </section>
 <section id="statas-confidence-intervals-in-gtsummary-tables" class="level2">
 <h2 class="anchored" data-anchor-id="statas-confidence-intervals-in-gtsummary-tables">Stata’s confidence intervals in gtsummary tables</h2>
-<p>gtsummary builds its model tables from a <em>tidier</em>, a function that turns a fitted model into a table of estimates. The default for <code>glm()</code> gives profile-likelihood confidence intervals, and for <code>svyglm()</code> intervals from the t distribution. Stata’s <code>logistic</code> reports Wald intervals and p-values from the normal distribution, and so does <a href="#odds-ratios"><code>odds_ratio_for_str()</code></a>. Passing <code>tidy_wald_z()</code> as <code>tidy_fun</code> makes the publication tables report the same.</p>
+<p><a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a> builds its model tables from a <em>tidier</em>, a function that turns a fitted model into a table of estimates. The default for <code>glm()</code> gives profile-likelihood confidence intervals, and for <code>svyglm()</code> intervals from the t distribution. Stata’s <code>logistic</code> reports Wald intervals and p-values from the normal distribution, and so does <a href="#odds-ratios"><code>odds_ratio_for_str()</code></a>. Passing <code>tidy_wald_z()</code> as <code>tidy_fun</code> makes the publication tables report the same.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>R code</summary>
@@ -1953,7 +1953,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <span id="cb29-280"><a href="#cb29-280" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-281"><a href="#cb29-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## Stata's confidence intervals in gtsummary tables</span></span>
 <span id="cb29-282"><a href="#cb29-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-283"><a href="#cb29-283" aria-hidden="true" tabindex="-1"></a>gtsummary builds its model tables from a *tidier*, a function that turns a fitted model into a table of estimates. The default for <span class="in">`glm()`</span> gives profile-likelihood confidence intervals, and for <span class="in">`svyglm()`</span> intervals from the t distribution. Stata's <span class="in">`logistic`</span> reports Wald intervals and p-values from the normal distribution, and so does <span class="co">[</span><span class="ot">`odds_ratio_for_str()`</span><span class="co">](#odds-ratios)</span>. Passing <span class="in">`tidy_wald_z()`</span> as <span class="in">`tidy_fun`</span> makes the publication tables report the same.</span>
+<span id="cb29-283"><a href="#cb29-283" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">{gtsummary}</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span> builds its model tables from a *tidier*, a function that turns a fitted model into a table of estimates. The default for <span class="in">`glm()`</span> gives profile-likelihood confidence intervals, and for <span class="in">`svyglm()`</span> intervals from the t distribution. Stata's <span class="in">`logistic`</span> reports Wald intervals and p-values from the normal distribution, and so does <span class="co">[</span><span class="ot">`odds_ratio_for_str()`</span><span class="co">](#odds-ratios)</span>. Passing <span class="in">`tidy_wald_z()`</span> as <span class="in">`tidy_fun`</span> makes the publication tables report the same.</span>
 <span id="cb29-284"><a href="#cb29-284" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-287"><a href="#cb29-287" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb29-288"><a href="#cb29-288" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tidy-wald-z</span></span>

@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e3a35904f429b4d0baa96e5eab7940c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4163d1d55cb47a20bda86bfd99a5cd12.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -536,7 +536,7 @@ edit that file, not this page. Its first heading is the page title.
 <ul>
 <li><strong><code>analysis-plan.md</code> is the source of truth for design.</strong> It was reconstructed from the paper and the code. The code is the record of what was done; the plan marks where it is more specific than the paper’s methods. The R translation follows the code, except where the saved Stata is evidently a slip against the published method (for example, outcomes the paper reports for year one that the saved file computes over all follow-up); there the R follows the paper. Every such departure is stated on the script’s page and in <code>stata_overview.qmd</code>.</li>
 <li><strong>Deciders.</strong> Scientific decisions are made by: Vagish Hemmige (all areas). Anyone may open or contribute to an issue; only a decider settles it.</li>
-<li><strong>This is an analysis project, not an R package.</strong> Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.</li>
+<li><strong>This is an analysis project, not an R package.</strong> Do not add DESCRIPTION, NAMESPACE, roxygen, or <a href="https://pkgdown.r-lib.org/">{pkgdown}</a> infrastructure, or apply CRAN conventions.</li>
 <li><strong>Default branch:</strong> <code>main</code>, protected. Changes reach it only through pull requests.</li>
 </ul>
 </section>
@@ -643,7 +643,7 @@ edit that file, not this page. Its first heading is the page title.
 <section id="outputs" class="level2">
 <h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
 <ul>
-<li><code>R/tables.R</code> builds the publication tables with gtsummary (Word and HTML) and writes every result as CSV to <code>tables/</code>, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site’s teaching figures are described under Quarto website.</li>
+<li><code>R/tables.R</code> builds the publication tables with <a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a> (Word and HTML) and writes every result as CSV to <code>tables/</code>, which is gitignored: tables from synthetic data mean nothing, and tables from the real data would need clearing before release. The analysis makes no figures; the site’s teaching figures are described under Quarto website.</li>
 <li><code>README.Rmd</code> is the source of <code>README.md</code>; edit the <code>.Rmd</code> and re-knit.</li>
 </ul>
 </section>
