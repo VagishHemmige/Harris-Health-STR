@@ -35,6 +35,8 @@ Every patient becomes one row per day from 2008 to 2013, and each day records th
 - **Intention to treat:** patients stay in the group of the regimen they started, even if they switch.
 - **LVCF:** last value carried forward: each day takes the most recent test result.
 
+[Braces](https://forum.posit.co/t/curly-braces-around-package-name-convention/122547) identify R packages throughout this site.
+
 ## Status
 
 Teaching material for a completed, published study. The R code has been run only on synthetic data; it has not been used to reproduce the published numbers, and no real data or results from it are in this repository.

@@ -45,7 +45,7 @@ source("R/synthetic/make_synthetic_data.R")  # writes fake inputs to data-synthe
 source("R/main.R")                           # runs the translation
 ```
 
-Packages: dplyr, tidyr, readr, stringr, lubridate, purrr, broom and
+Packages: [{dplyr}](https://dplyr.tidyverse.org/), [{tidyr}](https://tidyr.tidyverse.org/), [{readr}](https://readr.tidyverse.org/), [{stringr}](https://stringr.tidyverse.org/), [{lubridate}](https://lubridate.tidyverse.org/), [{purrr}](https://purrr.tidyverse.org/), [{broom}](https://broom.tidymodels.org/) and
 survey. Results from synthetic data are meaningless and are not results
 of the study.
 

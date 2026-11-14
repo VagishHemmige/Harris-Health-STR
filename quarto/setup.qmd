@@ -23,7 +23,7 @@ source("_stata_links.R")
 
 ## Packages
 
-`dplyr` and `tidyr` do the data work that Stata did with `generate`, `replace`, `by`, `egen`, `merge` and `reshape`. `readr` replaces `insheet`, `lubridate` replaces `date(x, "MDY")`, and `stringr` handles the regimen names. `survey` fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after `[pw=IPW]`.
+[{dplyr}](https://dplyr.tidyverse.org/) and [{tidyr}](https://tidyr.tidyverse.org/) do the data work that Stata did with `generate`, `replace`, `by`, `egen`, `merge` and `reshape`. [{readr}](https://readr.tidyverse.org/) replaces `insheet`, [{lubridate}](https://lubridate.tidyverse.org/) replaces `date(x, "MDY")`, and [{stringr}](https://stringr.tidyverse.org/) handles the regimen names. [{survey}](https://CRAN.R-project.org/package=survey) fits the weighted logistic regressions; it gives the same kind of robust standard errors Stata reports after `[pw=IPW]`.
 
 ```{r}
 #| label: load-packages

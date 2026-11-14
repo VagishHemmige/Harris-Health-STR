@@ -30,7 +30,7 @@ source("_stata_links.R")
 
 ## Baseline differences
 
-Each Stata line such as `tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2` becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as `gtsummary`.
+Each Stata line such as `tab InitialRegimenSTR Gender if FirstObservationOfSubject, row column chi2` becomes one call to a helper that returns the test and its p-value. The percentages themselves would come from a Table 1 package such as [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/).
 
 ```{r}
 #| label: test-baseline-differences
